@@ -1,974 +1,1273 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" class="dark">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CodeMind — AI Coding Assistant</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeAI — Intelligent Coding Assistant</title>
 
-<style>
-  :root {
-    --bg-primary: #0a0a0f;
-    --bg-secondary: #111118;
-    --bg-card: #16161f;
-    --bg-elevated: #1c1c28;
-    --border: #2a2a3a;
-    --border-subtle: #1e1e2a;
-    --text-primary: #e8e8f0;
-    --text-secondary: #8888a8;
-    --text-muted: #55556a;
-    --accent: #6c8ef5;
-    --accent-soft: #2a3560;
-    --accent-glow: rgba(108,142,245,0.15);
-    --green: #4ec9b0;
-    --red: #f28b82;
-    --font-mono: 'JetBrains Mono', monospace;
-    --font-sans: 'Syne', sans-serif;
-  }
-  [data-theme="light"] {
-    --bg-primary: #f4f4f8;
-    --bg-secondary: #ffffff;
-    --bg-card: #ffffff;
-    --bg-elevated: #f0f0f6;
-    --border: #e0e0ee;
-    --border-subtle: #ebebf5;
-    --text-primary: #1a1a2e;
-    --text-secondary: #5555778;
-    --text-muted: #aaaacc;
-    --accent: #4f6ef0;
-    --accent-soft: #dde5ff;
-    --accent-glow: rgba(79,110,240,0.08);
-    --green: #1a8f7a;
-    --red: #d93025;
-  }
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        surface: {
+                            dark: '#0b0b12',
+                            panel: '#111118',
+                            card: '#1a1a24',
+                            hover: '#22222f',
+                            border: '#2a2a38',
+                            muted: '#8888a0',
+                            accent: '#6366f1',
+                            'accent-glow': '#818cf8',
+                        },
+                        surfaceLight: {
+                            bg: '#f8f9fb',
+                            panel: '#ffffff',
+                            card: '#f1f3f6',
+                            hover: '#e8eaef',
+                            border: '#dde0e5',
+                            muted: '#6b7280',
+                            accent: '#4f46e5',
+                            'accent-glow': '#6366f1',
+                        },
+                    },
+                },
+            },
+        };
+    </script>
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); overflow: hidden; }
+    <style>
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3a3a4a;
+            border-radius: 10px;
+        }
+        .light ::-webkit-scrollbar-thumb {
+            background: #c5c5d0;
+        }
 
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+        /* Code block styling */
+        .code-block-wrapper {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 12px 0;
+            border: 1px solid #2a2a38;
+        }
+        .light .code-block-wrapper {
+            border-color: #dde0e5;
+        }
+        .code-block-wrapper pre {
+            margin: 0;
+            padding: 16px;
+            padding-top: 40px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+            font-size: 0.85rem;
+            line-height: 1.65;
+            background: #0d0d16;
+            color: #e2e2f0;
+        }
+        .light .code-block-wrapper pre {
+            background: #f5f5fa;
+            color: #1e1e2e;
+        }
+        .code-block-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 36px;
+            background: #1a1a28;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            z-index: 2;
+            border-bottom: 1px solid #2a2a38;
+        }
+        .light .code-block-header {
+            background: #e8eaf0;
+            border-bottom-color: #d0d3db;
+        }
+        .code-lang-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #8888a0;
+        }
+        .copy-btn {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #2a2a38;
+            color: #c0c0d0;
+            border: none;
+            transition: all 0.15s ease;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+        }
+        .copy-btn:hover {
+            background: #3a3a50;
+            color: #fff;
+        }
+        .light .copy-btn {
+            background: #dde0e5;
+            color: #4b5563;
+        }
+        .light .copy-btn:hover {
+            background: #c8ccd4;
+            color: #1f2937;
+        }
+        .copy-btn.copied {
+            background: #1a7f4b;
+            color: #fff;
+        }
 
-  /* Layout */
-  #app { display: flex; height: 100vh; }
-  #auth-screen { display: flex; align-items: center; justify-content: center; height: 100vh; background: var(--bg-primary); flex-direction: column; gap: 0; }
-  #dashboard { display: flex; width: 100%; height: 100%; }
-  .hidden { display: none !important; }
+        /* Syntax highlighting */
+        .kw {
+            color: #c792ea;
+            font-weight: 600;
+        }
+        .light .kw {
+            color: #7c3aed;
+        }
+        .str {
+            color: #89dd89;
+        }
+        .light .str {
+            color: #059669;
+        }
+        .num {
+            color: #f78c6c;
+        }
+        .light .num {
+            color: #d97706;
+        }
+        .cm {
+            color: #676e95;
+            font-style: italic;
+        }
+        .light .cm {
+            color: #9ca3af;
+        }
+        .fn {
+            color: #82aaff;
+        }
+        .light .fn {
+            color: #2563eb;
+        }
+        .op {
+            color: #ff5370;
+        }
+        .light .op {
+            color: #dc2626;
+        }
+        .builtin {
+            color: #ffcb6b;
+        }
+        .light .builtin {
+            color: #b45309;
+        }
 
-  /* Auth Screen */
-  .auth-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 48px;
-    width: 420px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .auth-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  }
-  .auth-logo {
-    font-family: var(--font-sans);
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    color: var(--text-primary);
-    margin-bottom: 8px;
-  }
-  .auth-logo span { color: var(--accent); }
-  .auth-subtitle { font-size: 13px; color: var(--text-muted); font-family: var(--font-mono); margin-bottom: 40px; }
-  .auth-btn {
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    width: 100%; padding: 13px 20px;
-    background: var(--bg-elevated); border: 1px solid var(--border);
-    border-radius: 10px; color: var(--text-primary);
-    font-family: var(--font-sans); font-size: 14px; font-weight: 500;
-    cursor: pointer; transition: all 0.15s;
-  }
-  .auth-btn:hover { border-color: var(--accent); background: var(--accent-soft); }
-  .auth-btn svg { flex-shrink: 0; }
+        /* Glass effect */
+        .glass-subtle {
+            background: rgba(17, 17, 24, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .light .glass-subtle {
+            background: rgba(255, 255, 255, 0.78);
+        }
 
-  /* Sidebar */
-  #sidebar {
-    width: 240px; flex-shrink: 0;
-    background: var(--bg-secondary);
-    border-right: 1px solid var(--border-subtle);
-    display: flex; flex-direction: column;
-    padding: 16px 12px;
-    gap: 4px;
-  }
-  .sidebar-logo { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; padding: 8px 8px 16px; color: var(--text-primary); }
-  .sidebar-logo span { color: var(--accent); }
+        /* Pulse for loading */
+        @keyframes subtlePulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.4;
+            }
+        }
+        .ai-loading-dot {
+            animation: subtlePulse 1.2s infinite;
+        }
+        .ai-loading-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .ai-loading-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
 
-  #new-chat-btn {
-    display: flex; align-items: center; gap: 8px;
-    padding: 10px 12px; border-radius: 8px;
-    background: var(--accent); color: #fff;
-    font-family: var(--font-sans); font-size: 13px; font-weight: 600;
-    cursor: pointer; border: none; width: 100%;
-    transition: opacity 0.15s;
-    margin-bottom: 8px;
-  }
-  #new-chat-btn:hover { opacity: 0.88; }
+        /* Fade in */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .msg-enter {
+            animation: fadeInUp 0.25s ease forwards;
+        }
 
-  .sidebar-section-label { font-size: 10px; font-weight: 600; letter-spacing: 1px; color: var(--text-muted); padding: 8px 8px 4px; text-transform: uppercase; font-family: var(--font-mono); }
+        /* Transition for theme */
+        * {
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
+        }
+    </style>
 
-  .chat-history-item {
-    padding: 8px 10px; border-radius: 7px; cursor: pointer;
-    font-size: 12.5px; color: var(--text-secondary); font-family: var(--font-mono);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    transition: background 0.1s, color 0.1s; border: 1px solid transparent;
-  }
-  .chat-history-item:hover { background: var(--bg-elevated); color: var(--text-primary); }
-  .chat-history-item.active { background: var(--accent-soft); border-color: var(--border); color: var(--accent); }
-
-  #chat-history-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
-
-  /* Bottom sidebar controls */
-  .sidebar-bottom { display: flex; flex-direction: column; gap: 2px; border-top: 1px solid var(--border-subtle); padding-top: 12px; margin-top: 4px; }
-  .sidebar-action-btn {
-    display: flex; align-items: center; gap: 8px;
-    padding: 9px 10px; border-radius: 7px; cursor: pointer;
-    font-size: 12.5px; color: var(--text-secondary); font-family: var(--font-mono);
-    border: none; background: transparent; width: 100%; text-align: left;
-    transition: background 0.1s, color 0.1s;
-  }
-  .sidebar-action-btn:hover { background: var(--bg-elevated); color: var(--text-primary); }
-
-  /* Main chat */
-  #main { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--bg-primary); }
-
-  /* Top bar */
-  #topbar {
-    height: 52px; border-bottom: 1px solid var(--border-subtle);
-    display: flex; align-items: center; padding: 0 20px;
-    background: var(--bg-secondary); gap: 12px; flex-shrink: 0;
-  }
-  #model-badge {
-    font-family: var(--font-mono); font-size: 11px; padding: 3px 10px;
-    background: var(--accent-soft); border: 1px solid var(--border);
-    border-radius: 20px; color: var(--accent);
-  }
-  #topbar-title { font-size: 13.5px; font-weight: 600; color: var(--text-primary); flex: 1; }
-  .topbar-icon-btn { padding: 6px; border-radius: 7px; cursor: pointer; border: none; background: transparent; color: var(--text-muted); transition: color 0.1s, background 0.1s; }
-  .topbar-icon-btn:hover { background: var(--bg-elevated); color: var(--text-primary); }
-  .tts-btn.active { color: var(--accent) !important; background: var(--accent-soft) !important; }
-
-  /* Messages */
-  #messages-container { flex: 1; overflow-y: auto; padding: 24px 0; display: flex; flex-direction: column; gap: 0; }
-
-  .message-row { padding: 6px 24px; display: flex; gap: 14px; }
-  .message-row.user-row { justify-content: flex-end; }
-  .message-row.ai-row { justify-content: flex-start; }
-
-  .msg-avatar {
-    width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700; font-family: var(--font-mono);
-    margin-top: 2px;
-  }
-  .ai-avatar { background: var(--accent-soft); border: 1px solid var(--border); color: var(--accent); }
-  .user-avatar { background: var(--accent); color: #fff; }
-
-  .msg-bubble {
-    max-width: 680px; padding: 12px 16px; border-radius: 12px;
-    font-size: 14px; line-height: 1.65; font-family: var(--font-sans);
-  }
-  .user-bubble { background: var(--accent); color: #fff; border-radius: 12px 12px 2px 12px; }
-  .ai-bubble { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px 12px 12px 2px; color: var(--text-primary); }
-
-  /* Code blocks */
-  .code-block-wrapper { margin: 10px 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
-  .code-block-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 6px 12px; background: var(--bg-elevated);
-    font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
-  }
-  .copy-code-btn {
-    font-family: var(--font-mono); font-size: 10px; padding: 3px 8px;
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px;
-    color: var(--text-secondary); cursor: pointer; transition: all 0.15s;
-  }
-  .copy-code-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .code-block-wrapper pre { margin: 0 !important; border-radius: 0 !important; }
-  .code-block-wrapper pre code { font-family: var(--font-mono) !important; font-size: 13px !important; }
-
-  /* Inline code */
-  .ai-bubble code:not(pre code) {
-    background: var(--bg-elevated); padding: 1px 6px; border-radius: 4px;
-    font-family: var(--font-mono); font-size: 12.5px; color: var(--green);
-    border: 1px solid var(--border);
-  }
-
-  /* Input */
-  #input-area { padding: 16px 24px 20px; border-top: 1px solid var(--border-subtle); background: var(--bg-secondary); flex-shrink: 0; }
-  #input-wrapper { display: flex; gap: 10px; align-items: flex-end; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; transition: border-color 0.15s; }
-  #input-wrapper:focus-within { border-color: var(--accent); }
-  #user-input {
-    flex: 1; background: transparent; border: none; outline: none;
-    color: var(--text-primary); font-family: var(--font-sans); font-size: 14px;
-    resize: none; min-height: 22px; max-height: 140px; line-height: 1.5;
-  }
-  #user-input::placeholder { color: var(--text-muted); }
-  #send-btn {
-    width: 34px; height: 34px; border-radius: 8px; background: var(--accent);
-    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    color: #fff; flex-shrink: 0; transition: opacity 0.15s;
-  }
-  #send-btn:hover { opacity: 0.85; }
-  #send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  /* Thinking indicator */
-  .thinking-indicator { display: flex; gap: 5px; padding: 4px 0; }
-  .thinking-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: thinking 1.2s infinite; }
-  .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
-  .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes thinking { 0%,80%,100% { opacity: 0.2; } 40% { opacity: 1; } }
-
-  /* Right Panel */
-  #right-panel {
-    width: 260px; flex-shrink: 0;
-    background: var(--bg-secondary);
-    border-left: 1px solid var(--border-subtle);
-    display: flex; flex-direction: column;
-    padding: 20px 16px;
-  }
-
-  .panel-title { font-size: 10px; font-weight: 600; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase; font-family: var(--font-mono); margin-bottom: 16px; }
-
-  .profile-section { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; }
-  #profile-pic { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; border: 2px solid var(--border); }
-  .profile-name { font-size: 15px; font-weight: 700; color: var(--text-primary); text-align: center; }
-  .profile-email { font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); text-align: center; word-break: break-all; }
-
-  .panel-divider { height: 1px; background: var(--border-subtle); margin: 12px 0; }
-
-  .panel-input-label { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-bottom: 5px; }
-  .panel-input {
-    width: 100%; padding: 8px 10px; border-radius: 7px;
-    background: var(--bg-elevated); border: 1px solid var(--border);
-    color: var(--text-primary); font-family: var(--font-sans); font-size: 13px;
-    outline: none; transition: border-color 0.15s;
-  }
-  .panel-input:focus { border-color: var(--accent); }
-
-  .panel-btn {
-    width: 100%; padding: 9px 14px; border-radius: 8px;
-    font-family: var(--font-sans); font-size: 13px; font-weight: 500;
-    cursor: pointer; border: 1px solid var(--border); background: var(--bg-elevated);
-    color: var(--text-primary); transition: all 0.15s; margin-top: 6px;
-  }
-  .panel-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .panel-btn.danger { color: var(--red); border-color: transparent; }
-  .panel-btn.danger:hover { border-color: var(--red); background: rgba(242,139,130,0.08); }
-  .panel-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .panel-btn.primary:hover { opacity: 0.85; }
-
-  /* Admin Panel */
-  #admin-panel {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 1000; backdrop-filter: blur(4px);
-  }
-  .admin-card {
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 16px; width: 560px; max-height: 80vh;
-    display: flex; flex-direction: column; overflow: hidden;
-  }
-  .admin-header {
-    padding: 20px 24px; border-bottom: 1px solid var(--border-subtle);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .admin-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
-  .admin-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
-  .close-btn { width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .close-btn:hover { color: var(--text-primary); background: var(--bg-elevated); }
-
-  .user-row-admin {
-    padding: 10px 14px; border-radius: 8px; background: var(--bg-elevated);
-    border: 1px solid var(--border-subtle); margin-bottom: 8px;
-    font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary);
-  }
-  .user-row-admin .user-name { font-size: 13.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; font-family: var(--font-sans); }
-  .user-row-admin .user-uid { font-size: 10.5px; color: var(--text-muted); }
-
-  /* Toast */
-  #toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(10px);
-    background: var(--bg-elevated); border: 1px solid var(--border);
-    border-radius: 8px; padding: 10px 18px; font-size: 13px; font-family: var(--font-mono);
-    color: var(--text-primary); z-index: 2000; opacity: 0; transition: all 0.2s; pointer-events: none;
-  }
-  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* Empty state */
-  #empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; gap: 12px; padding: 40px; }
-  .empty-logo { font-size: 36px; font-weight: 800; color: var(--text-muted); letter-spacing: -1px; }
-  .empty-logo span { color: var(--accent); }
-  .empty-sub { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
-  .empty-suggestions { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; width: 100%; max-width: 500px; }
-  .suggestion-chip {
-    padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border);
-    background: var(--bg-card); color: var(--text-secondary); font-size: 13px;
-    cursor: pointer; text-align: left; font-family: var(--font-sans);
-    transition: all 0.15s;
-  }
-  .suggestion-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
-
-  /* Markdown-like formatting */
-  .ai-bubble strong { font-weight: 700; color: var(--text-primary); }
-  .ai-bubble h1, .ai-bubble h2, .ai-bubble h3 { margin: 10px 0 4px; color: var(--text-primary); }
-  .ai-bubble p { margin: 4px 0; }
-  .ai-bubble ul, .ai-bubble ol { padding-left: 20px; margin: 6px 0; }
-  .ai-bubble li { margin: 2px 0; }
-
-  /* Theme toggle */
-  .theme-toggle {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 12px; font-family: var(--font-mono); color: var(--text-muted);
-    cursor: pointer; padding: 9px 10px; border-radius: 7px; border: none; background: transparent; width: 100%;
-    transition: background 0.1s, color 0.1s;
-  }
-  .theme-toggle:hover { background: var(--bg-elevated); color: var(--text-primary); }
-
-  /* Welcome grid */
-  .welcome-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; max-width: 500px; margin-top: 8px; }
-  .welcome-card { padding: 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-card); }
-  .welcome-card-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-family: var(--font-mono); margin-bottom: 8px; }
-  .welcome-card p { font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; }
-</style>
+    <!-- Firebase v10 SDK (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js">
+    </script>
 </head>
-<body>
+<body class="bg-[#0b0b12] text-gray-200 min-h-screen font-sans antialiased light:bg-[#f8f9fb] light:text-gray-800">
 
-<div id="app">
-  <!-- AUTH SCREEN -->
-  <div id="auth-screen">
-    <div class="auth-card">
-      <div class="auth-logo">Code<span>Mind</span></div>
-      <div class="auth-subtitle">// AI-powered coding assistant</div>
-      <button class="auth-btn" id="google-login-btn">
-        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.7 33.4 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9L37 10.7C33.4 7.4 29 5 24 5 13.5 5 5 13.5 5 24s8.5 19 19 19c11 0 18.7-7.7 18.7-18.7 0-1.2-.1-2.2-.1-3.3z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 16 19 13 24 13c3 0 5.7 1.1 7.8 2.9L37 10.7C33.4 7.4 29 5 24 5c-7.7 0-14.4 4.4-17.7 9.7z"/><path fill="#4CAF50" d="M24 43c5 0 9.3-1.7 12.8-4.5l-6-4.9C28.7 35.2 26.4 36 24 36c-5.2 0-9.6-3.5-11.2-8.3l-6.5 5C9.4 39.4 16.2 43 24 43z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.9 2.5-2.5 4.6-4.6 6.1l6 4.9C40 35.7 44 30.4 44 24c0-1.4-.2-2.7-.4-4z"/></svg>
-        Continue with Google
-      </button>
-    </div>
-  </div>
-
-  <!-- DASHBOARD -->
-  <div id="dashboard" class="hidden">
-    <!-- Sidebar -->
-    <div id="sidebar">
-      <div class="sidebar-logo">Code<span>Mind</span></div>
-      <button id="new-chat-btn">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-        New Chat
-      </button>
-      <div class="sidebar-section-label">History</div>
-      <div id="chat-history-list"></div>
-      <div class="sidebar-bottom">
-        <button class="theme-toggle" id="theme-toggle-btn">
-          <svg id="theme-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 109.8 9.8z"/></svg>
-          <span id="theme-label">Light Mode</span>
+    <!-- ==================== LOGIN SCREEN ==================== -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center p-6">
+        <div class="w-full max-w-md glass-subtle rounded-2xl p-8 border border-[#2a2a38] light:border-[#dde0e5] shadow-2xl">
+            <div class="text-center mb-8">
+                <div class="w-14 h-14 rounded-xl bg-indigo-600 flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold tracking-tight">CodeAI</h1>
+                <p class="text-sm text-gray-400 light:text-gray-500 mt-1">Intelligent Coding Assistant</p>
+            </div>
+            <button id="googleLoginBtn"
+            class="w-full flex items-center justify-center gap-3 py-3 px-5 rounded-xl border border-[#2a2a38] light:border-[#dde0e5] bg-[#1a1a24] light:bg-white hover:bg-[#22222f] light:hover:bg-gray-50 transition-colors font-medium text-sm">
+            <svg class="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Sign in with Google
         </button>
-        <button class="sidebar-action-btn" id="admin-btn">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          Admin Panel
-        </button>
-      </div>
+        <p class="text-xs text-gray-500 light:text-gray-400 text-center mt-5">
+            Secure authentication powered by Firebase
+        </p>
     </div>
-
-    <!-- Main Chat -->
-    <div id="main">
-      <div id="topbar">
-        <span id="topbar-title">New Conversation</span>
-        <span id="model-badge">qwen-2.5-coder-32b</span>
-        <button class="topbar-icon-btn tts-btn" id="tts-toggle" title="Toggle voice output">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 010 7M19 5a10 10 0 010 14"/></svg>
-        </button>
-      </div>
-
-      <div id="messages-container">
-        <div id="empty-state">
-          <div class="empty-logo">Code<span>Mind</span></div>
-          <div class="empty-sub">// What will you build today?</div>
-          <div class="welcome-grid">
-            <div class="welcome-card"><div class="welcome-card-label">Code</div><p>Write, debug, and explain code in any language</p></div>
-            <div class="welcome-card"><div class="welcome-card-label">Review</div><p>Analyze your code for bugs and improvements</p></div>
-            <div class="welcome-card"><div class="welcome-card-label">Learn</div><p>Understand concepts with detailed explanations</p></div>
-            <div class="welcome-card"><div class="welcome-card-label">Architect</div><p>Design systems and plan project structures</p></div>
-          </div>
-          <div class="empty-suggestions">
-            <button class="suggestion-chip" onclick="insertSuggestion('Write a Python function to parse JSON and handle errors gracefully')">Write a Python function to parse JSON and handle errors gracefully</button>
-            <button class="suggestion-chip" onclick="insertSuggestion('Explain the difference between async/await and Promises in JavaScript')">Explain the difference between async/await and Promises in JavaScript</button>
-            <button class="suggestion-chip" onclick="insertSuggestion('Review this SQL query for performance issues and suggest optimizations')">Review this SQL query for performance issues and suggest optimizations</button>
-          </div>
-        </div>
-      </div>
-
-      <div id="input-area">
-        <div id="input-wrapper">
-          <textarea id="user-input" rows="1" placeholder="Ask anything about code..."></textarea>
-          <button id="send-btn">
-            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right Panel -->
-    <div id="right-panel">
-      <div class="panel-title">Profile</div>
-      <div class="profile-section">
-        <img id="profile-pic" src="" alt="Profile" />
-        <div class="profile-name" id="display-name-text"></div>
-        <div class="profile-email" id="email-text"></div>
-      </div>
-      <div class="panel-divider"></div>
-      <div style="display:flex;flex-direction:column;gap:10px;flex:1">
-        <div>
-          <div class="panel-input-label">Display Name</div>
-          <input type="text" class="panel-input" id="name-input" placeholder="Your name" />
-        </div>
-        <div>
-          <div class="panel-input-label">Profile Picture URL</div>
-          <input type="text" class="panel-input" id="photo-input" placeholder="https://..." />
-        </div>
-        <button class="panel-btn primary" id="save-profile-btn">Save Changes</button>
-      </div>
-      <div class="panel-divider"></div>
-      <button class="panel-btn danger" id="logout-btn">Sign Out</button>
-    </div>
-  </div>
 </div>
 
-<!-- Admin Panel -->
-<div id="admin-panel" class="hidden">
-  <div class="admin-card">
-    <div class="admin-header">
-      <div class="admin-title">Admin Dashboard</div>
-      <button class="close-btn" id="close-admin">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      </button>
+<!-- ==================== DASHBOARD (Hidden initially) ==================== -->
+<div id="dashboard" class="hidden h-screen flex overflow-hidden">
+    <!-- LEFT SIDEBAR -->
+    <aside class="w-[270px] flex-shrink-0 glass-subtle border-r border-[#2a2a38] light:border-[#dde0e5] flex flex-col z-10">
+        <div class="p-4 border-b border-[#2a2a38] light:border-[#dde0e5]">
+            <button id="newChatBtn"
+            class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            New Chat
+        </button>
     </div>
-    <div class="admin-body">
-      <div id="admin-login-view">
-        <div class="panel-input-label" style="margin-bottom:8px">Admin Password</div>
-        <input type="password" class="panel-input" id="admin-password-input" placeholder="Enter admin password" style="margin-bottom:10px" />
-        <button class="panel-btn primary" id="admin-login-btn" style="width:100%;margin-top:0">Access Dashboard</button>
-        <div id="admin-error" style="font-family:var(--font-mono);font-size:12px;color:var(--red);margin-top:8px;display:none">Incorrect password.</div>
-      </div>
-      <div id="admin-users-view" class="hidden">
-        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-bottom:14px">Registered Users</div>
-        <div id="admin-users-list"></div>
-      </div>
+    <nav class="flex-1 overflow-y-auto p-3 space-y-1" id="chatHistoryList">
+        <!-- Chat history items loaded from Firebase -->
+        <p class="text-xs text-gray-500 light:text-gray-400 text-center py-8" id="noChatsMsg">No conversations yet</p>
+    </nav>
+    <div class="p-3 border-t border-[#2a2a38] light:border-[#dde0e5] flex items-center gap-2">
+        <button id="themeToggleBtn"
+        class="flex-1 py-2 px-3 rounded-lg text-xs font-medium bg-[#1a1a24] light:bg-[#f1f3f6] hover:bg-[#22222f] light:hover:bg-[#e8eaef] transition-colors flex items-center justify-center gap-1.5">
+        <svg id="themeIconDark" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+        </svg>
+        <svg id="themeIconLight" class="w-3.5 h-3.5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <span id="themeLabel">Light Mode</span>
+    </button>
+    <button id="adminBtn"
+    class="py-2 px-3 rounded-lg text-xs font-medium bg-[#1a1a24] light:bg-[#f1f3f6] hover:bg-[#22222f] light:hover:bg-[#e8eaef] transition-colors"
+    title="Admin Panel">
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+    </svg>
+</button>
+</div>
+</aside>
+
+<!-- CENTER CHAT AREA -->
+<main class="flex-1 flex flex-col min-w-0 bg-[#0b0b12] light:bg-[#f8f9fb]">
+    <!-- Chat header -->
+    <header class="h-14 border-b border-[#2a2a38] light:border-[#dde0e5] flex items-center px-5 gap-3 flex-shrink-0 glass-subtle">
+        <h2 id="currentChatTitle" class="font-semibold text-sm truncate">New Chat</h2>
+        <span id="voiceToggleContainer" class="ml-auto flex items-center gap-2">
+            <span class="text-xs text-gray-500 light:text-gray-400">Voice</span>
+            <button id="voiceToggleBtn"
+            class="relative w-9 h-5 rounded-full bg-[#2a2a38] light:bg-[#d0d3db] transition-colors flex items-center px-0.5"
+            role="switch" aria-checked="false">
+            <span id="voiceToggleDot" class="w-4 h-4 rounded-full bg-gray-400 shadow-sm transition-transform translate-x-0"></span>
+        </button>
+    </span>
+</header>
+
+<!-- Messages -->
+<div id="chatMessagesContainer" class="flex-1 overflow-y-auto p-5 space-y-4">
+    <div class="text-center text-gray-500 light:text-gray-400 py-16" id="emptyChatPlaceholder">
+        <div class="w-12 h-12 rounded-xl bg-[#1a1a24] light:bg-[#f1f3f6] flex items-center justify-center mx-auto mb-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+        </div>
+        <p class="text-sm">Ask a coding question to get started</p>
+        <p class="text-xs mt-1 text-gray-600 light:text-gray-400">Powered by Groq AI &middot; qwen-2.5-coder-32b</p>
     </div>
-  </div>
 </div>
 
-<!-- Toast -->
-<div id="toast"></div>
+<!-- Input area -->
+<div class="p-4 border-t border-[#2a2a38] light:border-[#dde0e5] glass-subtle flex-shrink-0">
+    <div class="flex gap-3 items-end max-w-3xl mx-auto">
+        <textarea id="chatInput"
+        class="flex-1 resize-none rounded-xl border border-[#2a2a38] light:border-[#dde0e5] bg-[#1a1a24] light:bg-white text-gray-100 light:text-gray-800 p-3 text-sm placeholder-gray-500 light:placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all min-h-[44px] max-h-[160px]"
+        placeholder="Ask a coding question..." rows="1"
+    ></textarea>
+    <button id="sendBtn"
+    class="flex-shrink-0 w-10 h-10 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+    disabled>
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/>
+    </svg>
+</button>
+</div>
+</div>
+</main>
 
-<!-- Firebase v10 SDK -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getDatabase, ref, set, get, push, onValue, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+<!-- RIGHT PANEL (Profile) -->
+<aside class="w-[280px] flex-shrink-0 glass-subtle border-l border-[#2a2a38] light:border-[#dde0e5] flex flex-col z-10 p-5">
+    <div class="text-center">
+        <div class="relative inline-block">
+            <img id="profilePic" src=""
+            alt="Profile"
+            class="w-16 h-16 rounded-full object-cover border-2 border-[#2a2a38] light:border-[#dde0e5] mx-auto shadow-lg"
+            onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%233a3a50%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 dy=%22.1em%22 fill=%22%23aaa%22 font-size=%2240%22 font-weight=%22bold%22>?</text></svg>'">
+        </div>
+        <h3 id="profileName" class="font-semibold text-sm mt-3 truncate">User</h3>
+        <p id="profileEmail" class="text-xs text-gray-400 light:text-gray-500 truncate">email@example.com</p>
+    </div>
+    <div class="mt-6 space-y-3 flex-1">
+        <button id="changeNameBtn"
+        class="w-full py-2 px-3 rounded-lg text-xs font-medium bg-[#1a1a24] light:bg-[#f1f3f6] hover:bg-[#22222f] light:hover:bg-[#e8eaef] transition-colors text-left flex items-center gap-2">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+        </svg>
+        Change Name
+    </button>
+    <button id="changePhotoBtn"
+    class="w-full py-2 px-3 rounded-lg text-xs font-medium bg-[#1a1a24] light:bg-[#f1f3f6] hover:bg-[#22222f] light:hover:bg-[#e8eaef] transition-colors text-left flex items-center gap-2">
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+    </svg>
+    Update Photo
+</button>
+</div>
+<button id="logoutBtn"
+class="w-full py-2.5 px-4 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-400 font-medium text-sm transition-colors border border-red-600/20 flex items-center justify-center gap-2 mt-auto">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v1"/>
+</svg>
+Logout
+</button>
+</aside>
+</div>
 
-// ============================================================
-// CONFIGURATION — Replace with your Firebase project config
-// ============================================================
-const firebaseConfig = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  databaseURL: "YOUR_DATABASE_URL",
-  projectId: "YOUR_PROJECT_ID",
-  appId: "YOUR_APP_ID"
-};
+<!-- ==================== ADMIN MODAL ==================== -->
+<div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm">
+    <div class="w-full max-w-lg glass-subtle rounded-2xl border border-[#2a2a38] light:border-[#dde0e5] shadow-2xl p-6 max-h-[80vh] flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="font-bold text-lg">Admin Panel</h2>
+            <button id="closeAdminBtn" class="p-1.5 rounded-lg hover:bg-[#22222f] light:hover:bg-[#e8eaef] transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div id="adminPasswordPrompt" class="space-y-3">
+            <p class="text-sm text-gray-400 light:text-gray-500">Enter admin password to continue.</p>
+            <input type="password" id="adminPasswordInput"
+            class="w-full rounded-lg border border-[#2a2a38] light:border-[#dde0e5] bg-[#1a1a24] light:bg-white text-gray-100 light:text-gray-800 p-2.5 text-sm placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors"
+            placeholder="Admin password">
+            <button id="adminLoginBtn"
+            class="w-full py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition-colors">
+            Access Admin Panel
+        </button>
+        <p id="adminError" class="text-xs text-red-400 hidden">Incorrect password.</p>
+    </div>
+    <div id="adminContent" class="hidden flex-1 flex flex-col min-h-0">
+        <h3 class="text-sm font-semibold mb-3">Registered Users</h3>
+        <div id="adminUsersList" class="flex-1 overflow-y-auto space-y-2 text-sm">
+            <p class="text-gray-500 text-xs">Loading...</p>
+        </div>
+    </div>
+</div>
+</div>
 
-// ============================================================
-// AI API CONFIG — Replace with your Groq API key
-// ============================================================
-const GROQ_API_KEY = "YOUR_GROQ_API_KEY";
-const MODEL = "qwen-2.5-coder-32b";
-const ADMIN_PASSWORD = "308580";
+<!-- ==================== MODAL OVERLAYS (Change Name / Photo) ==================== -->
+<div id="changeNameModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm">
+    <div class="w-full max-w-sm glass-subtle rounded-2xl border border-[#2a2a38] light:border-[#dde0e5] shadow-2xl p-6">
+        <h2 class="font-bold text-lg mb-3">Change Display Name</h2>
+        <input type="text" id="newNameInput"
+        class="w-full rounded-lg border border-[#2a2a38] light:border-[#dde0e5] bg-[#1a1a24] light:bg-white text-gray-100 light:text-gray-800 p-2.5 text-sm focus:outline-none focus:border-indigo-500 transition-colors mb-3"
+        placeholder="Enter new name">
+        <div class="flex gap-2">
+            <button id="saveNameBtn"
+            class="flex-1 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition-colors">Save</button>
+            <button id="cancelNameBtn"
+            class="flex-1 py-2.5 rounded-lg bg-[#1a1a24] light:bg-[#f1f3f6] hover:bg-[#22222f] light:hover:bg-[#e8eaef] font-medium text-sm transition-colors">Cancel</button>
+        </div>
+    </div>
+</div>
 
-// ============================================================
-// Init Firebase
-// ============================================================
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
-const provider = new GoogleAuthProvider();
+<div id="changePhotoModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm">
+    <div class="w-full max-w-sm glass-subtle rounded-2xl border border-[#2a2a38] light:border-[#dde0e5] shadow-2xl p-6">
+        <h2 class="font-bold text-lg mb-3">Update Profile Photo</h2>
+        <input type="text" id="newPhotoUrlInput"
+        class="w-full rounded-lg border border-[#2a2a38] light:border-[#dde0e5] bg-[#1a1a24] light:bg-white text-gray-100 light:text-gray-800 p-2.5 text-sm focus:outline-none focus:border-indigo-500 transition-colors mb-3"
+        placeholder="Enter image URL">
+        <div class="flex gap-2">
+            <button id="savePhotoBtn"
+            class="flex-1 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition-colors">Save</button>
+            <button id="cancelPhotoBtn"
+            class="flex-1 py-2.5 rounded-lg bg-[#1a1a24] light:bg-[#f1f3f6] hover:bg-[#22222f] light:hover:bg-[#e8eaef] font-medium text-sm transition-colors">Cancel</button>
+        </div>
+    </div>
+</div>
 
-// ============================================================
-// App State
-// ============================================================
-let currentUser = null;
-let currentChatId = null;
-let currentMessages = [];
-let ttsEnabled = false;
-let isStreaming = false;
+<!-- ==================== SCRIPTS ==================== -->
+<script>
+    (function() {
+        // ==================== CONFIGURATION ====================
+        // IMPORTANT: Replace these with your actual Firebase config values.
+        // In production, never expose API keys. Use a backend proxy for the Groq API.
+        const firebaseConfig = {
+            apiKey: "YOUR_FIREBASE_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            appId: "YOUR_APP_ID",
+        };
 
-// ============================================================
-// Theme
-// ============================================================
-function applyTheme(t) {
-  document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('cm_theme', t);
-  const icon = document.getElementById('theme-icon');
-  const label = document.getElementById('theme-label');
-  if (t === 'dark') {
-    icon.innerHTML = '<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 109.8 9.8z"/>';
-    label.textContent = 'Light Mode';
-  } else {
-    icon.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
-    label.textContent = 'Dark Mode';
-  }
-}
-const savedTheme = localStorage.getItem('cm_theme') || 'dark';
-applyTheme(savedTheme);
-document.getElementById('theme-toggle-btn').addEventListener('click', () => {
-  const cur = document.documentElement.getAttribute('data-theme');
-  applyTheme(cur === 'dark' ? 'light' : 'dark');
-});
+        // Groq API configuration — SECURE THIS IN PRODUCTION (use a backend proxy)
+        const GROQ_API_KEY = "YOUR_GROQ_API_KEY";
+        const GROQ_MODEL = "qwen-2.5-coder-32b";
+        const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-// ============================================================
-// Auth
-// ============================================================
-document.getElementById('google-login-btn').addEventListener('click', async () => {
-  try {
-    await signInWithPopup(auth, provider);
-  } catch (e) {
-    showToast('Login failed: ' + e.message);
-  }
-});
+        const ADMIN_PASSWORD = "308580";
 
-onAuthStateChanged(auth, user => {
-  if (user) {
-    currentUser = user;
-    showDashboard();
-    loadProfile();
-    loadChatHistory();
-    saveUserToDb(user);
-  } else {
-    currentUser = null;
-    showAuth();
-  }
-});
+        // ==================== INITIALIZE FIREBASE ====================
+        let firebaseApp;
+        let firebaseAuth;
+        let firebaseDb;
 
-function showAuth() {
-  document.getElementById('auth-screen').classList.remove('hidden');
-  document.getElementById('dashboard').classList.add('hidden');
-}
+        try {
+            firebaseApp = firebase.initializeApp(firebaseConfig);
+            firebaseAuth = firebase.auth();
+            firebaseDb = firebase.database();
+        } catch (err) {
+            console.error("Firebase initialization error:", err);
+            alert("Failed to initialize Firebase. Check your configuration.");
+        }
 
-function showDashboard() {
-  document.getElementById('auth-screen').classList.add('hidden');
-  document.getElementById('dashboard').classList.remove('hidden');
-}
+        // ==================== DOM REFERENCES ====================
+        const $ = (sel) => document.querySelector(sel);
+        const $$ = (sel) => document.querySelectorAll(sel);
 
-document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+        // Screens
+        const loginScreen = $('#loginScreen');
+        const dashboard = $('#dashboard');
 
-// ============================================================
-// Save user to DB
-// ============================================================
-async function saveUserToDb(user) {
-  const userRef = ref(db, `users/${user.uid}/profile`);
-  await set(userRef, {
-    name: user.displayName || '',
-    email: user.email || '',
-    uid: user.uid,
-    photoURL: user.photoURL || '',
-    lastSeen: Date.now()
-  });
-}
+        // Login
+        const googleLoginBtn = $('#googleLoginBtn');
 
-// ============================================================
-// Profile
-// ============================================================
-function loadProfile() {
-  document.getElementById('display-name-text').textContent = currentUser.displayName || 'User';
-  document.getElementById('email-text').textContent = currentUser.email || '';
-  document.getElementById('profile-pic').src = currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName||'U')}&background=6c8ef5&color=fff&size=128`;
-  document.getElementById('name-input').value = currentUser.displayName || '';
-  document.getElementById('photo-input').value = currentUser.photoURL || '';
-}
+        // Sidebar
+        const newChatBtn = $('#newChatBtn');
+        const chatHistoryList = $('#chatHistoryList');
+        const noChatsMsg = $('#noChatsMsg');
+        const themeToggleBtn = $('#themeToggleBtn');
+        const themeIconDark = $('#themeIconDark');
+        const themeIconLight = $('#themeIconLight');
+        const themeLabel = $('#themeLabel');
+        const adminBtn = $('#adminBtn');
 
-document.getElementById('save-profile-btn').addEventListener('click', async () => {
-  const name = document.getElementById('name-input').value.trim();
-  const photo = document.getElementById('photo-input').value.trim();
-  if (!name) { showToast('Name cannot be empty'); return; }
-  try {
-    await updateProfile(currentUser, { displayName: name, photoURL: photo || null });
-    await saveUserToDb(currentUser);
-    loadProfile();
-    showToast('Profile updated');
-  } catch (e) {
-    showToast('Update failed: ' + e.message);
-  }
-});
+        // Chat
+        const currentChatTitle = $('#currentChatTitle');
+        const chatMessagesContainer = $('#chatMessagesContainer');
+        const emptyChatPlaceholder = $('#emptyChatPlaceholder');
+        const chatInput = $('#chatInput');
+        const sendBtn = $('#sendBtn');
+        const voiceToggleBtn = $('#voiceToggleBtn');
+        const voiceToggleDot = $('#voiceToggleDot');
+        const voiceToggleContainer = $('#voiceToggleContainer');
 
-// ============================================================
-// Chat History
-// ============================================================
-function loadChatHistory() {
-  const chatsRef = ref(db, `users/${currentUser.uid}/chats`);
-  onValue(chatsRef, snap => {
-    const list = document.getElementById('chat-history-list');
-    list.innerHTML = '';
-    if (!snap.exists()) return;
-    const chats = snap.val();
-    const sorted = Object.entries(chats).sort((a,b) => (b[1].createdAt||0) - (a[1].createdAt||0));
-    sorted.forEach(([id, chat]) => {
-      const item = document.createElement('div');
-      item.className = 'chat-history-item' + (id === currentChatId ? ' active' : '');
-      item.textContent = chat.title || 'Untitled Chat';
-      item.dataset.chatId = id;
-      item.addEventListener('click', () => loadChat(id));
-      list.appendChild(item);
-    });
-  });
-}
+        // Profile
+        const profilePic = $('#profilePic');
+        const profileName = $('#profileName');
+        const profileEmail = $('#profileEmail');
+        const logoutBtn = $('#logoutBtn');
+        const changeNameBtn = $('#changeNameBtn');
+        const changePhotoBtn = $('#changePhotoBtn');
 
-async function loadChat(chatId) {
-  currentChatId = chatId;
-  currentMessages = [];
-  const chatRef = ref(db, `users/${currentUser.uid}/chats/${chatId}`);
-  const snap = await get(chatRef);
-  if (!snap.exists()) return;
-  const chat = snap.val();
-  document.getElementById('topbar-title').textContent = chat.title || 'Conversation';
-  document.getElementById('empty-state').style.display = 'none';
-  const container = document.getElementById('messages-container');
-  container.innerHTML = '';
-  const msgs = chat.messages ? Object.values(chat.messages) : [];
-  msgs.forEach(m => {
-    currentMessages.push(m);
-    appendMessageToUI(m.role, m.content);
-  });
-  updateHistoryActiveState();
-}
+        // Admin modal
+        const adminModal = $('#adminModal');
+        const closeAdminBtn = $('#closeAdminBtn');
+        const adminPasswordPrompt = $('#adminPasswordPrompt');
+        const adminPasswordInput = $('#adminPasswordInput');
+        const adminLoginBtn = $('#adminLoginBtn');
+        const adminError = $('#adminError');
+        const adminContent = $('#adminContent');
+        const adminUsersList = $('#adminUsersList');
 
-function updateHistoryActiveState() {
-  document.querySelectorAll('.chat-history-item').forEach(el => {
-    el.classList.toggle('active', el.dataset.chatId === currentChatId);
-  });
-}
+        // Change name modal
+        const changeNameModal = $('#changeNameModal');
+        const newNameInput = $('#newNameInput');
+        const saveNameBtn = $('#saveNameBtn');
+        const cancelNameBtn = $('#cancelNameBtn');
 
-// ============================================================
-// New Chat
-// ============================================================
-document.getElementById('new-chat-btn').addEventListener('click', () => {
-  currentChatId = null;
-  currentMessages = [];
-  document.getElementById('messages-container').innerHTML = '';
-  const es = document.createElement('div');
-  es.id = 'empty-state';
-  es.className = 'flex flex-col items-center justify-center gap-3 p-10';
-  es.innerHTML = document.getElementById('empty-state')?.innerHTML || '';
-  document.getElementById('messages-container').appendChild(es);
-  document.getElementById('topbar-title').textContent = 'New Conversation';
-  updateHistoryActiveState();
-});
+        // Change photo modal
+        const changePhotoModal = $('#changePhotoModal');
+        const newPhotoUrlInput = $('#newPhotoUrlInput');
+        const savePhotoBtn = $('#savePhotoBtn');
+        const cancelPhotoBtn = $('#cancelPhotoBtn');
 
-// ============================================================
-// Sending Messages
-// ============================================================
-const textarea = document.getElementById('user-input');
-textarea.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-});
-textarea.addEventListener('input', () => {
-  textarea.style.height = 'auto';
-  textarea.style.height = Math.min(textarea.scrollHeight, 140) + 'px';
-});
-document.getElementById('send-btn').addEventListener('click', sendMessage);
+        // ==================== STATE ====================
+        let currentUser = null;
+        let currentChatId = null;
+        let chatMessages = [];
+        let voiceEnabled = false;
+        let isAiResponding = false;
+        let adminAuthed = false;
+        let allChatsCache = {};
 
-async function sendMessage() {
-  const text = textarea.value.trim();
-  if (!text || isStreaming) return;
-  textarea.value = '';
-  textarea.style.height = 'auto';
+        // ==================== THEME MANAGEMENT ====================
+        function getStoredTheme() {
+            return localStorage.getItem('codeai_theme') || 'dark';
+        }
 
-  // Hide empty state
-  const emptyState = document.getElementById('empty-state');
-  if (emptyState) emptyState.style.display = 'none';
+        function applyTheme(theme) {
+            const html = document.documentElement;
+            if (theme === 'light') {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                themeIconDark.classList.add('hidden');
+                themeIconLight.classList.remove('hidden');
+                themeLabel.textContent = 'Dark Mode';
+            } else {
+                html.classList.add('dark');
+                html.classList.remove('light');
+                themeIconDark.classList.remove('hidden');
+                themeIconLight.classList.add('hidden');
+                themeLabel.textContent = 'Light Mode';
+            }
+            localStorage.setItem('codeai_theme', theme);
+        }
 
-  const userMsg = { role: 'user', content: text, timestamp: Date.now() };
-  currentMessages.push(userMsg);
-  appendMessageToUI('user', text);
+        function toggleTheme() {
+            const current = getStoredTheme();
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        }
 
-  // Create chat in DB if new
-  if (!currentChatId) {
-    const chatsRef = ref(db, `users/${currentUser.uid}/chats`);
-    const newChatRef = push(chatsRef);
-    currentChatId = newChatRef.key;
-    await set(newChatRef, {
-      title: text.slice(0, 50),
-      createdAt: Date.now(),
-      messages: {}
-    });
-    document.getElementById('topbar-title').textContent = text.slice(0, 50);
-  }
+        // Initialize theme
+        applyTheme(getStoredTheme());
+        themeToggleBtn.addEventListener('click', toggleTheme);
 
-  // Save user message
-  const msgRef = push(ref(db, `users/${currentUser.uid}/chats/${currentChatId}/messages`));
-  await set(msgRef, userMsg);
+        // ==================== VOICE TOGGLE ====================
+        voiceToggleBtn.addEventListener('click', () => {
+            voiceEnabled = !voiceEnabled;
+            if (voiceEnabled) {
+                voiceToggleDot.classList.add('translate-x-4');
+                voiceToggleDot.classList.remove('translate-x-0');
+                voiceToggleBtn.classList.add('bg-indigo-500');
+                voiceToggleBtn.classList.remove('bg-[#2a2a38]', 'light:bg-[#d0d3db]');
+                voiceToggleDot.classList.add('bg-white');
+                voiceToggleDot.classList.remove('bg-gray-400');
+                voiceToggleBtn.setAttribute('aria-checked', 'true');
+            } else {
+                voiceToggleDot.classList.remove('translate-x-4');
+                voiceToggleDot.classList.add('translate-x-0');
+                voiceToggleBtn.classList.remove('bg-indigo-500');
+                voiceToggleBtn.classList.add('bg-[#2a2a38]', 'light:bg-[#d0d3db]');
+                voiceToggleDot.classList.remove('bg-white');
+                voiceToggleDot.classList.add('bg-gray-400');
+                voiceToggleBtn.setAttribute('aria-checked', 'false');
+                window.speechSynthesis.cancel();
+            }
+        });
 
-  // Show thinking
-  const thinkingId = showThinking();
-  isStreaming = true;
-  document.getElementById('send-btn').disabled = true;
+        function speakText(text) {
+            if (!voiceEnabled) return;
+            window.speechSynthesis.cancel();
+            // Strip code blocks for cleaner speech
+            const cleaned = text.replace(/```[\s\S]*?```/g, ' [code block omitted] ')
+                .replace(/`([^`]+)`/g, ' $1 ')
+                .replace(/[*_~#>\[\]()]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+            if (!cleaned) return;
+            const utterance = new SpeechSynthesisUtterance(cleaned);
+            utterance.rate = 1.05;
+            utterance.pitch = 1.0;
+            utterance.volume = 0.9;
+            const voices = window.speechSynthesis.getVoices();
+            const preferred = voices.find(v => v.name.includes('Google') || v.name.includes('Natural') || v.name
+                .includes('Daniel') || v.name.includes('Samantha'));
+            if (preferred) utterance.voice = preferred;
+            window.speechSynthesis.speak(utterance);
+        }
 
-  try {
-    const aiContent = await callGroqAPI(currentMessages);
-    removeThinking(thinkingId);
-    const aiMsg = { role: 'assistant', content: aiContent, timestamp: Date.now() };
-    currentMessages.push(aiMsg);
-    appendMessageToUI('assistant', aiContent);
+        // Preload voices
+        window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
 
-    // Save AI message
-    const aiMsgRef = push(ref(db, `users/${currentUser.uid}/chats/${currentChatId}/messages`));
-    await set(aiMsgRef, aiMsg);
+        // ==================== AUTHENTICATION ====================
+        googleLoginBtn.addEventListener('click', async () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                await firebaseAuth.signInWithPopup(provider);
+            } catch (err) {
+                console.error("Login error:", err);
+                alert("Login failed. Please try again.");
+            }
+        });
 
-    if (ttsEnabled) speakText(aiContent.replace(/```[\s\S]*?```/g, 'code block').replace(/[#*`]/g, ''));
-    updateHistoryActiveState();
-  } catch (e) {
-    removeThinking(thinkingId);
-    appendMessageToUI('assistant', 'Error: ' + e.message);
-  }
+        firebaseAuth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                loginScreen.classList.add('hidden');
+                dashboard.classList.remove('hidden');
+                await storeUserPublicData(user);
+                updateProfileUI(user);
+                loadChatHistoryList();
+                if (!currentChatId) {
+                    resetChatView();
+                }
+            } else {
+                currentUser = null;
+                currentChatId = null;
+                chatMessages = [];
+                allChatsCache = {};
+                loginScreen.classList.remove('hidden');
+                dashboard.classList.add('hidden');
+                chatHistoryList.innerHTML =
+                    '<p class="text-xs text-gray-500 light:text-gray-400 text-center py-8" id="noChatsMsg">No conversations yet</p>';
+                resetChatView();
+                window.speechSynthesis.cancel();
+            }
+        });
 
-  isStreaming = false;
-  document.getElementById('send-btn').disabled = false;
-}
+        async function storeUserPublicData(user) {
+            try {
+                await firebaseDb.ref('users_public/' + user.uid).set({
+                    name: user.displayName || 'User',
+                    email: user.email || '',
+                    uid: user.uid,
+                    photoURL: user.photoURL || '',
+                    lastSeen: new Date().toISOString(),
+                });
+            } catch (err) {
+                console.warn("Could not store public user data (check DB rules):", err.message);
+            }
+        }
 
-// ============================================================
-// Groq API
-// ============================================================
-async function callGroqAPI(messages) {
-  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${GROQ_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [
-        { role: 'system', content: 'You are CodeMind, an expert AI coding assistant. Format code with proper markdown code blocks specifying the language. Be concise, accurate, and helpful. Always use syntax highlighting by specifying the language after the triple backticks.' },
-        ...messages.map(m => ({ role: m.role, content: m.content }))
-      ],
-      max_tokens: 4096,
-      temperature: 0.7
-    })
-  });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error?.message || 'API request failed');
-  }
-  const data = await res.json();
-  return data.choices[0].message.content;
-}
+        function updateProfileUI(user) {
+            profileName.textContent = user.displayName || 'User';
+            profileEmail.textContent = user.email || '';
+            if (user.photoURL) {
+                profilePic.src = user.photoURL;
+            } else {
+                profilePic.src =
+                    'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%233a3a50" width="100" height="100"/><text x="50" y="55" text-anchor="middle" dy=".1em" fill="%23aaa" font-size="40" font-weight="bold">' +
+                    (user.displayName ? user.displayName.charAt(0).toUpperCase() : '?') + '</text></svg>';
+            }
+        }
 
-// ============================================================
-// Render Messages
-// ============================================================
-function appendMessageToUI(role, content) {
-  const container = document.getElementById('messages-container');
-  const es = document.getElementById('empty-state');
-  if (es) es.style.display = 'none';
+        // ==================== LOGOUT ====================
+        logoutBtn.addEventListener('click', async () => {
+            window.speechSynthesis.cancel();
+            await firebaseAuth.signOut();
+        });
 
-  const row = document.createElement('div');
-  row.className = `message-row ${role === 'user' ? 'user-row' : 'ai-row'}`;
+        // ==================== PROFILE UPDATES ====================
+        changeNameBtn.addEventListener('click', () => {
+            newNameInput.value = currentUser?.displayName || '';
+            changeNameModal.classList.remove('hidden');
+        });
+        cancelNameBtn.addEventListener('click', () => changeNameModal.classList.add('hidden'));
+        saveNameBtn.addEventListener('click', async () => {
+            const newName = newNameInput.value.trim();
+            if (!newName) return;
+            try {
+                await currentUser.updateProfile({ displayName: newName });
+                await storeUserPublicData(currentUser);
+                updateProfileUI(currentUser);
+                changeNameModal.classList.add('hidden');
+            } catch (err) {
+                alert("Failed to update name: " + err.message);
+            }
+        });
 
-  if (role === 'user') {
-    row.innerHTML = `
-      <div class="msg-bubble user-bubble">${escHtml(content)}</div>
-      <div class="msg-avatar user-avatar">${getUserInitials()}</div>
-    `;
-  } else {
-    const rendered = renderMarkdown(content);
-    row.innerHTML = `
-      <div class="msg-avatar ai-avatar">AI</div>
-      <div class="msg-bubble ai-bubble">${rendered}</div>
-    `;
-  }
+        changePhotoBtn.addEventListener('click', () => {
+            newPhotoUrlInput.value = currentUser?.photoURL || '';
+            changePhotoModal.classList.remove('hidden');
+        });
+        cancelPhotoBtn.addEventListener('click', () => changePhotoModal.classList.add('hidden'));
+        savePhotoBtn.addEventListener('click', async () => {
+            const newUrl = newPhotoUrlInput.value.trim();
+            if (!newUrl) return;
+            try {
+                await currentUser.updateProfile({ photoURL: newUrl });
+                await storeUserPublicData(currentUser);
+                updateProfileUI(currentUser);
+                changePhotoModal.classList.add('hidden');
+            } catch (err) {
+                alert("Failed to update photo: " + err.message);
+            }
+        });
 
-  container.appendChild(row);
+        // Close modals on backdrop click
+        [changeNameModal, changePhotoModal].forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.classList.add('hidden');
+            });
+        });
 
-  // Highlight code
-  row.querySelectorAll('pre code').forEach(block => {
-    hljs.highlightElement(block);
-  });
+        // ==================== CHAT HISTORY LIST ====================
+        async function loadChatHistoryList() {
+            if (!currentUser) return;
+            const chatsRef = firebaseDb.ref('users/' + currentUser.uid + '/chats');
+            try {
+                const snapshot = await chatsRef.once('value');
+                const data = snapshot.val() || {};
+                allChatsCache = data;
+                renderChatHistoryList(data);
+            } catch (err) {
+                console.error("Error loading chat history:", err);
+            }
+        }
 
-  container.scrollTop = container.scrollHeight;
-}
+        function renderChatHistoryList(data) {
+            const chatIds = Object.keys(data);
+            if (chatIds.length === 0) {
+                chatHistoryList.innerHTML =
+                    '<p class="text-xs text-gray-500 light:text-gray-400 text-center py-8" id="noChatsMsg">No conversations yet</p>';
+                return;
+            }
+            // Sort by updatedAt descending
+            chatIds.sort((a, b) => {
+                const tA = data[a].updatedAt || data[a].createdAt || '';
+                const tB = data[b].updatedAt || data[b].createdAt || '';
+                return tB.localeCompare(tA);
+            });
+            let html = '';
+            chatIds.forEach(chatId => {
+                const chat = data[chatId];
+                const title = chat.title || 'New Chat';
+                const isActive = chatId === currentChatId;
+                html += `
+                    <button data-chat-id="${chatId}"
+                            class="w-full text-left py-2.5 px-3 rounded-lg text-sm transition-colors truncate block ${
+                                isActive
+                                    ? 'bg-indigo-600/20 text-indigo-300 light:bg-indigo-100 light:text-indigo-700 font-medium'
+                                    : 'hover:bg-[#1a1a24] light:hover:bg-[#f1f3f6] text-gray-300 light:text-gray-700'
+                            }">
+                        ${escapeHtml(title)}
+                    </button>`;
+            });
+            chatHistoryList.innerHTML = html;
+            // Add click listeners
+            chatHistoryList.querySelectorAll('[data-chat-id]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const chatId = btn.getAttribute('data-chat-id');
+                    openChat(chatId);
+                });
+            });
+        }
 
-function getUserInitials() {
-  const name = currentUser?.displayName || 'U';
-  return name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
-}
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
 
-function escHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+        async function openChat(chatId) {
+            if (!currentUser || isAiResponding) return;
+            window.speechSynthesis.cancel();
+            currentChatId = chatId;
+            const chatRef = firebaseDb.ref('users/' + currentUser.uid + '/chats/' + chatId);
+            try {
+                const snapshot = await chatRef.once('value');
+                const data = snapshot.val();
+                if (data) {
+                    chatMessages = data.messages || [];
+                    currentChatTitle.textContent = data.title || 'New Chat';
+                } else {
+                    chatMessages = [];
+                    currentChatTitle.textContent = 'New Chat';
+                }
+                renderMessages();
+                renderChatHistoryList(allChatsCache);
+                scrollToBottom();
+            } catch (err) {
+                console.error("Error opening chat:", err);
+            }
+        }
 
-function renderMarkdown(text) {
-  // Code blocks
-  text = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
-    const l = lang || 'plaintext';
-    const id = 'cb_' + Math.random().toString(36).slice(2);
-    return `<div class="code-block-wrapper">
-      <div class="code-block-header">
-        <span>${l}</span>
-        <button class="copy-code-btn" onclick="copyCode('${id}')">Copy</button>
-      </div>
-      <pre><code id="${id}" class="language-${l}">${escHtml(code.trim())}</code></pre>
-    </div>`;
-  });
+        function resetChatView() {
+            currentChatId = null;
+            chatMessages = [];
+            currentChatTitle.textContent = 'New Chat';
+            chatMessagesContainer.innerHTML = `
+                <div class="text-center text-gray-500 light:text-gray-400 py-16" id="emptyChatPlaceholder">
+                    <div class="w-12 h-12 rounded-xl bg-[#1a1a24] light:bg-[#f1f3f6] flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                        </svg>
+                    </div>
+                    <p class="text-sm">Ask a coding question to get started</p>
+                    <p class="text-xs mt-1 text-gray-600 light:text-gray-400">Powered by Groq AI &middot; qwen-2.5-coder-32b</p>
+                </div>`;
+        }
 
-  // Inline code
-  text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+        // ==================== RENDER MESSAGES ====================
+        function renderMessages() {
+            if (chatMessages.length === 0) {
+                resetChatView();
+                return;
+            }
+            let html = '';
+            chatMessages.forEach((msg, index) => {
+                if (msg.role === 'user') {
+                    html += `
+                        <div class="msg-enter flex justify-end">
+                            <div class="max-w-[75%] bg-indigo-600 text-white rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-md">
+                                ${escapeHtml(msg.content)}
+                            </div>
+                        </div>`;
+                } else {
+                    html += `
+                        <div class="msg-enter flex justify-start">
+                            <div class="max-w-[85%] bg-[#1a1a24] light:bg-white border border-[#2a2a38] light:border-[#dde0e5] rounded-2xl rounded-bl-md px-4 py-3 text-sm shadow-md ai-message-content">
+                                ${formatAiContent(msg.content)}
+                            </div>
+                        </div>`;
+                }
+            });
+            chatMessagesContainer.innerHTML = html;
+            // Attach copy listeners to code blocks
+            attachCopyListeners();
+            scrollToBottom();
+        }
 
-  // Bold
-  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        function formatAiContent(content) {
+            // Parse markdown-style code blocks and inline code
+            let result = '';
+            const parts = content.split(/(```[\s\S]*?```)/g);
+            parts.forEach(part => {
+                if (part.startsWith('```') && part.endsWith('```')) {
+                    // Code block
+                    const inner = part.slice(3, -3);
+                    const firstNewline = inner.indexOf('\n');
+                    let lang = '';
+                    let code = inner;
+                    if (firstNewline > 0) {
+                        lang = inner.slice(0, firstNewline).trim();
+                        code = inner.slice(firstNewline + 1);
+                    } else if (firstNewline === 0) {
+                        code = inner.slice(1);
+                    }
+                    const langLabel = lang || 'code';
+                    const highlighted = highlightCode(code, lang);
+                    const escapedCode = escapeHtml(code);
+                    result += `
+                        <div class="code-block-wrapper">
+                            <div class="code-block-header">
+                                <span class="code-lang-label">${escapeHtml(langLabel)}</span>
+                                <button class="copy-btn" data-code="${escapeHtml(code).replace(/"/g, '&quot;')}">Copy</button>
+                            </div>
+                            <pre><code>${highlighted}</code></pre>
+                        </div>`;
+                } else {
+                    // Regular text with inline code
+                    let textHtml = escapeHtml(part);
+                    textHtml = textHtml.replace(/`([^`]+)`/g,
+                        '<code class="bg-[#2a2a38] light:bg-[#e8eaef] px-1.5 py-0.5 rounded text-xs font-mono">$1</code>');
+                    textHtml = textHtml.replace(/\n/g, '<br>');
+                    result += textHtml;
+                }
+            });
+            return result;
+        }
 
-  // Headings
-  text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-  text = text.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-  text = text.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+        function highlightCode(code, lang) {
+            // Simple syntax highlighting
+            const escaped = escapeHtml(code);
+            // Determine if we should highlight based on language
+            const highlightableLangs = ['js', 'javascript', 'ts', 'typescript', 'py', 'python', 'java', 'c', 'cpp',
+                'c++', 'go', 'rust', 'rs', 'rb', 'ruby', 'php', 'swift', 'kotlin', 'css', 'html', 'json', 'bash',
+                'sh', 'sql'
+            ];
+            const l = (lang || '').toLowerCase();
+            if (!highlightableLangs.includes(l) && lang) {
+                // Unknown language, return with basic escape
+                return escaped;
+            }
+            // Apply highlighting
+            let result = escaped;
+            // Comments
+            result = result.replace(/(\/\/.*$|\/\*[\s\S]*?\*\/|#.*$)/gm, '<span class="cm">$1</span>');
+            // Strings (double and single quotes, backticks)
+            result = result.replace(
+                /(&quot;.*?&quot;|&#39;.*?&#39;|`.*?`|&apos;.*?&apos;)/g,
+                '<span class="str">$1</span>'
+            );
+            // Numbers
+            result = result.replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
+            // Keywords
+            const keywords = [
+                'function', 'const', 'let', 'var', 'if', 'else', 'return', 'class', 'import', 'export',
+                'from', 'async', 'await', 'try', 'catch', 'throw', 'new', 'this', 'super', 'extends',
+                'static', 'public', 'private', 'protected', 'interface', 'type', 'enum', 'for', 'while',
+                'do', 'switch', 'case', 'break', 'continue', 'default', 'typeof', 'instanceof', 'in',
+                'of', 'def', 'elif', 'pass', 'yield', 'with', 'as', 'print', 'True', 'False', 'None',
+                'and', 'or', 'not', 'is', 'lambda', 'raise', 'except', 'finally', 'assert', 'global',
+                'nonlocal', 'void', 'int', 'float', 'string', 'boolean', 'bool', 'char', 'double',
+                'long', 'short', 'byte', 'final', 'abstract', 'package', 'implements', 'null', 'undefined',
+            ];
+            const kwPattern = new RegExp('\\b(' + keywords.join('|') + ')\\b', 'g');
+            result = result.replace(kwPattern, '<span class="kw">$1</span>');
+            // Built-in functions/objects
+            const builtins = [
+                'console', 'log', 'document', 'window', 'Array', 'Object', 'String', 'Number', 'Math',
+                'JSON', 'Promise', 'fetch', 'map', 'filter', 'reduce', 'forEach', 'push', 'pop',
+                'parseInt', 'parseFloat', 'setTimeout', 'setInterval', 'require', 'module', 'process',
+                'print', 'len', 'range', 'list', 'dict', 'set', 'tuple', 'str', 'int', 'open', 'close',
+                'read', 'write', 'append', 'format', 'join', 'split',
+            ];
+            const biPattern = new RegExp('\\b(' + builtins.join('|') + ')\\b', 'g');
+            result = result.replace(biPattern, '<span class="builtin">$1</span>');
+            // Function calls
+            result = result.replace(/\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g,
+                '<span class="fn">$1</span>(');
+            return result;
+        }
 
-  // Lists
-  text = text.replace(/^\s*[-*] (.+)$/gm, '<li>$1</li>');
-  text = text.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+        function attachCopyListeners() {
+            $$('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const code = btn.getAttribute('data-code');
+                    const decoded = code.replace(/&quot;/g, '"').replace(/&amp;/g, '&')
+                        .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'")
+                        .replace(/&apos;/g, "'");
+                    try {
+                        await navigator.clipboard.writeText(decoded);
+                        btn.textContent = 'Copied!';
+                        btn.classList.add('copied');
+                        setTimeout(() => {
+                            btn.textContent = 'Copy';
+                            btn.classList.remove('copied');
+                        }, 1800);
+                    } catch {
+                        btn.textContent = 'Failed';
+                        setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+                    }
+                });
+            });
+        }
 
-  // Paragraphs (newlines to br)
-  text = text.replace(/\n\n/g, '<br><br>').replace(/\n(?!<)/g, '<br>');
+        function scrollToBottom() {
+            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+        }
 
-  return text;
-}
+        // ==================== SEND MESSAGE ====================
+        sendBtn.addEventListener('click', () => handleSendMessage());
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+            }
+        });
+        chatInput.addEventListener('input', () => {
+            sendBtn.disabled = !chatInput.value.trim() || isAiResponding;
+            // Auto-resize
+            chatInput.style.height = 'auto';
+            chatInput.style.height = Math.min(chatInput.scrollHeight, 160) + 'px';
+        });
 
-// ============================================================
-// Copy Code
-// ============================================================
-window.copyCode = function(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  navigator.clipboard.writeText(el.textContent).then(() => showToast('Copied to clipboard'));
-};
+        async function handleSendMessage() {
+            if (!currentUser || isAiResponding) return;
+            const content = chatInput.value.trim();
+            if (!content) return;
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+            sendBtn.disabled = true;
+            isAiResponding = true;
+            window.speechSynthesis.cancel();
 
-// ============================================================
-// Thinking Indicator
-// ============================================================
-function showThinking() {
-  const id = 'thinking_' + Date.now();
-  const container = document.getElementById('messages-container');
-  const row = document.createElement('div');
-  row.className = 'message-row ai-row';
-  row.id = id;
-  row.innerHTML = `<div class="msg-avatar ai-avatar">AI</div><div class="msg-bubble ai-bubble"><div class="thinking-indicator"><div class="thinking-dot"></div><div class="thinking-dot"></div><div class="thinking-dot"></div></div></div>`;
-  container.appendChild(row);
-  container.scrollTop = container.scrollHeight;
-  return id;
-}
+            // Create chat if needed
+            if (!currentChatId) {
+                currentChatId = generateChatId();
+                const title = content.length > 50 ? content.slice(0, 50) + '...' : content;
+                currentChatTitle.textContent = title;
+                const chatData = {
+                    id: currentChatId,
+                    title: title,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    messages: [],
+                };
+                await firebaseDb.ref('users/' + currentUser.uid + '/chats/' + currentChatId).set(chatData);
+            }
 
-function removeThinking(id) {
-  document.getElementById(id)?.remove();
-}
+            // Add user message
+            const userMsg = {
+                role: 'user',
+                content: content,
+                timestamp: new Date().toISOString(),
+            };
+            chatMessages.push(userMsg);
+            await firebaseDb.ref('users/' + currentUser.uid + '/chats/' + currentChatId + '/messages').set(
+                chatMessages);
+            await firebaseDb.ref('users/' + currentUser.uid + '/chats/' + currentChatId + '/updatedAt').set(new Date()
+                .toISOString());
+            // Update title if first message
+            if (chatMessages.filter(m => m.role === 'user').length === 1) {
+                const title = content.length > 50 ? content.slice(0, 50) + '...' : content;
+                await firebaseDb.ref('users/' + currentUser.uid + '/chats/' + currentChatId + '/title').set(title);
+                currentChatTitle.textContent = title;
+            }
+            renderMessages();
+            await loadChatHistoryList();
+            renderChatHistoryList(allChatsCache);
+            scrollToBottom();
 
-// ============================================================
-// Text-to-Speech
-// ============================================================
-const ttsBtn = document.getElementById('tts-toggle');
-ttsBtn.addEventListener('click', () => {
-  ttsEnabled = !ttsEnabled;
-  ttsBtn.classList.toggle('active', ttsEnabled);
-  showToast(ttsEnabled ? 'Voice output enabled' : 'Voice output disabled');
-  if (!ttsEnabled) speechSynthesis.cancel();
-});
+            // Show loading indicator
+            const loadingHtml = `
+                <div class="msg-enter flex justify-start" id="aiLoadingMsg">
+                    <div class="max-w-[85%] bg-[#1a1a24] light:bg-white border border-[#2a2a38] light:border-[#dde0e5] rounded-2xl rounded-bl-md px-5 py-3.5 text-sm shadow-md">
+                        <div class="flex items-center gap-1.5">
+                            <span class="ai-loading-dot w-2 h-2 rounded-full bg-indigo-400 inline-block"></span>
+                            <span class="ai-loading-dot w-2 h-2 rounded-full bg-indigo-400 inline-block"></span>
+                            <span class="ai-loading-dot w-2 h-2 rounded-full bg-indigo-400 inline-block"></span>
+                        </div>
+                    </div>
+                </div>`;
+            chatMessagesContainer.insertAdjacentHTML('beforeend', loadingHtml);
+            scrollToBottom();
 
-function speakText(text) {
-  speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text.slice(0, 1000));
-  utterance.rate = 1;
-  utterance.pitch = 1;
-  const voices = speechSynthesis.getVoices();
-  const preferred = voices.find(v => v.lang === 'en-US' && v.name.includes('Natural')) || voices.find(v => v.lang === 'en-US') || voices[0];
-  if (preferred) utterance.voice = preferred;
-  speechSynthesis.speak(utterance);
-}
+            try {
+                const aiResponse = await callGroqApi(chatMessages);
+                // Remove loading
+                const loadingEl = $('#aiLoadingMsg');
+                if (loadingEl) loadingEl.remove();
 
-// ============================================================
-// Admin Panel
-// ============================================================
-document.getElementById('admin-btn').addEventListener('click', () => {
-  document.getElementById('admin-panel').classList.remove('hidden');
-  document.getElementById('admin-login-view').classList.remove('hidden');
-  document.getElementById('admin-users-view').classList.add('hidden');
-  document.getElementById('admin-password-input').value = '';
-  document.getElementById('admin-error').style.display = 'none';
-});
+                const aiMsg = {
+                    role: 'assistant',
+                    content: aiResponse,
+                    timestamp: new Date().toISOString(),
+                };
+                chatMessages.push(aiMsg);
+                await firebaseDb.ref('users/' + currentUser.uid + '/chats/' + currentChatId + '/messages').set(
+                    chatMessages);
+                await firebaseDb.ref('users/' + currentUser.uid + '/chats/' + currentChatId + '/updatedAt').set(
+                    new Date().toISOString());
+                renderMessages();
+                await loadChatHistoryList();
+                renderChatHistoryList(allChatsCache);
+                scrollToBottom();
+                speakText(aiResponse);
+            } catch (err) {
+                const loadingEl = $('#aiLoadingMsg');
+                if (loadingEl) loadingEl.remove();
+                console.error("AI API error:", err);
+                const errorMsg = {
+                    role: 'assistant',
+                    content: '**Error:** Unable to reach the AI service. Please check your API key and try again.\n\nDetails: ' +
+                        err.message,
+                    timestamp: new Date().toISOString(),
+                };
+                chatMessages.push(errorMsg);
+                await firebaseDb.ref('users/' + currentUser.uid + '/chats/' + currentChatId + '/messages').set(
+                    chatMessages);
+                renderMessages();
+                scrollToBottom();
+            }
 
-document.getElementById('close-admin').addEventListener('click', () => {
-  document.getElementById('admin-panel').classList.add('hidden');
-});
+            isAiResponding = false;
+            sendBtn.disabled = !chatInput.value.trim();
+        }
 
-document.getElementById('admin-login-btn').addEventListener('click', async () => {
-  const pw = document.getElementById('admin-password-input').value;
-  if (pw !== ADMIN_PASSWORD) {
-    document.getElementById('admin-error').style.display = 'block';
-    return;
-  }
-  document.getElementById('admin-login-view').classList.add('hidden');
-  document.getElementById('admin-users-view').classList.remove('hidden');
-  await loadAdminUsers();
-});
+        function generateChatId() {
+            return 'chat_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+        }
 
-async function loadAdminUsers() {
-  const usersRef = ref(db, 'users');
-  const snap = await get(usersRef);
-  const list = document.getElementById('admin-users-list');
-  list.innerHTML = '';
-  if (!snap.exists()) { list.innerHTML = '<div style="color:var(--text-muted);font-size:13px">No users registered.</div>'; return; }
-  const users = snap.val();
-  Object.entries(users).forEach(([uid, data]) => {
-    const profile = data.profile || {};
-    const el = document.createElement('div');
-    el.className = 'user-row-admin';
-    el.innerHTML = `<div class="user-name">${escHtml(profile.name || 'Unknown')}</div>
-    <div>${escHtml(profile.email || '')}</div>
-    <div class="user-uid">UID: ${uid}</div>`;
-    list.appendChild(el);
-  });
-}
+        // ==================== GROQ API CALL ====================
+        async function callGroqApi(messages) {
+            const systemPrompt = {
+                role: 'system',
+                content: `You are CodeAI, an expert coding assistant powered by qwen-2.5-coder-32b. 
+        You provide clear, accurate, and well-structured code solutions.
+        Always:
+        - Use proper markdown code blocks with language tags (e.g. \`\`\`javascript, \`\`\`python)
+        - Explain your code concisely before or after the code block
+        - Keep explanations focused and practical
+        - Format your responses for readability
+        - Provide complete, working code when applicable
+        - Note any dependencies or requirements
+        Be direct and professional. No unnecessary pleasantries.`,
+            };
+            const payload = {
+                model: GROQ_MODEL,
+                messages: [systemPrompt, ...messages.map(m => ({ role: m.role, content: m.content }))],
+                temperature: 0.5,
+                max_tokens: 4096,
+                top_p: 0.95,
+            };
+            const response = await fetch(GROQ_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + GROQ_API_KEY,
+                },
+                body: JSON.stringify(payload),
+            });
+            if (!response.ok) {
+                const errBody = await response.text();
+                throw new Error(`Groq API error ${response.status}: ${errBody}`);
+            }
+            const data = await response.json();
+            if (!data.choices || data.choices.length === 0) {
+                throw new Error('No response from AI.');
+            }
+            return data.choices[0].message.content;
+        }
 
-// ============================================================
-// Suggestion chips
-// ============================================================
-window.insertSuggestion = function(text) {
-  document.getElementById('user-input').value = text;
-  document.getElementById('user-input').focus();
-};
+        // ==================== NEW CHAT ====================
+        newChatBtn.addEventListener('click', () => {
+            if (isAiResponding) return;
+            window.speechSynthesis.cancel();
+            currentChatId = null;
+            chatMessages = [];
+            currentChatTitle.textContent = 'New Chat';
+            resetChatView();
+            renderChatHistoryList(allChatsCache);
+            chatInput.focus();
+        });
 
-// ============================================================
-// Toast
-// ============================================================
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
+        // ==================== ADMIN PANEL ====================
+        adminBtn.addEventListener('click', () => {
+            adminAuthed = false;
+            adminPasswordInput.value = '';
+            adminError.classList.add('hidden');
+            adminPasswordPrompt.classList.remove('hidden');
+            adminContent.classList.add('hidden');
+            adminUsersList.innerHTML = '<p class="text-gray-500 text-xs">Loading...</p>';
+            adminModal.classList.remove('hidden');
+        });
+        closeAdminBtn.addEventListener('click', () => adminModal.classList.add('hidden'));
+        adminModal.addEventListener('click', (e) => {
+            if (e.target === adminModal) adminModal.classList.add('hidden');
+        });
 
+        adminLoginBtn.addEventListener('click', async () => {
+            if (adminPasswordInput.value === ADMIN_PASSWORD) {
+                adminAuthed = true;
+                adminError.classList.add('hidden');
+                adminPasswordPrompt.classList.add('hidden');
+                adminContent.classList.remove('hidden');
+                await loadAdminUsers();
+            } else {
+                adminError.classList.remove('hidden');
+            }
+        });
+        adminPasswordInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') adminLoginBtn.click();
+        });
+
+        async function loadAdminUsers() {
+            if (!adminAuthed) return;
+            adminUsersList.innerHTML =
+                '<p class="text-gray-500 text-xs">Loading registered users...</p>';
+            try {
+                const snapshot = await firebaseDb.ref('users_public').once('value');
+                const data = snapshot.val() || {};
+                const users = Object.values(data);
+                if (users.length === 0) {
+                    adminUsersList.innerHTML =
+                        '<p class="text-gray-500 text-xs">No registered users found.</p>';
+                    return;
+                }
+                let html = '';
+                users.forEach((u, i) => {
+                    html += `
+                        <div class="p-3 rounded-lg bg-[#1a1a24] light:bg-[#f1f3f6] border border-[#2a2a38] light:border-[#dde0e5]">
+                            <p class="font-medium text-sm">${escapeHtml(u.name || 'Unknown')}</p>
+                            <p class="text-xs text-gray-400 light:text-gray-500">${escapeHtml(u.email || 'No email')}</p>
+                            <p class="text-xs text-gray-500 light:text-gray-400 font-mono mt-0.5">UID: ${escapeHtml(u.uid || 'N/A')}</p>
+                        </div>`;
+                });
+                adminUsersList.innerHTML = html;
+            } catch (err) {
+                adminUsersList.innerHTML =
+                    '<p class="text-red-400 text-xs">Failed to load users. Check database rules.</p>';
+                console.error("Admin load error:", err);
+            }
+        }
+
+        // ==================== INITIAL SETUP ====================
+        // Determine initial view based on auth state
+        if (firebaseAuth.currentUser) {
+            // Already signed in — onAuthStateChanged will fire shortly
+        } else {
+            loginScreen.classList.remove('hidden');
+            dashboard.classList.add('hidden');
+        }
+
+        // Handle Escape key to close modals
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                adminModal.classList.add('hidden');
+                changeNameModal.classList.add('hidden');
+                changePhotoModal.classList.add('hidden');
+            }
+        });
+
+        console.log('%cCodeAI %cReady %c— Intelligent Coding Assistant',
+            'color:#818cf8;font-weight:bold;font-size:1.1em;',
+            'color:#22c55e;',
+            'color:#8888a0;');
+        console.log('%cConfigure Firebase & Groq API key to begin.',
+            'color:#f59e0b;font-size:0.85em;');
+    })();
 </script>
 </body>
 </html>
