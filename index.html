@@ -1,1158 +1,1996 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeAI — Intelligent Coding Assistant</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FFD6E5">
+<title>For You</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500&family=Great+Vibes&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com">
-    </script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        surface: {
-                            dark: '#0b0b12',
-                            panel: '#111118',
-                            card: '#1a1a24',
-                            hover: '#22222f',
-                            border: '#2a2a38',
-                            muted: '#8888a0',
-                            accent: '#6366f1',
-                            'accent-glow': '#818cf8',
-                        },
-                        surfaceLight: {
-                            bg: '#f8f9fb',
-                            panel: '#ffffff',
-                            card: '#f1f3f6',
-                            hover: '#e8eaef',
-                            border: '#dde0e5',
-                            muted: '#6b7280',
-                            accent: '#4f46e5',
-                            'accent-glow': '#6366f1',
-                        },
-                    },
-                },
-            },
-        };
-    </script>
+<style>
+/* ================================================
+   ROOT TOKENS
+================================================ */
+:root {
+  --pink:       #FF8FB8;
+  --soft-pink:  #FFD6E5;
+  --baby-blue:  #9EDCFF;
+  --white:      #FFFFFF;
+  --lavender:   #DCCBFF;
+  --dark:       #292238;
+  --mid:        #5a4a6e;
+  --glass-bg:   rgba(255,255,255,0.12);
+  --glass-border: rgba(255,255,255,0.25);
+  --glass-shadow: rgba(100,60,120,0.18);
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-script:  'Great Vibes', cursive;
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
-    <style>
-        /* Smooth scrollbar */
-        ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #3a3a4a;
-            border-radius: 10px;
-        }
-        .light ::-webkit-scrollbar-thumb {
-            background: #c5c5d0;
-        }
+/* ================================================
+   RESET & BASE
+================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-        /* Code block styling */
-        .code-block-wrapper {
-            position: relative;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 12px 0;
-            border: 1px solid #2a2a38;
-        }
-        .light .code-block-wrapper {
-            border-color: #dde0e5;
-        }
-        .code-block-wrapper pre {
-            margin: 0;
-            padding: 16px;
-            padding-top: 40px;
-            overflow-x: auto;
-            font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
-            font-size: 0.85rem;
-            line-height: 1.65;
-            background: #0d0d16;
-            color: #e2e2f0;
-        }
-        .light .code-block-wrapper pre {
-            background: #f5f5fa;
-            color: #1e1e2e;
-        }
-        .code-block-header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 36px;
-            background: #1a1a28;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 12px;
-            z-index: 2;
-            border-bottom: 1px solid #2a2a38;
-        }
-        .light .code-block-header {
-            background: #e8eaf0;
-            border-bottom-color: #d0d3db;
-        }
-        .code-lang-label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #8888a0;
-        }
-        .copy-btn {
-            font-size: 0.7rem;
-            padding: 4px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            background: #2a2a38;
-            color: #c0c0d0;
-            border: none;
-            transition: all 0.15s ease;
-            font-weight: 500;
-            letter-spacing: 0.03em;
-        }
-        .copy-btn:hover {
-            background: #3a3a50;
-            color: #fff;
-        }
-        .light .copy-btn {
-            background: #dde0e5;
-            color: #4b5563;
-        }
-        .light .copy-btn:hover {
-            background: #c8ccd4;
-            color: #1f2937;
-        }
-        .copy-btn.copied {
-            background: #1a7f4b;
-            color: #fff;
-        }
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
 
-        /* Syntax highlighting */
-        .kw {
-            color: #c792ea;
-            font-weight: 600;
-        }
-        .light .kw {
-            color: #7c3aed;
-        }
-        .str {
-            color: #89dd89;
-        }
-        .light .str {
-            color: #059669;
-        }
-        .num {
-            color: #f78c6c;
-        }
-        .light .num {
-            color: #d97706;
-        }
-        .cm {
-            color: #676e95;
-            font-style: italic;
-        }
-        .light .cm {
-            color: #9ca3af;
-        }
-        .fn {
-            color: #82aaff;
-        }
-        .light .fn {
-            color: #2563eb;
-        }
-        .op {
-            color: #ff5370;
-        }
-        .light .op {
-            color: #dc2626;
-        }
-        .builtin {
-            color: #ffcb6b;
-        }
-        .light .builtin {
-            color: #b45309;
-        }
+body {
+  font-family: var(--font-body);
+  background: #1a0a2e;
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
 
-        /* Glass effect */
-        .glass-subtle {
-            background: rgba(17, 17, 24, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-        .light .glass-subtle {
-            background: rgba(255, 255, 255, 0.78);
-        }
+/* ================================================
+   ANIMATED BACKGROUND
+================================================ */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
 
-        /* Pulse for loading */
-        @keyframes subtlePulse {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.4;
-            }
-        }
-        .ai-loading-dot {
-            animation: subtlePulse 1.2s infinite;
-        }
-        .ai-loading-dot:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        .ai-loading-dot:nth-child(3) {
-            animation-delay: 0.4s;
-        }
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(135deg, #1a0a2e 0%, #2d1052 30%, #1a1a4e 60%, #2e0a2e 100%);
+  transition: background 3s ease;
+}
 
-        /* Fade in */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .msg-enter {
-            animation: fadeInUp 0.25s ease forwards;
-        }
+.bg-layer.phase-welcome {
+  background: linear-gradient(135deg, #1a0a2e 0%, #2d1052 30%, #1a2060 60%, #2e1248 100%);
+}
 
-        /* Transition for theme */
-        * {
-            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
-        }
-    </style>
+.bg-layer.phase-countdown {
+  background: linear-gradient(135deg, #0a1a2e 0%, #1a2052 30%, #2e0a4e 60%, #1a0a3e 100%);
+}
 
-    <!-- Firebase v10 SDK (compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js">
-    </script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js">
-    </script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js">
-    </script>
+.bg-layer.phase-letter {
+  background: linear-gradient(135deg, #1a0a2e 0%, #2e1248 30%, #1a2052 60%, #2e0a3e 100%);
+}
+
+.bg-layer.phase-proposal {
+  background: linear-gradient(135deg, #1a0a2e 0%, #2e1060 50%, #0a0a2e 100%);
+}
+
+.bg-layer.phase-yes {
+  background: linear-gradient(135deg, #2e0a30 0%, #4e1a52 30%, #2e1a60 60%, #1a0a3e 100%);
+}
+
+/* ================================================
+   CHERRY BLOSSOM PETALS CANVAS
+================================================ */
+#petal-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ================================================
+   SCREENS
+================================================ */
+.screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 3rem);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s var(--ease-smooth), visibility 0.8s;
+}
+
+.screen.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.screen.fade-out {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ================================================
+   GLASSMORPHISM CARD
+================================================ */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow:
+    0 8px 40px var(--glass-shadow),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+  padding: clamp(1.5rem, 5vw, 3rem);
+  width: 100%;
+  max-width: 520px;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+}
+
+/* ================================================
+   WELCOME SCREEN
+================================================ */
+#screen-welcome .pre-text {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(0.75rem, 2vw, 0.85rem);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+#screen-welcome h1 {
+  font-family: var(--font-script);
+  font-size: clamp(2.4rem, 7vw, 3.8rem);
+  font-weight: 400;
+  color: var(--white);
+  text-align: center;
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 40px rgba(255,143,184,0.5);
+}
+
+#screen-welcome .subtitle {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2.8vw, 1.2rem);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.name-input-wrap {
+  position: relative;
+  margin-bottom: 1.25rem;
+}
+
+.name-input {
+  width: 100%;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 3vw, 1.15rem);
+  font-style: italic;
+  color: var(--white);
+  outline: none;
+  transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+  -webkit-appearance: none;
+}
+
+.name-input::placeholder {
+  color: rgba(255,255,255,0.35);
+  font-style: italic;
+}
+
+.name-input:focus {
+  border-color: rgba(255,143,184,0.6);
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 0 0 3px rgba(255,143,184,0.15), 0 0 20px rgba(255,143,184,0.1);
+}
+
+.error-msg {
+  font-size: 0.8rem;
+  color: rgba(255,143,184,0.9);
+  margin-top: 0.5rem;
+  min-height: 1.2em;
+  padding-left: 0.25rem;
+  transition: opacity 0.3s;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, rgba(255,143,184,0.35), rgba(158,220,255,0.25));
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 14px;
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-smooth);
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,143,184,0.2), rgba(158,220,255,0.2));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.btn-primary:hover::before,
+.btn-primary:focus::before {
+  opacity: 1;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 30px rgba(255,143,184,0.3);
+  outline: none;
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* ================================================
+   TRANSITION SCREEN
+================================================ */
+#screen-transition {
+  z-index: 15;
+}
+
+.transition-text {
+  font-family: var(--font-script);
+  font-size: clamp(2rem, 8vw, 4rem);
+  color: var(--white);
+  text-align: center;
+  text-shadow: 0 0 60px rgba(255,143,184,0.7);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s var(--ease-smooth), transform 1s var(--ease-smooth);
+  line-height: 1.3;
+}
+
+.transition-text.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.transition-sub {
+  font-family: var(--font-display);
+  font-size: clamp(0.9rem, 3vw, 1.15rem);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(255,255,255,0.65);
+  text-align: center;
+  margin-top: 1rem;
+  opacity: 0;
+  transition: opacity 1s;
+  max-width: 420px;
+  line-height: 1.6;
+}
+
+.transition-sub.visible {
+  opacity: 1;
+}
+
+/* ================================================
+   COUNTDOWN SCREEN
+================================================ */
+#screen-countdown {
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.countdown-eyebrow {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(0.7rem, 1.8vw, 0.8rem);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  text-align: center;
+}
+
+.countdown-title {
+  font-family: var(--font-script);
+  font-size: clamp(2rem, 6vw, 3.2rem);
+  color: var(--white);
+  text-align: center;
+  text-shadow: 0 0 50px rgba(158,220,255,0.4);
+  margin-top: -0.5rem;
+}
+
+.countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(0.5rem, 2vw, 1rem);
+  width: 100%;
+  max-width: 460px;
+}
+
+.countdown-unit {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: clamp(0.75rem, 3vw, 1.25rem) 0.5rem;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(100,60,120,0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.countdown-unit::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+}
+
+.countdown-num {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
+  font-weight: 300;
+  color: var(--white);
+  display: block;
+  line-height: 1;
+  transition: transform 0.2s var(--ease-bounce), opacity 0.2s;
+}
+
+.countdown-num.tick {
+  transform: scale(1.12);
+  opacity: 0.7;
+}
+
+.countdown-label {
+  font-family: var(--font-body);
+  font-size: clamp(0.55rem, 1.5vw, 0.65rem);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  margin-top: 0.35rem;
+  display: block;
+}
+
+/* ================================================
+   MIDNIGHT REVEAL SCREEN
+================================================ */
+#screen-midnight {
+  z-index: 20;
+}
+
+.midnight-msg {
+  font-family: var(--font-script);
+  font-size: clamp(2.2rem, 7vw, 4rem);
+  color: var(--white);
+  text-align: center;
+  text-shadow: 0 0 60px rgba(255,143,184,0.6);
+  opacity: 0;
+  transform: translateY(20px) scale(0.97);
+  transition: all 1.2s var(--ease-smooth);
+  line-height: 1.3;
+}
+
+.midnight-msg.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.midnight-sub {
+  font-family: var(--font-display);
+  font-size: clamp(0.95rem, 3vw, 1.2rem);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(255,255,255,0.65);
+  text-align: center;
+  margin-top: 1.25rem;
+  opacity: 0;
+  transition: opacity 1.2s;
+  max-width: 380px;
+  line-height: 1.6;
+}
+
+.midnight-sub.visible {
+  opacity: 1;
+}
+
+/* ================================================
+   LOVE LETTER SCREEN
+================================================ */
+#screen-letter {
+  z-index: 10;
+  overflow: hidden;
+}
+
+.letter-stage {
+  max-width: 580px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.letter-chunk {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  padding: 0 1rem;
+  opacity: 0;
+  transform: translateY(24px);
+  filter: blur(6px);
+  transition: opacity 1s var(--ease-smooth), transform 1s var(--ease-smooth), filter 1s var(--ease-smooth);
+  pointer-events: none;
+}
+
+.letter-chunk.in {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+  pointer-events: auto;
+}
+
+.letter-chunk.out {
+  opacity: 0;
+  transform: translateY(-20px);
+  filter: blur(4px);
+}
+
+.letter-line-main {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 4.5vw, 2rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--white);
+  line-height: 1.5;
+  text-shadow: 0 0 30px rgba(255,143,184,0.2);
+}
+
+.letter-line-main.script {
+  font-family: var(--font-script);
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-style: normal;
+}
+
+.letter-line-main.bold {
+  font-weight: 500;
+  font-style: normal;
+}
+
+.letter-line-main em {
+  font-style: italic;
+  color: rgba(255,214,229,0.95);
+}
+
+.letter-line-main .name-highlight {
+  color: #FFD6E5;
+  text-shadow: 0 0 20px rgba(255,143,184,0.6);
+}
+
+.letter-line-sub {
+  font-family: var(--font-display);
+  font-size: clamp(0.9rem, 2.8vw, 1.1rem);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(255,255,255,0.55);
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+
+.letter-progress {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+}
+
+.progress-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.progress-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: all 0.4s;
+}
+
+.progress-dot.active {
+  background: rgba(255,143,184,0.8);
+  width: 20px;
+  border-radius: 2px;
+}
+
+/* ================================================
+   PROPOSAL SCREEN
+================================================ */
+#screen-proposal {
+  z-index: 25;
+}
+
+.proposal-card {
+  max-width: 540px;
+  text-align: center;
+}
+
+.proposal-question {
+  font-family: var(--font-script);
+  font-size: clamp(2rem, 7vw, 3.6rem);
+  color: var(--white);
+  line-height: 1.25;
+  text-shadow: 0 0 40px rgba(255,143,184,0.5);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 1s var(--ease-smooth);
+}
+
+.proposal-question.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.proposal-question.final {
+  font-size: clamp(2.4rem, 8vw, 4.2rem);
+  text-shadow:
+    0 0 40px rgba(255,143,184,0.7),
+    0 0 80px rgba(255,143,184,0.3);
+}
+
+.proposal-divider {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  margin: 1.5rem auto;
+}
+
+.proposal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: all 0.8s 0.4s var(--ease-smooth);
+}
+
+.proposal-buttons.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.btn-yes {
+  padding: 1rem 2.5rem;
+  background: linear-gradient(135deg, rgba(255,143,184,0.3), rgba(220,203,255,0.2));
+  border: 1px solid rgba(255,143,184,0.5);
+  border-radius: 14px;
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-smooth);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-yes:hover,
+.btn-yes:focus {
+  background: linear-gradient(135deg, rgba(255,143,184,0.5), rgba(220,203,255,0.35));
+  box-shadow: 0 8px 30px rgba(255,143,184,0.4), 0 0 0 1px rgba(255,143,184,0.3);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.btn-think {
+  padding: 0.8rem 2rem;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  color: rgba(255,255,255,0.5);
+  font-family: var(--font-display);
+  font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+  font-style: italic;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-smooth);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-think:hover,
+.btn-think:focus {
+  color: rgba(255,255,255,0.75);
+  border-color: rgba(255,255,255,0.3);
+  outline: none;
+}
+
+/* ================================================
+   THINK RESPONSE
+================================================ */
+#screen-think {
+  z-index: 30;
+}
+
+.think-msg {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 4vw, 1.6rem);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(255,255,255,0.8);
+  text-align: center;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+.think-msg .line {
+  display: block;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.7s var(--ease-smooth), transform 0.7s var(--ease-smooth);
+}
+
+.think-msg .line.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.btn-continue {
+  padding: 0.9rem 2rem;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 14px;
+  color: rgba(255,255,255,0.7);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: all 0.3s;
+  opacity: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-continue.visible {
+  opacity: 1;
+}
+
+.btn-continue:hover,
+.btn-continue:focus {
+  background: rgba(255,255,255,0.14);
+  outline: none;
+}
+
+/* ================================================
+   YES CELEBRATION SCREEN
+================================================ */
+#screen-yes {
+  z-index: 35;
+}
+
+.yes-main {
+  font-family: var(--font-body);
+  font-size: clamp(0.7rem, 2vw, 0.8rem);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255,143,184,0.8);
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.yes-headline {
+  font-family: var(--font-script);
+  font-size: clamp(2rem, 7vw, 3.8rem);
+  color: var(--white);
+  text-align: center;
+  line-height: 1.2;
+  text-shadow:
+    0 0 40px rgba(255,143,184,0.6),
+    0 0 80px rgba(220,203,255,0.3);
+  margin-bottom: 1.5rem;
+}
+
+.yes-body {
+  font-family: var(--font-display);
+  font-size: clamp(0.95rem, 3vw, 1.2rem);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(255,255,255,0.75);
+  text-align: center;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+
+.yes-final {
+  font-family: var(--font-script);
+  font-size: clamp(2.2rem, 8vw, 4rem);
+  color: rgba(255,214,229,0.95);
+  text-align: center;
+  text-shadow:
+    0 0 40px rgba(255,143,184,0.7),
+    0 0 80px rgba(220,203,255,0.4);
+}
+
+/* ================================================
+   MUSIC CONTROL
+================================================ */
+#music-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 100;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.5s, transform 0.3s, box-shadow 0.3s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#music-btn.visible {
+  opacity: 1;
+}
+
+#music-btn:hover,
+#music-btn:focus {
+  transform: scale(1.1);
+  box-shadow: 0 4px 20px rgba(255,143,184,0.3);
+  outline: none;
+}
+
+.music-icon {
+  width: 18px;
+  height: 18px;
+  fill: rgba(255,255,255,0.7);
+}
+
+/* ================================================
+   SVG HEARTS (CSS)
+================================================ */
+.heart-svg {
+  display: inline-block;
+  position: relative;
+}
+
+/* ================================================
+   GLOWING RING (proposal)
+================================================ */
+.proposal-ring {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,143,184,0.4);
+  box-shadow:
+    0 0 20px rgba(255,143,184,0.3),
+    inset 0 0 20px rgba(255,143,184,0.1);
+  margin: 0 auto 1.5rem;
+  position: relative;
+  animation: ring-pulse 3s ease-in-out infinite;
+}
+
+.proposal-ring::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 1px solid rgba(220,203,255,0.3);
+}
+
+.proposal-ring::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border-radius: 50%;
+  background: rgba(255,143,184,0.08);
+}
+
+@keyframes ring-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255,143,184,0.3), inset 0 0 20px rgba(255,143,184,0.1); }
+  50% { box-shadow: 0 0 40px rgba(255,143,184,0.5), 0 0 60px rgba(255,143,184,0.15), inset 0 0 20px rgba(255,143,184,0.15); }
+}
+
+/* ================================================
+   CONFETTI / CELEBRATION PARTICLES
+================================================ */
+#confetti-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+#confetti-canvas.active {
+  opacity: 1;
+}
+
+/* ================================================
+   GLOW PARTICLES
+================================================ */
+.glow-dot {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ================================================
+   LOADING DOTS
+================================================ */
+.loading-dots {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.loading-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  animation: loading-bounce 1.2s ease-in-out infinite;
+}
+
+.loading-dot:nth-child(1) { animation-delay: 0s; }
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes loading-bounce {
+  0%, 80%, 100% { transform: scale(1); opacity: 0.4; }
+  40% { transform: scale(1.4); opacity: 0.9; }
+}
+
+/* ================================================
+   STAR FIELD
+================================================ */
+#star-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 2s;
+}
+
+#star-canvas.visible {
+  opacity: 1;
+}
+
+/* ================================================
+   GRADIENT BLOBS (ambient)
+================================================ */
+.blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 1;
+  animation: blob-float 12s ease-in-out infinite;
+}
+
+.blob-pink {
+  width: 400px;
+  height: 400px;
+  background: #FF8FB8;
+  top: -100px;
+  right: -100px;
+  animation-delay: 0s;
+}
+
+.blob-blue {
+  width: 350px;
+  height: 350px;
+  background: #9EDCFF;
+  bottom: -100px;
+  left: -100px;
+  animation-delay: 4s;
+}
+
+.blob-lavender {
+  width: 300px;
+  height: 300px;
+  background: #DCCBFF;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  animation-delay: 8s;
+}
+
+@keyframes blob-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(20px, -20px) scale(1.05); }
+  66% { transform: translate(-15px, 15px) scale(0.95); }
+}
+
+/* ================================================
+   UTILITY
+================================================ */
+.hidden { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* ================================================
+   ACCESSIBILITY - REDUCED MOTION
+================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .screen {
+    transition: opacity 0.2s, visibility 0.2s;
+  }
+
+  .letter-chunk {
+    transition: opacity 0.3s, transform 0.3s, filter 0.3s;
+    filter: none;
+  }
+
+  .countdown-num.tick {
+    transform: none;
+  }
+}
+
+/* ================================================
+   MOBILE OPTIMIZATIONS
+================================================ */
+@media (max-width: 480px) {
+  .glass-card {
+    border-radius: 18px;
+    max-width: 100%;
+  }
+
+  .countdown-grid {
+    gap: 0.5rem;
+  }
+
+  .countdown-unit {
+    border-radius: 12px;
+  }
+
+  #music-btn {
+    bottom: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+  }
+
+  .proposal-ring {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+@media (max-height: 600px) {
+  .screen {
+    padding: 0.75rem;
+    justify-content: flex-start;
+    padding-top: 2rem;
+    overflow-y: auto;
+  }
+}
+</style>
 </head>
-<body class="bg-[#0b0b12] text-gray-200 min-h-screen font-sans antialiased light:bg-[#f8f9fb] light:text-gray-800">
+<body>
 
-    <!-- ==================== DASHBOARD (always visible) ==================== -->
-    <div id="dashboard" class="h-screen flex overflow-hidden">
-        <!-- LEFT SIDEBAR -->
-        <aside class="w-[270px] flex-shrink-0 glass-subtle border-r border-[#2a2a38] light:border-[#dde0e5] flex flex-col z-10">
-            <div class="p-4 border-b border-[#2a2a38] light:border-[#dde0e5]">
-                <button id="newChatBtn"
-                class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                </svg>
-                New Chat
-            </button>
-        </div>
-        <nav class="flex-1 overflow-y-auto p-3 space-y-1" id="chatHistoryList">
-            <p class="text-xs text-gray-500 light:text-gray-400 text-center py-8" id="noChatsMsg">No conversations yet</p>
-        </nav>
-        <div class="p-3 border-t border-[#2a2a38] light:border-[#dde0e5] flex items-center gap-2">
-            <button id="themeToggleBtn"
-            class="flex-1 py-2 px-3 rounded-lg text-xs font-medium bg-[#1a1a24] light:bg-[#f1f3f6] hover:bg-[#22222f] light:hover:bg-[#e8eaef] transition-colors flex items-center justify-center gap-1.5">
-            <svg id="themeIconDark" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-            </svg>
-            <svg id="themeIconLight" class="w-3.5 h-3.5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
-            </svg>
-            <span id="themeLabel">Light Mode</span>
-        </button>
-        <button id="adminBtn"
-        class="py-2 px-3 rounded-lg text-xs font-medium bg-[#1a1a24] light:bg-[#f1f3f6] hover:bg-[#22222f] light:hover:bg-[#e8eaef] transition-colors"
-        title="Admin Panel">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-        </svg>
-    </button>
-</div>
-</aside>
+<!-- Ambient layers -->
+<div class="bg-layer phase-welcome" id="bg-layer"></div>
+<div class="blob blob-pink"></div>
+<div class="blob blob-blue"></div>
+<div class="blob blob-lavender"></div>
 
-<!-- CENTER CHAT AREA -->
-<main class="flex-1 flex flex-col min-w-0 bg-[#0b0b12] light:bg-[#f8f9fb]">
-    <header class="h-14 border-b border-[#2a2a38] light:border-[#dde0e5] flex items-center px-5 gap-3 flex-shrink-0 glass-subtle">
-        <h2 id="currentChatTitle" class="font-semibold text-sm truncate">New Chat</h2>
-        <span id="voiceToggleContainer" class="ml-auto flex items-center gap-2">
-            <span class="text-xs text-gray-500 light:text-gray-400">Voice</span>
-            <button id="voiceToggleBtn"
-            class="relative w-9 h-5 rounded-full bg-[#2a2a38] light:bg-[#d0d3db] transition-colors flex items-center px-0.5"
-            role="switch" aria-checked="false">
-            <span id="voiceToggleDot" class="w-4 h-4 rounded-full bg-gray-400 shadow-sm transition-transform translate-x-0"></span>
-        </button>
-    </span>
-</header>
+<!-- Canvases -->
+<canvas id="petal-canvas" aria-hidden="true"></canvas>
+<canvas id="star-canvas" aria-hidden="true"></canvas>
+<canvas id="confetti-canvas" aria-hidden="true"></canvas>
 
-<div id="chatMessagesContainer" class="flex-1 overflow-y-auto p-5 space-y-4">
-    <div class="text-center text-gray-500 light:text-gray-400 py-16" id="emptyChatPlaceholder">
-        <div class="w-12 h-12 rounded-xl bg-[#1a1a24] light:bg-[#f1f3f6] flex items-center justify-center mx-auto mb-3">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-            </svg>
-        </div>
-        <p class="text-sm">Ask a coding question to get started</p>
-        <p class="text-xs mt-1 text-gray-600 light:text-gray-400">Powered by Groq AI &middot; qwen-2.5-coder-32b</p>
+<!-- ================================================
+     SCREEN 1: WELCOME / NAME INPUT
+================================================ -->
+<section class="screen active" id="screen-welcome" role="main" aria-label="Welcome">
+  <div class="glass-card">
+    <p class="pre-text">September 9</p>
+    <h1>Before we begin...</h1>
+    <p class="subtitle">I need one little thing from you.</p>
+    <div class="name-input-wrap">
+      <label class="sr-only" for="name-input">Your name</label>
+      <input
+        class="name-input"
+        id="name-input"
+        type="text"
+        placeholder="What's your name?"
+        maxlength="40"
+        autocomplete="off"
+        autocorrect="off"
+        spellcheck="false"
+      />
+      <p class="error-msg" id="name-error" role="alert" aria-live="polite"></p>
     </div>
-</div>
+    <button class="btn-primary" id="btn-enter" type="button">Enter</button>
+  </div>
+</section>
 
-<div class="p-4 border-t border-[#2a2a38] light:border-[#dde0e5] glass-subtle flex-shrink-0">
-    <div class="flex gap-3 items-end max-w-3xl mx-auto">
-        <textarea id="chatInput"
-        class="flex-1 resize-none rounded-xl border border-[#2a2a38] light:border-[#dde0e5] bg-[#1a1a24] light:bg-white text-gray-100 light:text-gray-800 p-3 text-sm placeholder-gray-500 light:placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all min-h-[44px] max-h-[160px]"
-        placeholder="Ask a coding question..." rows="1"
-    ></textarea>
-    <button id="sendBtn"
-    class="flex-shrink-0 w-10 h-10 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-    disabled>
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/>
-    </svg>
+<!-- ================================================
+     SCREEN 2: CINEMATIC TRANSITION
+================================================ -->
+<section class="screen" id="screen-transition" aria-label="Transition" aria-live="polite">
+  <div style="text-align: center; max-width: 500px;">
+    <div class="transition-text" id="trans-name"></div>
+    <div class="transition-sub" id="trans-sub"></div>
+    <div class="loading-dots" id="trans-dots">
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================
+     SCREEN 3: COUNTDOWN
+================================================ -->
+<section class="screen" id="screen-countdown" aria-label="Countdown to September 9">
+  <p class="countdown-eyebrow">Waiting for</p>
+  <h2 class="countdown-title">September 9</h2>
+  <div class="countdown-grid" role="timer" aria-label="Countdown timer">
+    <div class="countdown-unit">
+      <span class="countdown-num" id="cd-days">--</span>
+      <span class="countdown-label">Days</span>
+    </div>
+    <div class="countdown-unit">
+      <span class="countdown-num" id="cd-hours">--</span>
+      <span class="countdown-label">Hours</span>
+    </div>
+    <div class="countdown-unit">
+      <span class="countdown-num" id="cd-mins">--</span>
+      <span class="countdown-label">Minutes</span>
+    </div>
+    <div class="countdown-unit">
+      <span class="countdown-num" id="cd-secs">--</span>
+      <span class="countdown-label">Seconds</span>
+    </div>
+  </div>
+  <div style="margin-top: 1.5rem; text-align: center;">
+    <p style="font-family: var(--font-display); font-style: italic; font-size: clamp(0.8rem, 2.5vw, 1rem); color: rgba(255,255,255,0.4);">
+      Something special is coming for you.
+    </p>
+  </div>
+</section>
+
+<!-- ================================================
+     SCREEN 4: MIDNIGHT / BIRTHDAY REVEAL
+================================================ -->
+<section class="screen" id="screen-midnight" aria-label="Birthday reveal" aria-live="polite">
+  <div style="text-align: center; max-width: 480px; padding: 1rem;">
+    <div class="midnight-msg" id="midnight-msg-1">The wait is over.</div>
+    <div class="midnight-msg" id="midnight-msg-2" style="margin-top: 1rem;">Happy Birthday to me...</div>
+    <div class="midnight-sub" id="midnight-msg-3">But today isn't really about me.</div>
+  </div>
+</section>
+
+<!-- ================================================
+     SCREEN 5: LOVE LETTER
+================================================ -->
+<section class="screen" id="screen-letter" aria-label="Love letter" aria-live="polite">
+  <div class="letter-stage" id="letter-stage">
+    <div class="letter-chunk" id="letter-chunk-display"></div>
+  </div>
+  <div class="letter-progress" id="letter-progress">
+    <div class="progress-dots" id="progress-dots" role="progressbar" aria-label="Letter progress"></div>
+  </div>
+</section>
+
+<!-- ================================================
+     SCREEN 6: PROPOSAL
+================================================ -->
+<section class="screen" id="screen-proposal" aria-label="Proposal">
+  <div class="glass-card proposal-card">
+    <div class="proposal-ring" aria-hidden="true"></div>
+    <div class="proposal-question" id="prop-q1"></div>
+    <div class="proposal-question" id="prop-q2" style="transition-delay: 0.3s;"></div>
+    <div class="proposal-divider" aria-hidden="true"></div>
+    <div class="proposal-question" id="prop-q3" style="transition-delay: 0.6s;"></div>
+    <div class="proposal-question final" id="prop-q4" style="transition-delay: 0.9s; margin-top: 0.5rem;"></div>
+
+    <div class="proposal-buttons" id="proposal-btns">
+      <button class="btn-yes" id="btn-yes" type="button">Yes</button>
+      <button class="btn-think" id="btn-think" type="button">Let me think...</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================
+     SCREEN 7: LET ME THINK
+================================================ -->
+<section class="screen" id="screen-think" aria-label="Taking time" aria-live="polite">
+  <div class="glass-card" style="max-width: 460px; text-align: center;">
+    <div class="think-msg">
+      <span class="line" id="think-line-1">That's okay.</span>
+      <span class="line" id="think-line-2" style="transition-delay: 0.5s;">Take your time.</span>
+      <span class="line" id="think-line-3" style="transition-delay: 1s;">Some questions deserve a little time.</span>
+    </div>
+    <button class="btn-continue" id="btn-continue" type="button">I'm ready</button>
+  </div>
+</section>
+
+<!-- ================================================
+     SCREEN 8: YES CELEBRATION
+================================================ -->
+<section class="screen" id="screen-yes" aria-label="Celebration" aria-live="polite">
+  <div class="glass-card" style="max-width: 560px; text-align: center;">
+    <p class="yes-main">You said yes</p>
+    <div class="yes-headline" id="yes-headline"></div>
+    <div class="yes-body" id="yes-body">
+      Thank you, <span id="yes-name" class="name-highlight" style="color: #FFD6E5; text-shadow: 0 0 20px rgba(255,143,184,0.5);"></span>.<br>
+      From today...<br>
+      not just my girlfriend,<br>
+      but the person I want beside me for life.
+    </div>
+    <div class="yes-final">I Love You.</div>
+    <p style="font-family: var(--font-display); font-style: italic; font-size: clamp(0.8rem, 2.5vw, 0.95rem); color: rgba(255,255,255,0.4); margin-top: 0.75rem;">Truly.</p>
+  </div>
+</section>
+
+<!-- Music control -->
+<button id="music-btn" aria-label="Toggle music" title="Toggle music">
+  <svg class="music-icon" id="music-icon-on" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9 18V5l12-2v13M9 18a3 3 0 11-6 0 3 3 0 016 0zM21 16a3 3 0 11-6 0 3 3 0 016 0z" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  </svg>
+  <svg class="music-icon hidden" id="music-icon-off" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9 18V5l12-2v13M9 18a3 3 0 11-6 0 3 3 0 016 0zM21 16a3 3 0 11-6 0 3 3 0 016 0z" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+    <line x1="3" y1="3" x2="21" y2="21" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
 </button>
-</div>
-</div>
-</main>
 
-<!-- RIGHT PANEL (Profile) -->
-<aside class="w-[280px] flex-shrink-0 glass-subtle border-l border-[#2a2a38] light:border-[#dde0e5] flex flex-col z-10 p-5">
-    <div class="text-center">
-        <div class="relative inline-block">
-            <img id="profilePic" src=""
-            alt="Profile"
-            class="w-16 h-16 rounded-full object-cover border-2 border-[#2a2a38] light:border-[#dde0e5] mx-auto shadow-lg"
-            onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%233a3a50%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 dy=%22.1em%22 fill=%22%23aaa%22 font-size=%2240%22 font-weight=%22bold%22>?</text></svg>'">
-        </div>
-        <h3 id="profileName" class="font-semibold text-sm mt-3 truncate">Guest</h3>
-        <p id="profileEmail" class="text-xs text-gray-400 light:text-gray-500 truncate">anonymous@guest</p>
-    </div>
-    <div class="mt-6 space-y-3 flex-1">
-        <button id="changeNameBtn"
-        class="w-full py-2 px-3 rounded-lg text-xs font-medium bg-[#1a1a24] light:bg-[#f1f3f6] hover:bg-[#22222f] light:hover:bg-[#e8eaef] transition-colors text-left flex items-center gap-2">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-        </svg>
-        Change Name
-    </button>
-    <button id="changePhotoBtn"
-    class="w-full py-2 px-3 rounded-lg text-xs font-medium bg-[#1a1a24] light:bg-[#f1f3f6] hover:bg-[#22222f] light:hover:bg-[#e8eaef] transition-colors text-left flex items-center gap-2">
-    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-    </svg>
-    Update Photo
-</button>
-</div>
-<button id="logoutBtn"
-class="w-full py-2.5 px-4 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-400 font-medium text-sm transition-colors border border-red-600/20 flex items-center justify-center gap-2 mt-auto">
-<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v1"/>
-</svg>
-Logout
-</button>
-</aside>
-</div>
+<!-- Firebase SDK -->
+<script type="module">
+// ================================================
+// CONFIGURATION
+// ================================================
+const CONFIG = {
+  targetDate:     "2026-09-09T00:00:00",
+  enableFirebase: true,
+  enableMusic:    true,
+  musicPath:      "assets/music.mp3",
+  preserveName:   true,
+};
 
-<!-- ==================== ADMIN MODAL ==================== -->
-<div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm">
-    <div class="w-full max-w-lg glass-subtle rounded-2xl border border-[#2a2a38] light:border-[#dde0e5] shadow-2xl p-6 max-h-[80vh] flex flex-col">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="font-bold text-lg">Admin Panel</h2>
-            <button id="closeAdminBtn" class="p-1.5 rounded-lg hover:bg-[#22222f] light:hover:bg-[#e8eaef] transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
-        </div>
-        <div id="adminPasswordPrompt" class="space-y-3">
-            <p class="text-sm text-gray-400 light:text-gray-500">Enter admin password to continue.</p>
-            <input type="password" id="adminPasswordInput"
-            class="w-full rounded-lg border border-[#2a2a38] light:border-[#dde0e5] bg-[#1a1a24] light:bg-white text-gray-100 light:text-gray-800 p-2.5 text-sm placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors"
-            placeholder="Admin password">
-            <button id="adminLoginBtn"
-            class="w-full py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition-colors">
-            Access Admin Panel
-        </button>
-        <p id="adminError" class="text-xs text-red-400 hidden">Incorrect password.</p>
-    </div>
-    <div id="adminContent" class="hidden flex-1 flex flex-col min-h-0">
-        <h3 class="text-sm font-semibold mb-3">Registered Users</h3>
-        <div id="adminUsersList" class="flex-1 overflow-y-auto space-y-2 text-sm">
-            <p class="text-gray-500 text-xs">Loading...</p>
-        </div>
-    </div>
-</div>
-</div>
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyCw6RwbIUo-T-6IIb42YOAKrCH5pt1bCb0",
+  authDomain:        "rb-pro-98d50.firebaseapp.com",
+  databaseURL:       "https://rb-pro-98d50-default-rtdb.firebaseio.com",
+  projectId:         "rb-pro-98d50",
+  storageBucket:     "rb-pro-98d50.firebasestorage.app",
+  messagingSenderId: "59154734109",
+  appId:             "1:59154734109:web:b2b94813789d467b9dbaf4",
+  measurementId:     "G-L63LF5342D"
+};
+// NOTE: These Firebase rules should be locked down before production.
+// Current dev setup is open. See Firebase Realtime Database rules.
 
-<!-- ==================== MODAL OVERLAYS ==================== -->
-<div id="changeNameModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm">
-    <div class="w-full max-w-sm glass-subtle rounded-2xl border border-[#2a2a38] light:border-[#dde0e5] shadow-2xl p-6">
-        <h2 class="font-bold text-lg mb-3">Change Display Name</h2>
-        <input type="text" id="newNameInput"
-        class="w-full rounded-lg border border-[#2a2a38] light:border-[#dde0e5] bg-[#1a1a24] light:bg-white text-gray-100 light:text-gray-800 p-2.5 text-sm focus:outline-none focus:border-indigo-500 transition-colors mb-3"
-        placeholder="Enter new name">
-        <div class="flex gap-2">
-            <button id="saveNameBtn"
-            class="flex-1 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition-colors">Save</button>
-            <button id="cancelNameBtn"
-            class="flex-1 py-2.5 rounded-lg bg-[#1a1a24] light:bg-[#f1f3f6] hover:bg-[#22222f] light:hover:bg-[#e8eaef] font-medium text-sm transition-colors">Cancel</button>
-        </div>
-    </div>
-</div>
+// ================================================
+// STATE
+// ================================================
+const STATE = {
+  name: "",
+  sessionId: "",
+  db: null,
+  audio: null,
+  musicEnabled: false,
+  musicLoaded: false,
+  petalLoop: null,
+  countdownInterval: null,
+  letterIndex: 0,
+  letterTimer: null,
+};
 
-<div id="changePhotoModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm">
-    <div class="w-full max-w-sm glass-subtle rounded-2xl border border-[#2a2a38] light:border-[#dde0e5] shadow-2xl p-6">
-        <h2 class="font-bold text-lg mb-3">Update Profile Photo</h2>
-        <input type="text" id="newPhotoUrlInput"
-        class="w-full rounded-lg border border-[#2a2a38] light:border-[#dde0e5] bg-[#1a1a24] light:bg-white text-gray-100 light:text-gray-800 p-2.5 text-sm focus:outline-none focus:border-indigo-500 transition-colors mb-3"
-        placeholder="Enter image URL">
-        <div class="flex gap-2">
-            <button id="savePhotoBtn"
-            class="flex-1 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition-colors">Save</button>
-            <button id="cancelPhotoBtn"
-            class="flex-1 py-2.5 rounded-lg bg-[#1a1a24] light:bg-[#f1f3f6] hover:bg-[#22222f] light:hover:bg-[#e8eaef] font-medium text-sm transition-colors">Cancel</button>
-        </div>
-    </div>
-</div>
+// ================================================
+// LETTER CONTENT
+// Placeholders: {{NAME}} = user's name
+// ================================================
+const LETTER_CHUNKS = [
+  { text: "Heyy...", cls: "script" },
+  { text: "Finally...", cls: "script" },
+  { text: "Jei din er jonno\nwait korchilam,", cls: "" },
+  { text: "oi din ta\naise poro.", cls: "" },
+  { text: "Ami na,\nguchai valo moto\nkotha bolte pari na.", cls: "" },
+  { text: "Sorry for that.", cls: "", sub: "genuinely." },
+  { text: "Anyway mam...", cls: "script" },
+  { text: "Ami kokhono airokom bhabe\nkaoke boli na.", cls: "" },
+  { text: "Really.", cls: "bold" },
+  { text: "Ajke September 9.", cls: "" },
+  { text: "Mane ajke amar birthday.", cls: "", sub: "my day. but not really." },
+  { text: "Kothai theke shuru korbo\nbujhtacina.", cls: "" },
+  { text: "{{NAME}},", cls: "script name-highlight" },
+  { text: "apni amake kemon bhabe\netodin mone korcen,\njeta ami janina.", cls: "" },
+  { text: "Kintu ami apnake amar life er\nspecial kichu ekta mone korchi.", cls: "" },
+  { text: "Ami life e maturity bhabe\n2 ta relation korci.", cls: "" },
+  { text: "But aktaeo ami kaoke\npropose kori nai.", cls: "" },
+  { text: "Ora amake propose korse.", cls: "", sub: "but this time..." },
+  { text: "Ei jonno life er\nfirst time propose kortaci.", cls: "" },
+  { text: "Tao onekta\nserious bhabe.", cls: "bold" },
+  { text: "Ami apnake amar GF hisebe\nmoteo chai na.", cls: "" },
+  { text: "Wife hisebe chai.", cls: "script" },
+  { text: "I don't know ami apnar jonno\nbest kina.", cls: "" },
+  { text: "But amar jonno\napni best ever.", cls: "" },
+  { text: "Mane...", cls: "", sub: "ever." },
+];
 
-<!-- ==================== SCRIPTS ==================== -->
-<script>
-    (function() {
-        // ==================== CONFIGURATION ====================
-        const firebaseConfig = {
-            apiKey: "YOUR_FIREBASE_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            appId: "YOUR_APP_ID",
-        };
+const PROPOSAL_SEQUENCE = [
+  "Will you be mine?",
+  "Will you be my wife?",
+  "Will you marry me?",
+  "Willllll youuuuu\nmarry meeeeeee,\n{{NAME}}?"
+];
 
-        const GROQ_API_KEY = "YOUR_GROQ_API_KEY";
-        const GROQ_MODEL = "qwen-2.5-coder-32b";
-        const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+// ================================================
+// UTILITY
+// ================================================
+function $(id) { return document.getElementById(id); }
 
-        const ADMIN_PASSWORD = "308580";
+function sleep(ms) {
+  return new Promise(res => setTimeout(res, ms));
+}
 
-        // ==================== INITIALIZE FIREBASE ====================
-        let firebaseApp;
-        let firebaseAuth;
-        let firebaseDb;
+function applyName(text) {
+  return text.replace(/{{NAME}}/g, `<span class="name-highlight">${escapeHTML(STATE.name)}</span>`);
+}
 
-        try {
-            firebaseApp = firebase.initializeApp(firebaseConfig);
-            firebaseAuth = firebase.auth();
-            firebaseDb = firebase.database();
-        } catch (err) {
-            console.error("Firebase initialization error:", err);
-            alert("Failed to initialize Firebase. Check your configuration.");
-        }
+function applyNamePlain(text) {
+  return text.replace(/{{NAME}}/g, STATE.name);
+}
 
-        // ==================== DOM REFERENCES ====================
-        const $ = (sel) => document.querySelector(sel);
-        const $$ = (sel) => document.querySelectorAll(sel);
+function escapeHTML(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
 
-        const dashboard = $('#dashboard');
-        const newChatBtn = $('#newChatBtn');
-        const chatHistoryList = $('#chatHistoryList');
-        const noChatsMsg = $('#noChatsMsg');
-        const themeToggleBtn = $('#themeToggleBtn');
-        const themeIconDark = $('#themeIconDark');
-        const themeIconLight = $('#themeIconLight');
-        const themeLabel = $('#themeLabel');
-        const adminBtn = $('#adminBtn');
+function pad2(n) { return String(n).padStart(2, '0'); }
 
-        const currentChatTitle = $('#currentChatTitle');
-        const chatMessagesContainer = $('#chatMessagesContainer');
-        const emptyChatPlaceholder = $('#emptyChatPlaceholder');
-        const chatInput = $('#chatInput');
-        const sendBtn = $('#sendBtn');
-        const voiceToggleBtn = $('#voiceToggleBtn');
-        const voiceToggleDot = $('#voiceToggleDot');
-        const voiceToggleContainer = $('#voiceToggleContainer');
+function generateSessionId() {
+  try { return crypto.randomUUID(); } catch(e) {}
+  const arr = new Uint8Array(16);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, b => b.toString(16).padStart(2,'0')).join('-');
+}
 
-        const profilePic = $('#profilePic');
-        const profileName = $('#profileName');
-        const profileEmail = $('#profileEmail');
-        const logoutBtn = $('#logoutBtn');
-        const changeNameBtn = $('#changeNameBtn');
-        const changePhotoBtn = $('#changePhotoBtn');
+function setScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active', 'fade-out');
+  });
+  const el = $(id);
+  if (el) el.classList.add('active');
+}
 
-        const adminModal = $('#adminModal');
-        const closeAdminBtn = $('#closeAdminBtn');
-        const adminPasswordPrompt = $('#adminPasswordPrompt');
-        const adminPasswordInput = $('#adminPasswordInput');
-        const adminLoginBtn = $('#adminLoginBtn');
-        const adminError = $('#adminError');
-        const adminContent = $('#adminContent');
-        const adminUsersList = $('#adminUsersList');
+function setPhase(phase) {
+  const bg = $('bg-layer');
+  bg.className = `bg-layer phase-${phase}`;
+}
 
-        const changeNameModal = $('#changeNameModal');
-        const newNameInput = $('#newNameInput');
-        const saveNameBtn = $('#saveNameBtn');
-        const cancelNameBtn = $('#cancelNameBtn');
+// ================================================
+// FIREBASE
+// ================================================
+async function initFirebase() {
+  if (!CONFIG.enableFirebase) return;
+  try {
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+    const { getDatabase, ref, set, push, update } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+    const app = initializeApp(FIREBASE_CONFIG);
+    STATE.db = { db: getDatabase(app), ref, set, push, update };
+  } catch(e) {
+    console.warn("Firebase init failed – running offline.", e);
+  }
+}
 
-        const changePhotoModal = $('#changePhotoModal');
-        const newPhotoUrlInput = $('#newPhotoUrlInput');
-        const savePhotoBtn = $('#savePhotoBtn');
-        const cancelPhotoBtn = $('#cancelPhotoBtn');
+async function trackEvent(event, extra = {}) {
+  try {
+    if (!STATE.db || !STATE.sessionId) return;
+    const { db, ref, update } = STATE.db;
+    const path = `proposalSessions/${STATE.sessionId}`;
+    const payload = {
+      [`events/${event}`]: {
+        ts: Date.now(),
+        ...extra
+      }
+    };
+    // Also set top-level convenience fields
+    if (event === "NAME_SUBMITTED") payload.name = STATE.name;
+    if (event === "ENTRY")          payload.createdAt = Date.now();
+    if (event === "LETTER_STARTED") payload.letterStartedAt = Date.now();
+    if (event === "PROPOSAL_SHOWN") payload.proposalShownAt = Date.now();
+    if (event === "YES_CLICKED")    { payload.response = "YES"; payload.responseAt = Date.now(); }
+    if (event === "THINK_CLICKED")  { payload.response = "THINK"; payload.responseAt = Date.now(); }
+    await update(ref(db, path), payload);
+  } catch(e) {
+    // Firebase errors must not break the experience
+  }
+}
 
-        // ==================== STATE ====================
-        let currentUser = null;
-        let currentChatId = null;
-        let chatMessages = [];
-        let voiceEnabled = false;
-        let isAiResponding = false;
-        let adminAuthed = false;
-        let allChatsCache = {};
+// ================================================
+// SESSION
+// ================================================
+function initSession() {
+  let id = localStorage.getItem("rb_session_id");
+  if (!id) {
+    id = generateSessionId();
+    localStorage.setItem("rb_session_id", id);
+  }
+  STATE.sessionId = id;
 
-        // ==================== THEME MANAGEMENT ====================
-        function getStoredTheme() {
-            return localStorage.getItem('codeai_theme') || 'dark';
-        }
+  if (CONFIG.preserveName) {
+    const saved = localStorage.getItem("rb_name");
+    if (saved) STATE.name = saved;
+  }
+}
 
-        function applyTheme(theme) {
-            const html = document.documentElement;
-            if (theme === 'light') {
-                html.classList.remove('dark');
-                html.classList.add('light');
-                themeIconDark.classList.add('hidden');
-                themeIconLight.classList.remove('hidden');
-                themeLabel.textContent = 'Dark Mode';
-            } else {
-                html.classList.add('dark');
-                html.classList.remove('light');
-                themeIconDark.classList.remove('hidden');
-                themeIconLight.classList.add('hidden');
-                themeLabel.textContent = 'Light Mode';
-            }
-            localStorage.setItem('codeai_theme', theme);
-        }
+// ================================================
+// PETAL ANIMATION
+// ================================================
+function initPetals() {
+  const canvas = $('petal-canvas');
+  const ctx = canvas.getContext('2d');
+  const petals = [];
+  let W, H;
 
-        function toggleTheme() {
-            const current = getStoredTheme();
-            applyTheme(current === 'dark' ? 'light' : 'dark');
-        }
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
 
-        applyTheme(getStoredTheme());
-        themeToggleBtn.addEventListener('click', toggleTheme);
+  const COLORS = [
+    'rgba(255,143,184,ALPHA)',
+    'rgba(255,214,229,ALPHA)',
+    'rgba(220,203,255,ALPHA)',
+    'rgba(255,200,220,ALPHA)',
+    'rgba(255,255,255,ALPHA)',
+  ];
 
-        // ==================== VOICE TOGGLE ====================
-        voiceToggleBtn.addEventListener('click', () => {
-            voiceEnabled = !voiceEnabled;
-            if (voiceEnabled) {
-                voiceToggleDot.classList.add('translate-x-4');
-                voiceToggleDot.classList.remove('translate-x-0');
-                voiceToggleBtn.classList.add('bg-indigo-500');
-                voiceToggleBtn.classList.remove('bg-[#2a2a38]', 'light:bg-[#d0d3db]');
-                voiceToggleDot.classList.add('bg-white');
-                voiceToggleDot.classList.remove('bg-gray-400');
-                voiceToggleBtn.setAttribute('aria-checked', 'true');
-            } else {
-                voiceToggleDot.classList.remove('translate-x-4');
-                voiceToggleDot.classList.add('translate-x-0');
-                voiceToggleBtn.classList.remove('bg-indigo-500');
-                voiceToggleBtn.classList.add('bg-[#2a2a38]', 'light:bg-[#d0d3db]');
-                voiceToggleDot.classList.remove('bg-white');
-                voiceToggleDot.classList.add('bg-gray-400');
-                voiceToggleBtn.setAttribute('aria-checked', 'false');
-                window.speechSynthesis.cancel();
-            }
-        });
+  function spawnPetal() {
+    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    petals.push({
+      x:   Math.random() * W,
+      y:   -10,
+      vx:  (Math.random() - 0.5) * 1.2,
+      vy:  0.6 + Math.random() * 1.2,
+      rot: Math.random() * Math.PI * 2,
+      vrot: (Math.random() - 0.5) * 0.04,
+      w:   5 + Math.random() * 8,
+      h:   3 + Math.random() * 5,
+      alpha: 0.3 + Math.random() * 0.5,
+      color,
+      wobble: Math.random() * Math.PI * 2,
+      wobbleSpeed: 0.02 + Math.random() * 0.02,
+    });
+  }
 
-        function speakText(text) {
-            if (!voiceEnabled) return;
-            window.speechSynthesis.cancel();
-            const cleaned = text.replace(/```[\s\S]*?```/g, ' [code block omitted] ')
-                .replace(/`([^`]+)`/g, ' $1 ')
-                .replace(/[*_~#>\[\]()]/g, ' ')
-                .replace(/\s+/g, ' ')
-                .trim();
-            if (!cleaned) return;
-            const utterance = new SpeechSynthesisUtterance(cleaned);
-            utterance.rate = 1.05;
-            utterance.pitch = 1.0;
-            utterance.volume = 0.9;
-            const voices = window.speechSynthesis.getVoices();
-            const preferred = voices.find(v => v.name.includes('Google') || v.name.includes('Natural') || v.name
-                .includes('Daniel') || v.name.includes('Samantha'));
-            if (preferred) utterance.voice = preferred;
-            window.speechSynthesis.speak(utterance);
-        }
+  let spawnTimer = 0;
+  let intensity = 1; // 1 = normal, 2 = more
+  STATE.setIntensity = (v) => { intensity = v; };
 
-        window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+  function drawPetal(p) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    const col = p.color.replace('ALPHA', p.alpha.toFixed(2));
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, p.w, p.h, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
 
-        // ==================== AUTHENTICATION (ANONYMOUS AUTO-LOGIN) ====================
-        firebaseAuth.onAuthStateChanged(async (user) => {
-            if (user) {
-                currentUser = user;
-                dashboard.classList.remove('hidden');
-                await storeUserPublicData(user);
-                updateProfileUI(user);
-                loadChatHistoryList();
-                if (!currentChatId) {
-                    resetChatView();
-                }
-            } else {
-                // Auto sign-in anonymously
-                try {
-                    await firebaseAuth.signInAnonymously();
-                } catch (err) {
-                    console.error("Anonymous auth failed:", err);
-                    alert("Failed to initialize anonymous session.");
-                }
-            }
-        });
+  let raf;
+  function loop(ts) {
+    ctx.clearRect(0, 0, W, H);
 
-        async function storeUserPublicData(user) {
-            try {
-                await firebaseDb.ref('users_public/' + user.uid).set({
-                    name: user.displayName || 'Guest',
-                    email: user.email || 'anonymous@guest',
-                    uid: user.uid,
-                    photoURL: user.photoURL || '',
-                    lastSeen: new Date().toISOString(),
-                });
-            } catch (err) {
-                console.warn("Could not store public user data:", err.message);
-            }
-        }
+    spawnTimer += intensity;
+    if (spawnTimer >= (80 / intensity) && petals.length < 60 * intensity) {
+      spawnPetal();
+      spawnTimer = 0;
+    }
 
-        function updateProfileUI(user) {
-            profileName.textContent = user.displayName || 'Guest';
-            profileEmail.textContent = user.email || 'anonymous@guest';
-            if (user.photoURL) {
-                profilePic.src = user.photoURL;
-            } else {
-                profilePic.src =
-                    'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%233a3a50" width="100" height="100"/><text x="50" y="55" text-anchor="middle" dy=".1em" fill="%23aaa" font-size="40" font-weight="bold">' +
-                    (user.displayName ? user.displayName.charAt(0).toUpperCase() : 'G') + '</text></svg>';
-            }
-        }
+    for (let i = petals.length - 1; i >= 0; i--) {
+      const p = petals[i];
+      p.wobble += p.wobbleSpeed;
+      p.x += p.vx + Math.sin(p.wobble) * 0.4;
+      p.y += p.vy;
+      p.rot += p.vrot;
+      drawPetal(p);
+      if (p.y > H + 20 || p.x < -30 || p.x > W + 30) {
+        petals.splice(i, 1);
+      }
+    }
 
-        // ==================== LOGOUT ====================
-        logoutBtn.addEventListener('click', async () => {
-            window.speechSynthesis.cancel();
-            await firebaseAuth.signOut();
-            // After sign out, onAuthStateChanged will trigger anonymous sign-in again
-        });
+    raf = requestAnimationFrame(loop);
+  }
 
-        // ==================== PROFILE UPDATES ====================
-        changeNameBtn.addEventListener('click', () => {
-            newNameInput.value = currentUser?.displayName || '';
-            changeNameModal.classList.remove('hidden');
-        });
-        cancelNameBtn.addEventListener('click', () => changeNameModal.classList.add('hidden'));
-        saveNameBtn.addEventListener('click', async () => {
-            const newName = newNameInput.value.trim();
-            if (!newName) return;
-            try {
-                await currentUser.updateProfile({ displayName: newName });
-                await storeUserPublicData(currentUser);
-                updateProfileUI(currentUser);
-                changeNameModal.classList.add('hidden');
-            } catch (err) {
-                alert("Failed to update name: " + err.message);
-            }
-        });
+  loop(0);
+  STATE.petalLoop = () => cancelAnimationFrame(raf);
+}
 
-        changePhotoBtn.addEventListener('click', () => {
-            newPhotoUrlInput.value = currentUser?.photoURL || '';
-            changePhotoModal.classList.remove('hidden');
-        });
-        cancelPhotoBtn.addEventListener('click', () => changePhotoModal.classList.add('hidden'));
-        savePhotoBtn.addEventListener('click', async () => {
-            const newUrl = newPhotoUrlInput.value.trim();
-            if (!newUrl) return;
-            try {
-                await currentUser.updateProfile({ photoURL: newUrl });
-                await storeUserPublicData(currentUser);
-                updateProfileUI(currentUser);
-                changePhotoModal.classList.add('hidden');
-            } catch (err) {
-                alert("Failed to update photo: " + err.message);
-            }
-        });
+// ================================================
+// STAR CANVAS
+// ================================================
+function showStars() {
+  const canvas = $('star-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
 
-        [changeNameModal, changePhotoModal].forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) modal.classList.add('hidden');
-            });
-        });
+  const stars = Array.from({length: 80}, () => ({
+    x:     Math.random() * canvas.width,
+    y:     Math.random() * canvas.height,
+    r:     0.5 + Math.random() * 1.5,
+    alpha: 0.2 + Math.random() * 0.6,
+    speed: 0.005 + Math.random() * 0.008,
+    phase: Math.random() * Math.PI * 2,
+  }));
 
-        // ==================== CHAT HISTORY LIST ====================
-        async function loadChatHistoryList() {
-            if (!currentUser) return;
-            const chatsRef = firebaseDb.ref('users/' + currentUser.uid + '/chats');
-            try {
-                const snapshot = await chatsRef.once('value');
-                const data = snapshot.val() || {};
-                allChatsCache = data;
-                renderChatHistoryList(data);
-            } catch (err) {
-                console.error("Error loading chat history:", err);
-            }
-        }
+  function draw(ts) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      s.phase += s.speed;
+      const a = s.alpha * (0.6 + 0.4 * Math.sin(s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${a.toFixed(2)})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
 
-        function renderChatHistoryList(data) {
-            const chatIds = Object.keys(data);
-            if (chatIds.length === 0) {
-                chatHistoryList.innerHTML =
-                    '<p class="text-xs text-gray-500 light:text-gray-400 text-center py-8" id="noChatsMsg">No conversations yet</p>';
-                return;
-            }
-            chatIds.sort((a, b) => {
-                const tA = data[a].updatedAt || data[a].createdAt || '';
-                const tB = data[b].updatedAt || data[b].createdAt || '';
-                return tB.localeCompare(tA);
-            });
-            let html = '';
-            chatIds.forEach(chatId => {
-                const chat = data[chatId];
-                const title = chat.title || 'New Chat';
-                const isActive = chatId === currentChatId;
-                html += `
-                    <button data-chat-id="${chatId}"
-                            class="w-full text-left py-2.5 px-3 rounded-lg text-sm transition-colors truncate block ${
-                                isActive
-                                    ? 'bg-indigo-600/20 text-indigo-300 light:bg-indigo-100 light:text-indigo-700 font-medium'
-                                    : 'hover:bg-[#1a1a24] light:hover:bg-[#f1f3f6] text-gray-300 light:text-gray-700'
-                            }">
-                        ${escapeHtml(title)}
-                    </button>`;
-            });
-            chatHistoryList.innerHTML = html;
-            chatHistoryList.querySelectorAll('[data-chat-id]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const chatId = btn.getAttribute('data-chat-id');
-                    openChat(chatId);
-                });
-            });
-        }
+  draw(0);
+  canvas.classList.add('visible');
+}
 
-        function escapeHtml(str) {
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
-        }
+// ================================================
+// CONFETTI CELEBRATION
+// ================================================
+function launchConfetti() {
+  const canvas = $('confetti-canvas');
+  const ctx    = canvas.getContext('2d');
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+  canvas.classList.add('active');
 
-        async function openChat(chatId) {
-            if (!currentUser || isAiResponding) return;
-            window.speechSynthesis.cancel();
-            currentChatId = chatId;
-            const chatRef = firebaseDb.ref('users/' + currentUser.uid + '/chats/' + chatId);
-            try {
-                const snapshot = await chatRef.once('value');
-                const data = snapshot.val();
-                if (data) {
-                    chatMessages = data.messages || [];
-                    currentChatTitle.textContent = data.title || 'New Chat';
-                } else {
-                    chatMessages = [];
-                    currentChatTitle.textContent = 'New Chat';
-                }
-                renderMessages();
-                renderChatHistoryList(allChatsCache);
-                scrollToBottom();
-            } catch (err) {
-                console.error("Error opening chat:", err);
-            }
-        }
+  const particles = [];
+  const COLS = ['#FF8FB8','#FFD6E5','#9EDCFF','#DCCBFF','#ffffff','#FFB6D9'];
 
-        function resetChatView() {
-            currentChatId = null;
-            chatMessages = [];
-            currentChatTitle.textContent = 'New Chat';
-            chatMessagesContainer.innerHTML = `
-                <div class="text-center text-gray-500 light:text-gray-400 py-16" id="emptyChatPlaceholder">
-                    <div class="w-12 h-12 rounded-xl bg-[#1a1a24] light:bg-[#f1f3f6] flex items-center justify-center mx-auto mb-3">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                        </svg>
-                    </div>
-                    <p class="text-sm">Ask a coding question to get started</p>
-                    <p class="text-xs mt-1 text-gray-600 light:text-gray-400">Powered by Groq AI &middot; qwen-2.5-coder-32b</p>
-                </div>`;
-        }
+  for (let i = 0; i < 160; i++) {
+    particles.push({
+      x:    Math.random() * canvas.width,
+      y:    -10 - Math.random() * canvas.height * 0.3,
+      vx:   (Math.random() - 0.5) * 3,
+      vy:   2 + Math.random() * 4,
+      rot:  Math.random() * 360,
+      vrot: (Math.random() - 0.5) * 8,
+      w:    4 + Math.random() * 7,
+      h:    2 + Math.random() * 4,
+      col:  COLS[Math.floor(Math.random() * COLS.length)],
+      alpha: 1,
+    });
+  }
 
-        // ==================== RENDER MESSAGES ====================
-        function renderMessages() {
-            if (chatMessages.length === 0) {
-                resetChatView();
-                return;
-            }
-            let html = '';
-            chatMessages.forEach((msg) => {
-                if (msg.role === 'user') {
-                    html += `
-                        <div class="msg-enter flex justify-end">
-                            <div class="max-w-[75%] bg-indigo-600 text-white rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-md">
-                                ${escapeHtml(msg.content)}
-                            </div>
-                        </div>`;
-                } else {
-                    html += `
-                        <div class="msg-enter flex justify-start">
-                            <div class="max-w-[85%] bg-[#1a1a24] light:bg-white border border-[#2a2a38] light:border-[#dde0e5] rounded-2xl rounded-bl-md px-4 py-3 text-sm shadow-md ai-message-content">
-                                ${formatAiContent(msg.content)}
-                            </div>
-                        </div>`;
-                }
-            });
-            chatMessagesContainer.innerHTML = html;
-            attachCopyListeners();
-            scrollToBottom();
-        }
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    frame++;
+    let alive = false;
 
-        function formatAiContent(content) {
-            let result = '';
-            const parts = content.split(/(```[\s\S]*?```)/g);
-            parts.forEach(part => {
-                if (part.startsWith('```') && part.endsWith('```')) {
-                    const inner = part.slice(3, -3);
-                    const firstNewline = inner.indexOf('\n');
-                    let lang = '';
-                    let code = inner;
-                    if (firstNewline > 0) {
-                        lang = inner.slice(0, firstNewline).trim();
-                        code = inner.slice(firstNewline + 1);
-                    } else if (firstNewline === 0) {
-                        code = inner.slice(1);
-                    }
-                    const langLabel = lang || 'code';
-                    const highlighted = highlightCode(code, lang);
-                    const escapedCode = escapeHtml(code);
-                    result += `
-                        <div class="code-block-wrapper">
-                            <div class="code-block-header">
-                                <span class="code-lang-label">${escapeHtml(langLabel)}</span>
-                                <button class="copy-btn" data-code="${escapeHtml(code).replace(/"/g, '&quot;')}">Copy</button>
-                            </div>
-                            <pre><code>${highlighted}</code></pre>
-                        </div>`;
-                } else {
-                    let textHtml = escapeHtml(part);
-                    textHtml = textHtml.replace(/`([^`]+)`/g,
-                        '<code class="bg-[#2a2a38] light:bg-[#e8eaef] px-1.5 py-0.5 rounded text-xs font-mono">$1</code>');
-                    textHtml = textHtml.replace(/\n/g, '<br>');
-                    result += textHtml;
-                }
-            });
-            return result;
-        }
+    particles.forEach(p => {
+      if (p.y < canvas.height + 20) alive = true;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy *= 0.995;
+      p.rot += p.vrot;
+      if (p.y > canvas.height * 0.5) p.alpha = Math.max(0, p.alpha - 0.008);
 
-        function highlightCode(code, lang) {
-            const escaped = escapeHtml(code);
-            const highlightableLangs = ['js', 'javascript', 'ts', 'typescript', 'py', 'python', 'java', 'c', 'cpp',
-                'c++', 'go', 'rust', 'rs', 'rb', 'ruby', 'php', 'swift', 'kotlin', 'css', 'html', 'json', 'bash',
-                'sh', 'sql'
-            ];
-            const l = (lang || '').toLowerCase();
-            if (!highlightableLangs.includes(l) && lang) return escaped;
-            let result = escaped;
-            result = result.replace(/(\/\/.*$|\/\*[\s\S]*?\*\/|#.*$)/gm, '<span class="cm">$1</span>');
-            result = result.replace(/(&quot;.*?&quot;|&#39;.*?&#39;|`.*?`|&apos;.*?&apos;)/g,
-                '<span class="str">$1</span>');
-            result = result.replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
-            const keywords = [
-                'function', 'const', 'let', 'var', 'if', 'else', 'return', 'class', 'import', 'export',
-                'from', 'async', 'await', 'try', 'catch', 'throw', 'new', 'this', 'super', 'extends',
-                'static', 'public', 'private', 'protected', 'interface', 'type', 'enum', 'for', 'while',
-                'do', 'switch', 'case', 'break', 'continue', 'default', 'typeof', 'instanceof', 'in',
-                'of', 'def', 'elif', 'pass', 'yield', 'with', 'as', 'print', 'True', 'False', 'None',
-                'and', 'or', 'not', 'is', 'lambda', 'raise', 'except', 'finally', 'assert', 'global',
-                'nonlocal', 'void', 'int', 'float', 'string', 'boolean', 'bool', 'char', 'double',
-                'long', 'short', 'byte', 'final', 'abstract', 'package', 'implements', 'null', 'undefined',
-            ];
-            const kwPattern = new RegExp('\\b(' + keywords.join('|') + ')\\b', 'g');
-            result = result.replace(kwPattern, '<span class="kw">$1</span>');
-            const builtins = [
-                'console', 'log', 'document', 'window', 'Array', 'Object', 'String', 'Number', 'Math',
-                'JSON', 'Promise', 'fetch', 'map', 'filter', 'reduce', 'forEach', 'push', 'pop',
-                'parseInt', 'parseFloat', 'setTimeout', 'setInterval', 'require', 'module', 'process',
-                'print', 'len', 'range', 'list', 'dict', 'set', 'tuple', 'str', 'int', 'open', 'close',
-                'read', 'write', 'append', 'format', 'join', 'split',
-            ];
-            const biPattern = new RegExp('\\b(' + builtins.join('|') + ')\\b', 'g');
-            result = result.replace(biPattern, '<span class="builtin">$1</span>');
-            result = result.replace(/\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g, '<span class="fn">$1</span>(');
-            return result;
-        }
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.col;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
 
-        function attachCopyListeners() {
-            $$('.copy-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const code = btn.getAttribute('data-code');
-                    const decoded = code.replace(/&quot;/g, '"').replace(/&amp;/g, '&')
-                        .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'")
-                        .replace(/&apos;/g, "'");
-                    try {
-                        await navigator.clipboard.writeText(decoded);
-                        btn.textContent = 'Copied!';
-                        btn.classList.add('copied');
-                        setTimeout(() => {
-                            btn.textContent = 'Copy';
-                            btn.classList.remove('copied');
-                        }, 1800);
-                    } catch {
-                        btn.textContent = 'Failed';
-                        setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
-                    }
-                });
-            });
-        }
+    if (alive || frame < 120) requestAnimationFrame(draw);
+    else { canvas.classList.remove('active'); }
+  }
+  draw();
+}
 
-        function scrollToBottom() {
-            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
-        }
+// ================================================
+// MUSIC
+// ================================================
+function initMusic() {
+  if (!CONFIG.enableMusic) return;
+  try {
+    STATE.audio = new Audio(CONFIG.musicPath);
+    STATE.audio.loop = true;
+    STATE.audio.volume = 0.25;
+    STATE.audio.load();
 
-        // ==================== SEND MESSAGE ====================
-        sendBtn.addEventListener('click', () => handleSendMessage());
-        chatInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSendMessage();
-            }
-        });
-        chatInput.addEventListener('input', () => {
-            sendBtn.disabled = !chatInput.value.trim() || isAiResponding;
-            chatInput.style.height = 'auto';
-            chatInput.style.height = Math.min(chatInput.scrollHeight, 160) + 'px';
-        });
+    STATE.audio.addEventListener('canplaythrough', () => {
+      STATE.musicLoaded = true;
+    });
 
-        async function handleSendMessage() {
-            if (!currentUser || isAiResponding) return;
-            const content = chatInput.value.trim();
-            if (!content) return;
-            chatInput.value = '';
-            chatInput.style.height = 'auto';
-            sendBtn.disabled = true;
-            isAiResponding = true;
-            window.speechSynthesis.cancel();
+    STATE.audio.addEventListener('error', () => {
+      STATE.musicLoaded = false;
+      STATE.audio = null;
+    });
+  } catch(e) {
+    STATE.audio = null;
+  }
+}
 
-            if (!currentChatId) {
-                currentChatId = generateChatId();
-                const title = content.length > 50 ? content.slice(0, 50) + '...' : content;
-                currentChatTitle.textContent = title;
-                const chatData = {
-                    id: currentChatId,
-                    title: title,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                    messages: [],
-                };
-                await firebaseDb.ref('users/' + currentUser.uid + '/chats/' + currentChatId).set(chatData);
-            }
+function toggleMusic() {
+  if (!STATE.audio) return;
+  if (STATE.musicEnabled) {
+    STATE.audio.pause();
+    STATE.musicEnabled = false;
+    $('music-icon-on').classList.add('hidden');
+    $('music-icon-off').classList.remove('hidden');
+    trackEvent('MUSIC_DISABLED');
+  } else {
+    STATE.audio.play().catch(() => {});
+    STATE.musicEnabled = true;
+    $('music-icon-on').classList.remove('hidden');
+    $('music-icon-off').classList.add('hidden');
+    trackEvent('MUSIC_ENABLED');
+  }
+}
 
-            const userMsg = {
-                role: 'user',
-                content: content,
-                timestamp: new Date().toISOString(),
-            };
-            chatMessages.push(userMsg);
-            await firebaseDb.ref('users/' + currentUser.uid + '/chats/' + currentChatId + '/messages').set(chatMessages);
-            await firebaseDb.ref('users/' + currentUser.uid + '/chats/' + currentChatId + '/updatedAt').set(new Date()
-                .toISOString());
-            if (chatMessages.filter(m => m.role === 'user').length === 1) {
-                const title = content.length > 50 ? content.slice(0, 50) + '...' : content;
-                await firebaseDb.ref('users/' + currentUser.uid + '/chats/' + currentChatId + '/title').set(title);
-                currentChatTitle.textContent = title;
-            }
-            renderMessages();
-            await loadChatHistoryList();
-            renderChatHistoryList(allChatsCache);
-            scrollToBottom();
+function tryPlayMusic() {
+  if (!STATE.audio || STATE.musicEnabled) return;
+  STATE.audio.play().then(() => {
+    STATE.musicEnabled = true;
+    $('music-icon-on').classList.remove('hidden');
+    $('music-icon-off').classList.add('hidden');
+  }).catch(() => {});
+}
 
-            const loadingHtml = `
-                <div class="msg-enter flex justify-start" id="aiLoadingMsg">
-                    <div class="max-w-[85%] bg-[#1a1a24] light:bg-white border border-[#2a2a38] light:border-[#dde0e5] rounded-2xl rounded-bl-md px-5 py-3.5 text-sm shadow-md">
-                        <div class="flex items-center gap-1.5">
-                            <span class="ai-loading-dot w-2 h-2 rounded-full bg-indigo-400 inline-block"></span>
-                            <span class="ai-loading-dot w-2 h-2 rounded-full bg-indigo-400 inline-block"></span>
-                            <span class="ai-loading-dot w-2 h-2 rounded-full bg-indigo-400 inline-block"></span>
-                        </div>
-                    </div>
-                </div>`;
-            chatMessagesContainer.insertAdjacentHTML('beforeend', loadingHtml);
-            scrollToBottom();
+function showMusicBtn() {
+  $('music-btn').classList.add('visible');
+}
 
-            try {
-                const aiResponse = await callGroqApi(chatMessages);
-                const loadingEl = $('#aiLoadingMsg');
-                if (loadingEl) loadingEl.remove();
-                const aiMsg = {
-                    role: 'assistant',
-                    content: aiResponse,
-                    timestamp: new Date().toISOString(),
-                };
-                chatMessages.push(aiMsg);
-                await firebaseDb.ref('users/' + currentUser.uid + '/chats/' + currentChatId + '/messages').set(
-                    chatMessages);
-                await firebaseDb.ref('users/' + currentUser.uid + '/chats/' + currentChatId + '/updatedAt').set(new Date()
-                    .toISOString());
-                renderMessages();
-                await loadChatHistoryList();
-                renderChatHistoryList(allChatsCache);
-                scrollToBottom();
-                speakText(aiResponse);
-            } catch (err) {
-                const loadingEl = $('#aiLoadingMsg');
-                if (loadingEl) loadingEl.remove();
-                console.error("AI API error:", err);
-                const errorMsg = {
-                    role: 'assistant',
-                    content: '**Error:** Unable to reach the AI service. Please check your API key and try again.\n\nDetails: ' +
-                        err.message,
-                    timestamp: new Date().toISOString(),
-                };
-                chatMessages.push(errorMsg);
-                await firebaseDb.ref('users/' + currentUser.uid + '/chats/' + currentChatId + '/messages').set(
-                    chatMessages);
-                renderMessages();
-                scrollToBottom();
-            }
+// ================================================
+// NAME SUBMIT
+// ================================================
+function handleNameSubmit() {
+  const input = $('name-input');
+  const raw = input.value.trim();
 
-            isAiResponding = false;
-            sendBtn.disabled = !chatInput.value.trim();
-        }
+  if (!raw) {
+    const err = $('name-error');
+    err.textContent = "Please tell me your name first.";
+    input.focus();
+    input.classList.add('shake');
+    setTimeout(() => input.classList.remove('shake'), 500);
+    return;
+  }
 
-        function generateChatId() {
-            return 'chat_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
-        }
+  $('name-error').textContent = "";
 
-        async function callGroqApi(messages) {
-            const systemPrompt = {
-                role: 'system',
-                content: `You are CodeAI, an expert coding assistant powered by qwen-2.5-coder-32b.
-Provide clear, accurate code solutions with proper markdown code blocks (e.g. \`\`\`javascript). Explain concisely.`,
-            };
-            const payload = {
-                model: GROQ_MODEL,
-                messages: [systemPrompt, ...messages.map(m => ({ role: m.role, content: m.content }))],
-                temperature: 0.5,
-                max_tokens: 4096,
-                top_p: 0.95,
-            };
-            const response = await fetch(GROQ_API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + GROQ_API_KEY,
-                },
-                body: JSON.stringify(payload),
-            });
-            if (!response.ok) {
-                const errBody = await response.text();
-                throw new Error(`Groq API error ${response.status}: ${errBody}`);
-            }
-            const data = await response.json();
-            if (!data.choices || data.choices.length === 0) throw new Error('No response from AI.');
-            return data.choices[0].message.content;
-        }
+  // Capitalize first letter nicely
+  STATE.name = raw.charAt(0).toUpperCase() + raw.slice(1);
 
-        // ==================== NEW CHAT ====================
-        newChatBtn.addEventListener('click', () => {
-            if (isAiResponding) return;
-            window.speechSynthesis.cancel();
-            currentChatId = null;
-            chatMessages = [];
-            currentChatTitle.textContent = 'New Chat';
-            resetChatView();
-            renderChatHistoryList(allChatsCache);
-            chatInput.focus();
-        });
+  if (CONFIG.preserveName) {
+    localStorage.setItem("rb_name", STATE.name);
+  }
 
-        // ==================== ADMIN PANEL ====================
-        adminBtn.addEventListener('click', () => {
-            adminAuthed = false;
-            adminPasswordInput.value = '';
-            adminError.classList.add('hidden');
-            adminPasswordPrompt.classList.remove('hidden');
-            adminContent.classList.add('hidden');
-            adminUsersList.innerHTML = '<p class="text-gray-500 text-xs">Loading...</p>';
-            adminModal.classList.remove('hidden');
-        });
-        closeAdminBtn.addEventListener('click', () => adminModal.classList.add('hidden'));
-        adminModal.addEventListener('click', (e) => {
-            if (e.target === adminModal) adminModal.classList.add('hidden');
-        });
+  trackEvent("NAME_SUBMITTED");
+  tryPlayMusic();
+  showMusicBtn();
+  startCinematicTransition();
+}
 
-        adminLoginBtn.addEventListener('click', async () => {
-            if (adminPasswordInput.value === ADMIN_PASSWORD) {
-                adminAuthed = true;
-                adminError.classList.add('hidden');
-                adminPasswordPrompt.classList.add('hidden');
-                adminContent.classList.remove('hidden');
-                await loadAdminUsers();
-            } else {
-                adminError.classList.remove('hidden');
-            }
-        });
-        adminPasswordInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') adminLoginBtn.click();
-        });
+// ================================================
+// CINEMATIC TRANSITION
+// ================================================
+async function startCinematicTransition() {
+  setScreen('screen-transition');
+  setPhase('countdown');
 
-        async function loadAdminUsers() {
-            if (!adminAuthed) return;
-            adminUsersList.innerHTML = '<p class="text-gray-500 text-xs">Loading registered users...</p>';
-            try {
-                const snapshot = await firebaseDb.ref('users_public').once('value');
-                const data = snapshot.val() || {};
-                const users = Object.values(data);
-                if (users.length === 0) {
-                    adminUsersList.innerHTML = '<p class="text-gray-500 text-xs">No registered users found.</p>';
-                    return;
-                }
-                let html = '';
-                users.forEach((u) => {
-                    html += `
-                        <div class="p-3 rounded-lg bg-[#1a1a24] light:bg-[#f1f3f6] border border-[#2a2a38] light:border-[#dde0e5]">
-                            <p class="font-medium text-sm">${escapeHtml(u.name || 'Unknown')}</p>
-                            <p class="text-xs text-gray-400 light:text-gray-500">${escapeHtml(u.email || 'No email')}</p>
-                            <p class="text-xs text-gray-500 light:text-gray-400 font-mono mt-0.5">UID: ${escapeHtml(u.uid || 'N/A')}</p>
-                        </div>`;
-                });
-                adminUsersList.innerHTML = html;
-            } catch (err) {
-                adminUsersList.innerHTML = '<p class="text-red-400 text-xs">Failed to load users.</p>';
-                console.error("Admin load error:", err);
-            }
-        }
+  const nameEl = $('trans-name');
+  const subEl  = $('trans-sub');
+  const dotsEl = $('trans-dots');
 
-        // ==================== INITIAL SETUP ====================
-        dashboard.classList.remove('hidden'); // Show dashboard immediately while auth resolves
+  nameEl.innerHTML = `Okay, ${escapeHTML(STATE.name)}...`;
+  subEl.textContent = "Now let me tell you something I've never said like this before.";
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                adminModal.classList.add('hidden');
-                changeNameModal.classList.add('hidden');
-                changePhotoModal.classList.add('hidden');
-            }
-        });
+  await sleep(400);
+  nameEl.classList.add('visible');
 
-        console.log('%cCodeAI %cReady %c— Intelligent Coding Assistant',
-            'color:#818cf8;font-weight:bold;font-size:1.1em;',
-            'color:#22c55e;',
-            'color:#8888a0;');
-        console.log('%cConfigure Firebase & Groq API key to begin.',
-            'color:#f59e0b;font-size:0.85em;');
-    })();
+  await sleep(1800);
+  subEl.classList.add('visible');
+
+  await sleep(2200);
+  dotsEl.style.opacity = '0';
+
+  await sleep(600);
+
+  // Check date
+  const now = new Date();
+  const target = new Date(CONFIG.targetDate);
+
+  if (now >= target) {
+    startMidnightReveal();
+  } else {
+    startCountdown();
+  }
+}
+
+// ================================================
+// COUNTDOWN
+// ================================================
+function startCountdown() {
+  setScreen('screen-countdown');
+  setPhase('countdown');
+  trackEvent('COUNTDOWN_STARTED');
+
+  const target = new Date(CONFIG.targetDate);
+
+  function updateCountdown() {
+    const now  = new Date();
+    const diff = target - now;
+
+    if (diff <= 0) {
+      clearInterval(STATE.countdownInterval);
+      trackEvent('COUNTDOWN_FINISHED');
+      startMidnightReveal();
+      return;
+    }
+
+    const days  = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins  = Math.floor((diff % 3600000) / 60000);
+    const secs  = Math.floor((diff % 60000) / 1000);
+
+    animateNum('cd-days',  days);
+    animateNum('cd-hours', hours);
+    animateNum('cd-mins',  mins);
+    animateNum('cd-secs',  secs);
+  }
+
+  updateCountdown();
+  STATE.countdownInterval = setInterval(updateCountdown, 1000);
+}
+
+let prevVals = {};
+function animateNum(id, val) {
+  const el = $(id);
+  const str = pad2(val);
+  if (el && el.textContent !== str) {
+    el.classList.add('tick');
+    setTimeout(() => { el.textContent = str; el.classList.remove('tick'); }, 100);
+  } else if (el && el.textContent === '--') {
+    el.textContent = str;
+  }
+}
+
+// ================================================
+// MIDNIGHT / BIRTHDAY REVEAL
+// ================================================
+async function startMidnightReveal() {
+  setScreen('screen-midnight');
+  setPhase('letter');
+  showStars();
+  if (STATE.setIntensity) STATE.setIntensity(2);
+
+  trackEvent('COUNTDOWN_FINISHED');
+
+  await sleep(600);
+  $('midnight-msg-1').classList.add('visible');
+
+  await sleep(2000);
+  $('midnight-msg-2').classList.add('visible');
+
+  await sleep(2000);
+  $('midnight-msg-3').classList.add('visible');
+
+  await sleep(2800);
+
+  startLoveLetter();
+}
+
+// ================================================
+// LOVE LETTER
+// ================================================
+function buildProgressDots() {
+  const container = $('progress-dots');
+  container.innerHTML = '';
+  LETTER_CHUNKS.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'progress-dot';
+    if (i === 0) dot.classList.add('active');
+    container.appendChild(dot);
+  });
+}
+
+function updateProgressDot(idx) {
+  const dots = document.querySelectorAll('.progress-dot');
+  dots.forEach((d, i) => {
+    d.classList.toggle('active', i === idx);
+  });
+}
+
+async function startLoveLetter() {
+  setScreen('screen-letter');
+  setPhase('letter');
+  buildProgressDots();
+  trackEvent('LETTER_STARTED');
+  STATE.letterIndex = 0;
+  showLetterChunk(0);
+}
+
+async function showLetterChunk(idx) {
+  if (idx >= LETTER_CHUNKS.length) {
+    await sleep(800);
+    showProposal();
+    return;
+  }
+
+  const chunk  = LETTER_CHUNKS[idx];
+  const el     = $('letter-chunk-display');
+  updateProgressDot(idx);
+
+  // Build inner HTML
+  let html = '';
+  const lines = chunk.text.split('\n');
+  const clsStr = (chunk.cls || '').split(' ').filter(Boolean);
+  const extra = clsStr.filter(c => !['script','bold','name-highlight'].includes(c)).join(' ');
+
+  lines.forEach(line => {
+    if (!line.trim()) return;
+    // Apply name replacement
+    const rendered = applyName(line);
+    let cls = 'letter-line-main';
+    if (clsStr.includes('script'))         cls += ' script';
+    if (clsStr.includes('bold'))           cls += ' bold';
+    if (clsStr.includes('name-highlight')) cls += ' name-highlight';
+    html += `<div class="${cls}">${rendered}</div>`;
+  });
+
+  if (chunk.sub) {
+    html += `<div class="letter-line-sub">${escapeHTML(chunk.sub)}</div>`;
+  }
+
+  // Transition out old
+  el.classList.remove('in');
+  el.classList.add('out');
+
+  await sleep(400);
+
+  el.innerHTML  = html;
+  el.className  = 'letter-chunk';
+
+  await sleep(80);
+  el.classList.add('in');
+
+  // Dwell time — longer for emotional chunks
+  const dwellMap = {
+    'script': 2200,
+    'bold':   2400,
+  };
+  let dwell = 3000;
+  if (clsStr.includes('script')) dwell = 2400;
+  if (clsStr.includes('bold'))   dwell = 2800;
+  if (chunk.text.length > 60)    dwell = 3600;
+  if (chunk.text.includes('{{NAME}}')) dwell = 2800;
+
+  STATE.letterTimer = setTimeout(() => {
+    STATE.letterIndex = idx + 1;
+    showLetterChunk(idx + 1);
+  }, dwell);
+}
+
+// ================================================
+// PROPOSAL
+// ================================================
+async function showProposal() {
+  setScreen('screen-proposal');
+  setPhase('proposal');
+  trackEvent('PROPOSAL_SHOWN');
+  if (STATE.setIntensity) STATE.setIntensity(1.5);
+
+  const questions = PROPOSAL_SEQUENCE.map(q => applyNamePlain(q));
+
+  const ids = ['prop-q1','prop-q2','prop-q3','prop-q4'];
+
+  // Set text content (with name in final)
+  ids.forEach((id, i) => {
+    const el = $(id);
+    if (!el) return;
+    const text = questions[i];
+    // For q4, handle line breaks
+    el.innerHTML = text.replace(/\n/g, '<br>');
+  });
+
+  await sleep(400);
+  $('prop-q1').classList.add('visible');
+
+  await sleep(1200);
+  $('prop-q2').classList.add('visible');
+
+  await sleep(1000);
+  $('prop-q3').classList.add('visible');
+
+  await sleep(1400);
+  $('prop-q4').classList.add('visible');
+
+  await sleep(1000);
+  $('proposal-btns').classList.add('visible');
+}
+
+// ================================================
+// PROPOSAL BUTTONS
+// ================================================
+async function handleYes() {
+  trackEvent('YES_CLICKED');
+
+  setScreen('screen-yes');
+  setPhase('yes');
+  if (STATE.setIntensity) STATE.setIntensity(2.5);
+  launchConfetti();
+
+  $('yes-headline').textContent = "You just made my birthday the most special one.";
+  $('yes-name').textContent = STATE.name;
+}
+
+async function handleThink() {
+  trackEvent('THINK_CLICKED');
+  setScreen('screen-think');
+
+  await sleep(400);
+  $('think-line-1').classList.add('visible');
+
+  await sleep(700);
+  $('think-line-2').classList.add('visible');
+
+  await sleep(900);
+  $('think-line-3').classList.add('visible');
+
+  await sleep(1200);
+  $('btn-continue').classList.add('visible');
+}
+
+async function handleContinue() {
+  // Reset proposal screen visibility
+  const ids = ['prop-q1','prop-q2','prop-q3','prop-q4'];
+  ids.forEach(id => $(id)?.classList.remove('visible'));
+  $('proposal-btns').classList.remove('visible');
+
+  setScreen('screen-proposal');
+
+  await sleep(400);
+  ids.forEach((id, i) => {
+    setTimeout(() => $(id)?.classList.add('visible'), i * 300);
+  });
+  await sleep(1400);
+  $('proposal-btns').classList.add('visible');
+}
+
+// ================================================
+// APP INIT
+// ================================================
+async function initApp() {
+  initSession();
+  initPetals();
+  initMusic();
+  initFirebase().then(() => trackEvent('ENTRY'));
+
+  // Event: name submit
+  $('btn-enter').addEventListener('click', handleNameSubmit);
+  $('name-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleNameSubmit();
+  });
+
+  // Music
+  $('music-btn').addEventListener('click', toggleMusic);
+
+  // Proposal buttons
+  $('btn-yes').addEventListener('click', handleYes);
+  $('btn-think').addEventListener('click', handleThink);
+  $('btn-continue').addEventListener('click', handleContinue);
+
+  // If name was preserved and we want to skip entry
+  // (keep welcome for first-impression — always show entry)
+  setScreen('screen-welcome');
+  setPhase('welcome');
+
+  // Focus name input after load
+  setTimeout(() => $('name-input')?.focus(), 500);
+}
+
+// ================================================
+// SHAKE ANIMATION (inline, avoiding stylesheet)
+// ================================================
+const shakeStyle = document.createElement('style');
+shakeStyle.textContent = `
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%      { transform: translateX(-6px); }
+    40%      { transform: translateX(6px); }
+    60%      { transform: translateX(-4px); }
+    80%      { transform: translateX(4px); }
+  }
+  .shake { animation: shake 0.4s var(--ease-smooth); }
+`;
+document.head.appendChild(shakeStyle);
+
+// ================================================
+// START
+// ================================================
+initApp();
 </script>
 </body>
 </html>
