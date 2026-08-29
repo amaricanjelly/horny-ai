@@ -1411,13 +1411,17 @@
     };
 
     // ================================================================
-    // APP CONFIG
+    // APP CONFIG — 3-SONG MUSIC SYSTEM
     // ================================================================
     const CONFIG = {
       enableFirebase: true,
       enableMusic: true,
-      // Music source — YouTube Video ID (iCKUyNrJW_0)
-      musicSource: "iCKUyNrJW_0",
+      // Main Song: bgGrWLoSFJ4
+      // YES Song: 0qXn35dM4qU
+      // NO Song: DwT-sb00wXE
+      mainSongId: "bgGrWLoSFJ4",
+      yesSongId: "0qXn35dM4qU",
+      noSongId: "DwT-sb00wXE",
       preserveName: true,
       enableSoundEffects: true,
     };
@@ -1563,23 +1567,33 @@
     }
 
     // ================================================================
-    // AUDIO MANAGER — Centralized Sound System
+    // MUSIC MANAGER — 3-SONG SYSTEM
     // ================================================================
-    class AudioManager {
+    class MusicManager {
       constructor() {
         this.ctx = null;
-        this.backgroundElement = null;
+        this.players = {
+          main: null,
+          yes: null,
+          no: null,
+        };
+        this.currentTrack = null; // 'main' | 'yes' | 'no' | null
         this.isMuted = false;
-        this.isBackgroundPlaying = false;
-        this.backgroundVolume = 1.0; // 100% volume
-        this.targetVolume = 1.0;
-        this.fadeInterval = null;
-        this.typingThrottle = 0;
-        this.soundEffectsEnabled = true;
-        this.youtubePlayerReady = false;
-        this.youtubePlayer = null;
+        this.isPlaying = false;
+        this.volume = 1.0;
         this.initialized = false;
-        this.autoPlayAttempted = false;
+        this.fadeInterval = null;
+        this.youtubeReady = {
+          main: false,
+          yes: false,
+          no: false,
+        };
+        this.youtubePlayers = {
+          main: null,
+          yes: null,
+          no: null,
+        };
+        this.pendingStart = null;
       }
 
       init() {
@@ -1590,52 +1604,44 @@
           this.ctx = null;
         }
         this.initialized = true;
+        this.loadYouTubeAPI();
       }
 
-      // ---- Background Music ----
-      setupBackgroundMusic(source) {
-        if (source && source.length === 11 && /^[a-zA-Z0-9_-]+$/.test(source)) {
-          this.setupYouTubePlayer(source);
-        } else if (source && source.startsWith('http')) {
-          this.setupDirectAudio(source);
-        }
-      }
-
-      setupYouTubePlayer(videoId) {
+      loadYouTubeAPI() {
         if (typeof YT === 'undefined') {
           const tag = document.createElement('script');
           tag.src = 'https://www.youtube.com/iframe_api';
           document.head.appendChild(tag);
         }
-
-        this.youtubeVideoId = videoId;
-
         if (typeof YT !== 'undefined' && YT.Player) {
-          this.createYouTubePlayer();
+          this.createAllPlayers();
         } else {
           window.onYouTubeIframeAPIReady = () => {
-            this.createYouTubePlayer();
+            this.createAllPlayers();
           };
         }
       }
 
-      createYouTubePlayer() {
-        if (!this.youtubeVideoId) return;
-        let container = document.getElementById('youtube-audio-container');
-        if (!container) {
-          container = document.createElement('div');
-          container.id = 'youtube-audio-container';
-          container.style.cssText = 'position:fixed;bottom:-1000px;left:-1000px;width:1px;height:1px;opacity:0;pointer-events:none;z-index:-1;';
-          document.body.appendChild(container);
-        }
+      createAllPlayers() {
+        this.createPlayer('main', CONFIG.mainSongId);
+        this.createPlayer('yes', CONFIG.yesSongId);
+        this.createPlayer('no', CONFIG.noSongId);
+      }
+
+      createPlayer(track, videoId) {
+        if (!videoId) return;
+        const container = document.createElement('div');
+        container.id = `youtube-${track}-container`;
+        container.style.cssText = 'position:fixed;bottom:-1000px;left:-1000px;width:1px;height:1px;opacity:0;pointer-events:none;z-index:-1;';
+        document.body.appendChild(container);
 
         try {
-          this.youtubePlayer = new YT.Player(container, {
+          const player = new YT.Player(container, {
             height: '1',
             width: '1',
-            videoId: this.youtubeVideoId,
+            videoId: videoId,
             playerVars: {
-              autoplay: 1,
+              autoplay: 0,
               controls: 0,
               disablekb: 1,
               fs: 0,
@@ -1645,163 +1651,186 @@
               rel: 0,
               showinfo: 0,
               mute: 0,
-              loop: 1,
-              playlist: this.youtubeVideoId,
             },
             events: {
               onReady: () => {
-                this.youtubePlayerReady = true;
-                if (this.youtubePlayer.setVolume) {
-                  this.youtubePlayer.setVolume(100);
+                this.youtubeReady[track] = true;
+                if (this.youtubePlayers[track] && this.youtubePlayers[track].setVolume) {
+                  this.youtubePlayers[track].setVolume(Math.round(this.volume * 100));
                 }
-                if (this.youtubePlayer.playVideo) {
-                  this.youtubePlayer.playVideo();
-                  this.isBackgroundPlaying = true;
+                // If this track was pending start
+                if (this.pendingStart === track) {
+                  this.pendingStart = null;
+                  this.playTrack(track);
                 }
               },
               onStateChange: (e) => {
-                if (e.data === 0 && this.isBackgroundPlaying) {
-                  this.youtubePlayer.playVideo();
+                // If video ends and we're still on this track, replay
+                if (e.data === 0 && this.currentTrack === track) {
+                  this.youtubePlayers[track].playVideo();
                 }
               },
             },
           });
+          this.youtubePlayers[track] = player;
         } catch (e) {
-          console.warn('YouTube player creation failed:', e);
-          this.tryFallbackAudio();
+          console.warn(`YouTube player creation failed for ${track}:`, e);
         }
       }
 
-      tryFallbackAudio() {
-        const fallbackUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
-        this.setupDirectAudio(fallbackUrl);
+      playMain() {
+        this.switchTo('main');
       }
 
-      setupDirectAudio(url) {
-        try {
-          this.backgroundElement = new Audio(url);
-          this.backgroundElement.loop = true;
-          this.backgroundElement.volume = this.backgroundVolume;
-          this.backgroundElement.load();
-        } catch (e) {
-          console.warn('Direct audio setup failed:', e);
-        }
+      playYes() {
+        this.switchTo('yes');
       }
 
-      startBackgroundMusic() {
-        if (this.isBackgroundPlaying) return;
+      playNo() {
+        this.switchTo('no');
+      }
 
-        if (this.youtubePlayer && this.youtubePlayerReady) {
+      switchTo(track) {
+        if (this.currentTrack === track && this.isPlaying) return;
+
+        // Fade out current
+        const currentPlayer = this.currentTrack ? this.youtubePlayers[this.currentTrack] : null;
+        if (currentPlayer && this.youtubeReady[this.currentTrack]) {
           try {
-            this.youtubePlayer.playVideo();
-            this.isBackgroundPlaying = true;
-            if (this.youtubePlayer.setVolume) {
-              this.youtubePlayer.setVolume(100);
-            }
+            this.fadeOutPlayer(currentPlayer, () => {
+              this.stopCurrent();
+              this.startTrack(track);
+            });
           } catch (e) {
-            console.warn('YouTube play failed:', e);
+            this.stopCurrent();
+            this.startTrack(track);
           }
-        } else if (this.backgroundElement) {
-          this.backgroundElement.play().then(() => {
-            this.isBackgroundPlaying = true;
-          }).catch(() => {
-            this.isBackgroundPlaying = false;
-          });
+        } else {
+          this.stopCurrent();
+          this.startTrack(track);
         }
       }
 
-      setBackgroundVolume(vol) {
-        this.targetVolume = Math.max(0, Math.min(1, vol));
-        this.backgroundVolume = this.targetVolume;
-        if (this.backgroundElement) {
-          this.backgroundElement.volume = this.targetVolume;
+      startTrack(track) {
+        const player = this.youtubePlayers[track];
+        if (!player || !this.youtubeReady[track]) {
+          // Player not ready yet — store pending
+          this.pendingStart = track;
+          return;
         }
-        if (this.youtubePlayer && this.youtubePlayerReady) {
-          const ytVol = Math.round(this.targetVolume * 100);
-          if (this.youtubePlayer.setVolume) {
-            this.youtubePlayer.setVolume(Math.min(ytVol, 100));
+
+        try {
+          player.playVideo();
+          this.currentTrack = track;
+          this.isPlaying = true;
+          if (player.setVolume) {
+            player.setVolume(Math.round(this.volume * 100));
           }
+          // Fade in
+          this.fadeInPlayer(player);
+        } catch (e) {
+          console.warn(`Failed to start track ${track}:`, e);
         }
       }
 
-      pauseBackgroundMusic() {
-        if (this.youtubePlayer && this.youtubePlayerReady) {
-          try {
-            this.youtubePlayer.pauseVideo();
-          } catch (e) {}
+      stopCurrent() {
+        if (this.currentTrack) {
+          const player = this.youtubePlayers[this.currentTrack];
+          if (player && this.youtubeReady[this.currentTrack]) {
+            try {
+              player.pauseVideo();
+            } catch (e) {}
+          }
         }
-        if (this.backgroundElement) {
-          this.backgroundElement.pause();
+        this.isPlaying = false;
+        this.currentTrack = null;
+        if (this.fadeInterval) {
+          clearInterval(this.fadeInterval);
+          this.fadeInterval = null;
         }
-        this.isBackgroundPlaying = false;
+      }
+
+      fadeOutPlayer(player, callback) {
+        let vol = 100;
+        const step = 5;
+        const interval = 50;
+        if (this.fadeInterval) clearInterval(this.fadeInterval);
+        this.fadeInterval = setInterval(() => {
+          vol = Math.max(vol - step, 0);
+          if (player.setVolume) {
+            player.setVolume(vol);
+          }
+          if (vol <= 0) {
+            clearInterval(this.fadeInterval);
+            this.fadeInterval = null;
+            if (callback) callback();
+          }
+        }, interval);
+        // Fallback: if fade takes too long
+        setTimeout(() => {
+          if (this.fadeInterval) {
+            clearInterval(this.fadeInterval);
+            this.fadeInterval = null;
+            if (callback) callback();
+          }
+        }, 1500);
+      }
+
+      fadeInPlayer(player) {
+        let vol = 0;
+        const target = Math.round(this.volume * 100);
+        const step = 5;
+        const interval = 50;
+        if (this.fadeInterval) clearInterval(this.fadeInterval);
+        this.fadeInterval = setInterval(() => {
+          vol = Math.min(vol + step, target);
+          if (player.setVolume) {
+            player.setVolume(vol);
+          }
+          if (vol >= target) {
+            clearInterval(this.fadeInterval);
+            this.fadeInterval = null;
+          }
+        }, interval);
+      }
+
+      setVolume(vol) {
+        this.volume = Math.max(0, Math.min(1, vol));
+        if (this.currentTrack) {
+          const player = this.youtubePlayers[this.currentTrack];
+          if (player && this.youtubeReady[this.currentTrack] && player.setVolume) {
+            player.setVolume(Math.round(this.volume * 100));
+          }
+        }
       }
 
       toggleMute() {
         this.isMuted = !this.isMuted;
-        if (this.isMuted) {
-          if (this.youtubePlayer && this.youtubePlayerReady) {
-            try { this.youtubePlayer.mute(); } catch (e) {}
-          }
-          if (this.backgroundElement) {
-            this.backgroundElement.volume = 0;
-          }
-        } else {
-          if (this.youtubePlayer && this.youtubePlayerReady) {
-            try { this.youtubePlayer.unMute(); } catch (e) {}
-            if (this.youtubePlayer.setVolume) {
-              this.youtubePlayer.setVolume(100);
-            }
-          }
-          if (this.backgroundElement) {
-            this.backgroundElement.volume = this.targetVolume;
+        const targetVol = this.isMuted ? 0 : Math.round(this.volume * 100);
+        if (this.currentTrack) {
+          const player = this.youtubePlayers[this.currentTrack];
+          if (player && this.youtubeReady[this.currentTrack] && player.setVolume) {
+            player.setVolume(targetVol);
           }
         }
         return this.isMuted;
       }
 
-      // ---- Sound Effects (Only YES/NO remain) ----
-      playTone(freq, duration, type = 'sine', volume = 0.12) {
-        if (!this.soundEffectsEnabled || this.isMuted) return;
-        try {
-          if (!this.ctx) this.init();
-          if (!this.ctx) return;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = type;
-          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-          gain.gain.setValueAtTime(volume, this.ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(this.ctx.currentTime);
-          osc.stop(this.ctx.currentTime + duration);
-        } catch (e) { /* silent */ }
+      getCurrentTrack() {
+        return this.currentTrack;
       }
 
-      playYes() {
-        // Romantic confirmation — kept
-        this.playTone(523.25, 0.3, 'sine', 0.10);
-        setTimeout(() => this.playTone(659.25, 0.3, 'sine', 0.08), 150);
-        setTimeout(() => this.playTone(783.99, 0.4, 'sine', 0.07), 300);
-        setTimeout(() => this.playTone(1046.50, 0.5, 'sine', 0.05), 500);
+      isMutedState() {
+        return this.isMuted;
       }
 
-      playNo() {
-        // Emotional broken-heart — kept
-        this.playTone(440, 0.3, 'sine', 0.07);
-        setTimeout(() => this.playTone(349.23, 0.4, 'sine', 0.05), 200);
-        setTimeout(() => this.playTone(293.66, 0.5, 'sine', 0.04), 400);
-        setTimeout(() => this.playTone(310, 0.3, 'sine', 0.03), 500);
+      // For compatibility with existing code
+      playBackgroundMusic() {
+        this.playMain();
       }
 
-      // ---- REMOVED: typing, soft chime, sparkle, whoosh ----
-      // These are intentionally removed per the patch requirements
-
-      // ---- Utilities ----
-      isMutedState() { return this.isMuted; }
-
-      setSoundEffectsEnabled(enabled) {
-        this.soundEffectsEnabled = enabled;
+      startBackgroundMusic() {
+        this.playMain();
       }
     }
 
@@ -2131,7 +2160,7 @@
     }
 
     // ================================================================
-    // LOVE LETTER — Professional Reading-Time
+    // LOVE LETTER — Professional Reading-Time (NO SOUND EFFECTS)
     // ================================================================
     function buildProgressDots() {
       const container = $('progress-dots');
@@ -2193,7 +2222,7 @@
       el.className = 'letter-chunk';
       await sleep(50);
 
-      // NO typing sound, NO chime — removed per patch
+      // NO sound effects — just visual transition
       el.classList.add('in');
 
       const totalDelay = timing.holdTime + 600;
@@ -2224,12 +2253,11 @@
         await sleep(i === 0 ? 400 : 300);
         const el = $(ids[i]);
         if (el) el.classList.add('visible');
-        // NO chime sound — removed
+        // NO sound effects
       }
 
       await sleep(600);
       $('proposal-btns').classList.add('visible');
-      // NO sparkle sound — removed
     }
 
     // ================================================================
@@ -2263,12 +2291,16 @@
     }
 
     // ================================================================
-    // PROPOSAL BUTTONS
+    // PROPOSAL BUTTONS — With 3-Song Switching
     // ================================================================
     async function handleYes() {
-      audioManager.playYes();
       trackEvent('YES_CLICKED');
       await saveUserResponse('ACCEPTED');
+
+      // Switch to YES song
+      if (musicManager) {
+        musicManager.playYes();
+      }
 
       setPhase('yes');
       if (STATE.setIntensity) STATE.setIntensity(2);
@@ -2280,9 +2312,13 @@
     }
 
     async function handleNo() {
-      audioManager.playNo();
       trackEvent('NO_CLICKED');
       await saveUserResponse('REJECTED');
+
+      // Switch to NO song
+      if (musicManager) {
+        musicManager.playNo();
+      }
 
       setPhase('no');
       if (STATE.setIntensity) STATE.setIntensity(0.5);
@@ -2361,7 +2397,7 @@
     }
 
     // ================================================================
-    // ADMIN PANEL INIT — DOUBLE CTRL (no CTRL+T)
+    // ADMIN PANEL INIT — DOUBLE CTRL
     // ================================================================
     function initAdmin() {
       const overlay = $('admin-overlay');
@@ -2373,7 +2409,6 @@
       let ctrlTimer = null;
 
       document.addEventListener('keydown', (e) => {
-        // Ignore if typing in input
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
         if (e.key === 'Control') {
@@ -2385,7 +2420,6 @@
               ctrlPressCount = 0;
             }, 500);
           } else if (ctrlPressCount >= 2) {
-            // Double CTRL detected!
             clearTimeout(ctrlTimer);
             ctrlPressCount = 0;
             overlay.classList.add('open');
@@ -2395,13 +2429,12 @@
             $('admin-error').textContent = '';
           }
         } else {
-          // Any other key resets the counter
           ctrlPressCount = 0;
           clearTimeout(ctrlTimer);
         }
       });
 
-      // Mobile fallback: 5 taps on welcome card
+      // Mobile fallback: 5 taps
       let mobileTapCount = 0;
       let mobileTapTimer = null;
       $('welcome-card').addEventListener('click', (e) => {
@@ -2423,7 +2456,6 @@
         overlay.classList.remove('open');
       });
 
-      // Login with password: 1234
       $('admin-login-btn').addEventListener('click', () => {
         if ($('admin-password').value === '1234') {
           loginDiv.style.display = 'none';
@@ -2449,40 +2481,38 @@
     // ================================================================
     // APP INIT
     // ================================================================
-    // Create AudioManager instance
-    const audioManager = new AudioManager();
+    // Create MusicManager instance
+    const musicManager = new MusicManager();
 
     function showMusicBtn() { $('music-btn').classList.add('visible'); }
 
-    // Function to attempt starting music immediately
     function attemptAutoStartMusic() {
-      audioManager.init();
-      audioManager.setupBackgroundMusic(CONFIG.musicSource);
-      audioManager.setBackgroundVolume(1.0); // 100% volume
+      musicManager.init();
+      // Volume at 100%
+      musicManager.setVolume(1.0);
 
-      // Try to start immediately
-      audioManager.startBackgroundMusic();
+      // Attempt to start main song immediately
+      musicManager.playMain();
 
-      // If YouTube player not ready, try again after a delay
+      // Retry if not playing after short delay
       setTimeout(() => {
-        if (!audioManager.isBackgroundPlaying) {
-          audioManager.startBackgroundMusic();
+        if (musicManager.getCurrentTrack() !== 'main') {
+          musicManager.playMain();
         }
-      }, 1000);
+      }, 1500);
 
-      // One more attempt after API loads
       setTimeout(() => {
-        if (!audioManager.isBackgroundPlaying) {
-          audioManager.startBackgroundMusic();
+        if (musicManager.getCurrentTrack() !== 'main') {
+          musicManager.playMain();
         }
-      }, 3000);
+      }, 3500);
     }
 
     async function initApp() {
       initSession();
       initPetals();
 
-      // Start music IMMEDIATELY on page load
+      // Start music immediately
       attemptAutoStartMusic();
 
       initFirebase().then(() => trackEvent('ENTRY'));
@@ -2491,7 +2521,7 @@
 
       // Music button toggle
       $('music-btn').addEventListener('click', () => {
-        const muted = audioManager.toggleMute();
+        const muted = musicManager.toggleMute();
         const iconOn = $('music-icon-on');
         const iconOff = $('music-icon-off');
         if (muted) {
@@ -2513,8 +2543,8 @@
       setTimeout(() => $('name-input')?.focus(), 500);
     }
 
-    // Expose audioManager globally for debugging
-    window.audioManager = audioManager;
+    // Expose musicManager globally for debugging
+    window.musicManager = musicManager;
 
     initApp();
   </script>
