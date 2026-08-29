@@ -1417,10 +1417,7 @@
       enableFirebase: true,
       enableMusic: true,
       // Music source — YouTube Video ID (iCKUyNrJW_0)
-      // The actual audio will be loaded via YouTube iframe API
-      // For direct fallback, provide a direct .mp3 URL here:
-      musicSource: "iCKUyNrJW_0", // YouTube video ID
-      // musicSource: "https://example.com/romantic-music.mp3", // direct fallback
+      musicSource: "iCKUyNrJW_0",
       preserveName: true,
       enableSoundEffects: true,
     };
@@ -1476,7 +1473,6 @@
       sessionId: "",
       db: null,
       fbFunctions: null,
-      // Audio state managed by AudioManager
       letterIndex: 0,
       letterTimer: null,
       adminClickCount: 0,
@@ -1575,14 +1571,15 @@
         this.backgroundElement = null;
         this.isMuted = false;
         this.isBackgroundPlaying = false;
-        this.backgroundVolume = 0.10;
-        this.targetVolume = 0.10;
+        this.backgroundVolume = 1.0; // 100% volume
+        this.targetVolume = 1.0;
         this.fadeInterval = null;
         this.typingThrottle = 0;
         this.soundEffectsEnabled = true;
         this.youtubePlayerReady = false;
         this.youtubePlayer = null;
         this.initialized = false;
+        this.autoPlayAttempted = false;
       }
 
       init() {
@@ -1597,8 +1594,6 @@
 
       // ---- Background Music ----
       setupBackgroundMusic(source) {
-        // If source is a YouTube video ID, use YouTube iframe API
-        // Otherwise treat as direct audio URL
         if (source && source.length === 11 && /^[a-zA-Z0-9_-]+$/.test(source)) {
           this.setupYouTubePlayer(source);
         } else if (source && source.startsWith('http')) {
@@ -1607,21 +1602,17 @@
       }
 
       setupYouTubePlayer(videoId) {
-        // Load YouTube iframe API if not already loaded
         if (typeof YT === 'undefined') {
           const tag = document.createElement('script');
           tag.src = 'https://www.youtube.com/iframe_api';
           document.head.appendChild(tag);
         }
 
-        // Store videoId for later
         this.youtubeVideoId = videoId;
 
-        // If API is already ready, create player
         if (typeof YT !== 'undefined' && YT.Player) {
           this.createYouTubePlayer();
         } else {
-          // Wait for API to load
           window.onYouTubeIframeAPIReady = () => {
             this.createYouTubePlayer();
           };
@@ -1630,7 +1621,6 @@
 
       createYouTubePlayer() {
         if (!this.youtubeVideoId) return;
-        // Create a hidden container for the player
         let container = document.getElementById('youtube-audio-container');
         if (!container) {
           container = document.createElement('div');
@@ -1645,7 +1635,7 @@
             width: '1',
             videoId: this.youtubeVideoId,
             playerVars: {
-              autoplay: 0,
+              autoplay: 1,
               controls: 0,
               disablekb: 1,
               fs: 0,
@@ -1654,20 +1644,22 @@
               playsinline: 1,
               rel: 0,
               showinfo: 0,
-              mute: 1,
+              mute: 0,
               loop: 1,
               playlist: this.youtubeVideoId,
             },
             events: {
               onReady: () => {
                 this.youtubePlayerReady = true;
-                // Set volume very low
                 if (this.youtubePlayer.setVolume) {
-                  this.youtubePlayer.setVolume(15);
+                  this.youtubePlayer.setVolume(100);
+                }
+                if (this.youtubePlayer.playVideo) {
+                  this.youtubePlayer.playVideo();
+                  this.isBackgroundPlaying = true;
                 }
               },
               onStateChange: (e) => {
-                // If video ends, replay
                 if (e.data === 0 && this.isBackgroundPlaying) {
                   this.youtubePlayer.playVideo();
                 }
@@ -1676,13 +1668,11 @@
           });
         } catch (e) {
           console.warn('YouTube player creation failed:', e);
-          // Fallback: try direct audio
           this.tryFallbackAudio();
         }
       }
 
       tryFallbackAudio() {
-        // Try to load a fallback audio file if available
         const fallbackUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
         this.setupDirectAudio(fallbackUrl);
       }
@@ -1705,12 +1695,8 @@
           try {
             this.youtubePlayer.playVideo();
             this.isBackgroundPlaying = true;
-            // Unmute and set volume
-            if (this.youtubePlayer.unMute) {
-              this.youtubePlayer.unMute();
-            }
             if (this.youtubePlayer.setVolume) {
-              this.youtubePlayer.setVolume(15);
+              this.youtubePlayer.setVolume(100);
             }
           } catch (e) {
             console.warn('YouTube play failed:', e);
@@ -1718,52 +1704,15 @@
         } else if (this.backgroundElement) {
           this.backgroundElement.play().then(() => {
             this.isBackgroundPlaying = true;
-            this.fadeInBackground();
           }).catch(() => {
-            // Autoplay blocked, will start on user interaction
             this.isBackgroundPlaying = false;
           });
         }
       }
 
-      fadeInBackground() {
-        if (!this.backgroundElement) return;
-        let vol = 0;
-        const step = 0.005;
-        const interval = 30;
-        if (this.fadeInterval) clearInterval(this.fadeInterval);
-        this.fadeInterval = setInterval(() => {
-          vol = Math.min(vol + step, this.targetVolume);
-          this.backgroundElement.volume = vol;
-          if (vol >= this.targetVolume) {
-            clearInterval(this.fadeInterval);
-            this.fadeInterval = null;
-          }
-        }, interval);
-      }
-
-      fadeOutBackground(callback) {
-        if (!this.backgroundElement) {
-          if (callback) callback();
-          return;
-        }
-        let vol = this.backgroundElement.volume || this.targetVolume;
-        const step = 0.01;
-        const interval = 30;
-        if (this.fadeInterval) clearInterval(this.fadeInterval);
-        this.fadeInterval = setInterval(() => {
-          vol = Math.max(vol - step, 0);
-          this.backgroundElement.volume = vol;
-          if (vol <= 0) {
-            clearInterval(this.fadeInterval);
-            this.fadeInterval = null;
-            if (callback) callback();
-          }
-        }, interval);
-      }
-
       setBackgroundVolume(vol) {
         this.targetVolume = Math.max(0, Math.min(1, vol));
+        this.backgroundVolume = this.targetVolume;
         if (this.backgroundElement) {
           this.backgroundElement.volume = this.targetVolume;
         }
@@ -1799,6 +1748,9 @@
         } else {
           if (this.youtubePlayer && this.youtubePlayerReady) {
             try { this.youtubePlayer.unMute(); } catch (e) {}
+            if (this.youtubePlayer.setVolume) {
+              this.youtubePlayer.setVolume(100);
+            }
           }
           if (this.backgroundElement) {
             this.backgroundElement.volume = this.targetVolume;
@@ -1807,7 +1759,7 @@
         return this.isMuted;
       }
 
-      // ---- Sound Effects ----
+      // ---- Sound Effects (Only YES/NO remain) ----
       playTone(freq, duration, type = 'sine', volume = 0.12) {
         if (!this.soundEffectsEnabled || this.isMuted) return;
         try {
@@ -1826,61 +1778,24 @@
         } catch (e) { /* silent */ }
       }
 
-      playTyping() {
-        const now = Date.now();
-        if (now - this.typingThrottle < 100) return;
-        this.typingThrottle = now;
-        const freqs = [400, 500, 600, 450, 550];
-        const f = freqs[Math.floor(Math.random() * freqs.length)];
-        this.playTone(f, 0.05, 'sine', 0.035);
-      }
-
-      playSoftChime() {
-        this.playTone(523.25, 0.35, 'sine', 0.08);
-        setTimeout(() => this.playTone(659.25, 0.3, 'sine', 0.06), 150);
-      }
-
-      playRomanticSparkle() {
-        this.playTone(880, 0.2, 'sine', 0.05);
-        setTimeout(() => this.playTone(1108.73, 0.25, 'sine', 0.04), 120);
-        setTimeout(() => this.playTone(1318.51, 0.3, 'sine', 0.035), 240);
-      }
-
       playYes() {
-        // Romantic confirmation
+        // Romantic confirmation — kept
         this.playTone(523.25, 0.3, 'sine', 0.10);
         setTimeout(() => this.playTone(659.25, 0.3, 'sine', 0.08), 150);
         setTimeout(() => this.playTone(783.99, 0.4, 'sine', 0.07), 300);
         setTimeout(() => this.playTone(1046.50, 0.5, 'sine', 0.05), 500);
-        setTimeout(() => this.playRomanticSparkle(), 200);
       }
 
       playNo() {
-        // Emotional broken-heart tone
+        // Emotional broken-heart — kept
         this.playTone(440, 0.3, 'sine', 0.07);
         setTimeout(() => this.playTone(349.23, 0.4, 'sine', 0.05), 200);
         setTimeout(() => this.playTone(293.66, 0.5, 'sine', 0.04), 400);
-        // Soft dissonance
         setTimeout(() => this.playTone(310, 0.3, 'sine', 0.03), 500);
       }
 
-      playSoftWhoosh() {
-        try {
-          if (!this.ctx) this.init();
-          if (!this.ctx) return;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(200, this.ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(100, this.ctx.currentTime + 0.3);
-          gain.gain.setValueAtTime(0.035, this.ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(this.ctx.currentTime);
-          osc.stop(this.ctx.currentTime + 0.3);
-        } catch (e) { /* silent */ }
-      }
+      // ---- REMOVED: typing, soft chime, sparkle, whoosh ----
+      // These are intentionally removed per the patch requirements
 
       // ---- Utilities ----
       isMutedState() { return this.isMuted; }
@@ -2174,18 +2089,6 @@
       if (CONFIG.preserveName) localStorage.setItem("rb_name", STATE.name);
       trackEvent('NAME_SUBMITTED');
 
-      // Start music on user interaction
-      if (audioManager && !audioManager.isBackgroundPlaying) {
-        audioManager.init();
-        audioManager.startBackgroundMusic();
-        // If YouTube player not ready, try again after a delay
-        if (!audioManager.youtubePlayerReady) {
-          setTimeout(() => {
-            audioManager.startBackgroundMusic();
-          }, 2000);
-        }
-      }
-
       showMusicBtn();
       startCinematicTransition();
     }
@@ -2202,7 +2105,6 @@
       subEl.textContent = "Now let me tell you something I've never said like this before.";
       await sleep(400);
       nameEl.classList.add('visible');
-      audioManager.playSoftChime();
       await sleep(1800);
       subEl.classList.add('visible');
       await sleep(2600);
@@ -2220,10 +2122,8 @@
       trackEvent('COUNTDOWN_FINISHED');
       await sleep(600);
       $('midnight-msg-1').classList.add('visible');
-      audioManager.playSoftChime();
       await sleep(2000);
       $('midnight-msg-2').classList.add('visible');
-      audioManager.playSoftChime();
       await sleep(2000);
       $('midnight-msg-3').classList.add('visible');
       await sleep(2800);
@@ -2293,14 +2193,8 @@
       el.className = 'letter-chunk';
       await sleep(50);
 
-      const wordCount = timing.wordCount;
-      const typeCount = Math.min(wordCount, 8);
-      for (let i = 0; i < typeCount; i++) {
-        setTimeout(() => audioManager.playTyping(), i * 100);
-      }
-
+      // NO typing sound, NO chime — removed per patch
       el.classList.add('in');
-      audioManager.playSoftChime();
 
       const totalDelay = timing.holdTime + 600;
 
@@ -2330,12 +2224,12 @@
         await sleep(i === 0 ? 400 : 300);
         const el = $(ids[i]);
         if (el) el.classList.add('visible');
-        if (i === 0 || i === 2 || i === 4) audioManager.playSoftChime();
+        // NO chime sound — removed
       }
 
       await sleep(600);
       $('proposal-btns').classList.add('visible');
-      audioManager.playRomanticSparkle();
+      // NO sparkle sound — removed
     }
 
     // ================================================================
@@ -2383,7 +2277,6 @@
       setScreen('screen-yes');
 
       setTimeout(launchConfetti, 400);
-      setTimeout(() => audioManager.playRomanticSparkle(), 500);
     }
 
     async function handleNo() {
@@ -2468,29 +2361,47 @@
     }
 
     // ================================================================
-    // ADMIN PANEL INIT — CTRL + Double Click
+    // ADMIN PANEL INIT — DOUBLE CTRL (no CTRL+T)
     // ================================================================
     function initAdmin() {
       const overlay = $('admin-overlay');
       const loginDiv = $('admin-login');
       const dashboard = $('admin-dashboard');
 
-      // CTRL + Double Click on welcome card to open admin
-      let adminTriggerCount = 0;
-      let adminTriggerTimer = null;
+      // Double CTRL detection
+      let ctrlPressCount = 0;
+      let ctrlTimer = null;
 
-      $('welcome-card').addEventListener('dblclick', (e) => {
-        if (e.ctrlKey) {
+      document.addEventListener('keydown', (e) => {
+        // Ignore if typing in input
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        if (e.key === 'Control') {
           e.preventDefault();
-          overlay.classList.add('open');
-          loginDiv.style.display = 'block';
-          dashboard.style.display = 'none';
-          $('admin-password').value = '';
-          $('admin-error').textContent = '';
+          ctrlPressCount++;
+
+          if (ctrlPressCount === 1) {
+            ctrlTimer = setTimeout(() => {
+              ctrlPressCount = 0;
+            }, 500);
+          } else if (ctrlPressCount >= 2) {
+            // Double CTRL detected!
+            clearTimeout(ctrlTimer);
+            ctrlPressCount = 0;
+            overlay.classList.add('open');
+            loginDiv.style.display = 'block';
+            dashboard.style.display = 'none';
+            $('admin-password').value = '';
+            $('admin-error').textContent = '';
+          }
+        } else {
+          // Any other key resets the counter
+          ctrlPressCount = 0;
+          clearTimeout(ctrlTimer);
         }
       });
 
-      // Fallback: 5 taps on mobile
+      // Mobile fallback: 5 taps on welcome card
       let mobileTapCount = 0;
       let mobileTapTimer = null;
       $('welcome-card').addEventListener('click', (e) => {
@@ -2543,14 +2454,36 @@
 
     function showMusicBtn() { $('music-btn').classList.add('visible'); }
 
+    // Function to attempt starting music immediately
+    function attemptAutoStartMusic() {
+      audioManager.init();
+      audioManager.setupBackgroundMusic(CONFIG.musicSource);
+      audioManager.setBackgroundVolume(1.0); // 100% volume
+
+      // Try to start immediately
+      audioManager.startBackgroundMusic();
+
+      // If YouTube player not ready, try again after a delay
+      setTimeout(() => {
+        if (!audioManager.isBackgroundPlaying) {
+          audioManager.startBackgroundMusic();
+        }
+      }, 1000);
+
+      // One more attempt after API loads
+      setTimeout(() => {
+        if (!audioManager.isBackgroundPlaying) {
+          audioManager.startBackgroundMusic();
+        }
+      }, 3000);
+    }
+
     async function initApp() {
       initSession();
       initPetals();
 
-      // Setup audio with YouTube video ID
-      audioManager.init();
-      audioManager.setupBackgroundMusic(CONFIG.musicSource);
-      audioManager.setBackgroundVolume(0.10);
+      // Start music IMMEDIATELY on page load
+      attemptAutoStartMusic();
 
       initFirebase().then(() => trackEvent('ENTRY'));
 
