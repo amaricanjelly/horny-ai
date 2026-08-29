@@ -345,7 +345,7 @@
     }
 
     /* ============================================================
-       TRANSITION SCREEN — Sharp, Elegant, Readable
+       TRANSITION SCREEN
        ============================================================ */
     #screen-transition {
       z-index: 15;
@@ -600,7 +600,7 @@
       margin: 1.25rem auto;
     }
 
-    /* Proposal Buttons — Big, Centered, Mobile Friendly */
+    /* Proposal Buttons */
     .proposal-buttons {
       display: flex;
       flex-direction: row;
@@ -674,78 +674,140 @@
     }
 
     /* ============================================================
-       FINAL RESPONSE SCREENS (YES / NO)
+       RESPONSE SCREENS — YES & NO (3-step letter display)
        ============================================================ */
     #screen-yes,
     #screen-no {
       z-index: 35;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
+      padding: clamp(1.5rem, 4vw, 2.5rem);
       overflow-y: auto;
-      padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 4vw, 2.5rem);
     }
-    .response-card {
+    .response-letter-stage {
       max-width: 600px;
       width: 100%;
       text-align: center;
+      position: relative;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 0;
     }
-    .response-headline {
-      font-family: var(--font-script);
-      font-size: clamp(3rem, 10vw, 5.5rem);
-      color: var(--text-primary);
-      text-shadow: 0 0 50px var(--pink-glow), 0 0 100px rgba(255, 183, 197, 0.08);
-      line-height: 1.2;
-      margin-bottom: 1.5rem;
+    .response-chunk {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      padding: 0 0.5rem;
       opacity: 0;
-      animation: fadeUp 1s 0.3s var(--ease-smooth) forwards;
+      transform: translateY(28px);
+      filter: blur(6px);
+      transition: opacity 0.6s var(--ease-smooth), transform 0.6s var(--ease-smooth), filter 0.6s var(--ease-smooth);
+      pointer-events: none;
+    }
+    .response-chunk.in {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+      pointer-events: auto;
+    }
+    .response-chunk.out {
+      opacity: 0;
+      transform: translateY(-18px);
+      filter: blur(3px);
+    }
+    .response-line {
+      font-family: var(--font-display);
+      font-size: clamp(1.1rem, 3.6vw, 1.6rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text-primary);
+      line-height: 1.8;
+      text-shadow: 0 0 20px rgba(255, 183, 197, 0.06);
+      letter-spacing: 0.02em;
+      max-width: 100%;
+      word-break: break-word;
+    }
+    .response-line.script {
+      font-family: var(--font-script);
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-style: normal;
       font-weight: 400;
     }
-    .response-body {
-      font-family: var(--font-display);
-      font-size: clamp(1.1rem, 3vw, 1.4rem);
-      font-weight: 300;
-      color: var(--text-secondary);
-      line-height: 2;
-      letter-spacing: 0.02em;
-      opacity: 0;
-      animation: fadeUp 1s 0.8s var(--ease-smooth) forwards;
-    }
-    .response-body p {
-      margin-bottom: 1.2rem;
-    }
-    .response-body .highlight {
+    .response-line .highlight {
       color: #E8749A;
-      font-style: italic;
       text-shadow: 0 0 16px rgba(255, 183, 197, 0.2);
     }
-    .response-closing {
-      margin-top: 2.5rem;
-      font-family: var(--font-script);
-      font-size: clamp(2rem, 6vw, 3.5rem);
-      color: #E8749A;
-      text-shadow: 0 0 30px var(--pink-glow);
+    .response-progress {
+      position: fixed;
+      bottom: 1.75rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+    }
+    .response-progress .progress-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .response-progress .progress-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(45, 27, 45, 0.15);
+      transition: all 0.5s var(--ease-smooth);
+    }
+    .response-progress .progress-dot.active {
+      background: #FFB7C5;
+      width: 24px;
+      border-radius: 2px;
+      box-shadow: 0 0 12px rgba(255, 183, 197, 0.25);
+    }
+    /* Final message after all steps */
+    .response-final {
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      padding: 0.5rem;
       opacity: 0;
-      animation: fadeUp 1s 1.5s var(--ease-smooth) forwards;
+      transition: opacity 0.8s var(--ease-smooth);
+      margin-top: 1rem;
+    }
+    .response-final.visible {
+      opacity: 1;
+    }
+    .response-final .final-headline {
+      font-family: var(--font-script);
+      font-size: clamp(2.2rem, 6vw, 3.5rem);
+      color: var(--text-primary);
+      text-shadow: 0 0 40px var(--pink-glow);
+      line-height: 1.3;
       font-weight: 400;
     }
-    .response-note {
-      margin-top: 0.5rem;
+    .response-final .final-sub {
       font-family: var(--font-display);
+      font-size: clamp(1rem, 2.8vw, 1.2rem);
+      font-weight: 300;
       font-style: italic;
-      font-size: clamp(0.85rem, 2vw, 1rem);
-      color: var(--text-muted);
-      opacity: 0;
-      animation: fadeUp 0.8s 2s ease forwards;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+      line-height: 1.7;
     }
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(24px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .response-final .final-closing {
+      font-family: var(--font-script);
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      color: #E8749A;
+      text-shadow: 0 0 30px var(--pink-glow);
+      margin-top: 1.5rem;
+      font-weight: 400;
+    }
+    .response-final .final-note {
+      font-family: var(--font-display);
+      font-size: clamp(0.85rem, 2vw, 1rem);
+      font-style: italic;
+      color: var(--text-muted);
+      margin-top: 0.3rem;
     }
 
     /* ============================================================
@@ -795,7 +857,7 @@
     }
 
     /* ============================================================
-       ADMIN PANEL — Premium, Light
+       ADMIN PANEL
        ============================================================ */
     #admin-overlay {
       position: fixed;
@@ -1131,6 +1193,18 @@
       .admin-table td {
         padding: 0.3rem 0.15rem;
       }
+      .response-line {
+        font-size: clamp(0.95rem, 3.2vw, 1.3rem);
+      }
+      .response-line.script {
+        font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      }
+      .response-letter-stage {
+        min-height: 160px;
+      }
+      .response-progress {
+        bottom: 1.25rem;
+      }
     }
 
     @media (max-width: 380px) {
@@ -1199,8 +1273,17 @@
       .letter-stage {
         min-height: 120px;
       }
-      .response-headline {
-        font-size: clamp(2.2rem, 7vw, 3.5rem);
+      .response-letter-stage {
+        min-height: 120px;
+      }
+      .response-line {
+        font-size: clamp(0.85rem, 2.8vw, 1.1rem);
+      }
+      .response-line.script {
+        font-size: clamp(1.3rem, 4vw, 1.8rem);
+      }
+      .response-progress {
+        bottom: 1rem;
       }
     }
 
@@ -1215,7 +1298,8 @@
       .screen {
         transition: opacity 0.2s, visibility 0.2s;
       }
-      .letter-chunk {
+      .letter-chunk,
+      .response-chunk {
         transition: opacity 0.3s, transform 0.3s, filter 0.3s;
         filter: none;
       }
@@ -1276,7 +1360,7 @@
   </section>
 
   <!-- ============================================================
-  SCREEN 4 — LOVE LETTER (Professional Reading-Time)
+  SCREEN 4 — LOVE LETTER
   ============================================================ -->
   <section class="screen" id="screen-letter" aria-label="Love letter" aria-live="polite">
     <div class="letter-stage" id="letter-stage">
@@ -1309,33 +1393,42 @@
   </section>
 
   <!-- ============================================================
-  SCREEN 6 — YES RESPONSE
+  SCREEN 6 — YES RESPONSE (3 STEPS)
   ============================================================ -->
   <section class="screen" id="screen-yes" aria-label="Yes response">
-    <div class="glass-card response-card">
-      <div class="response-headline">Yesssss!</div>
-      <div class="response-body">
-        <p>You just made my whole world the most beautiful place.</p>
-        <p>I promise to <span class="highlight">love you</span>, cherish you, and stand by you forever.</p>
+    <div class="glass-card" style="max-width:600px;text-align:center;">
+      <div class="response-letter-stage" id="yes-letter-stage">
+        <div class="response-chunk" id="yes-chunk-display"></div>
       </div>
-      <div class="response-closing">I Love You.</div>
-      <div class="response-note">Truly. Always. Without doubt.</div>
+      <div class="response-progress" id="yes-progress">
+        <div class="progress-dots" id="yes-progress-dots" role="progressbar" aria-label="Response progress"></div>
+      </div>
+      <div class="response-final" id="yes-final">
+        <div class="final-headline">💗 Forever Yours 💗</div>
+        <div class="final-sub">You just made my whole world the most beautiful place.</div>
+        <div class="final-closing">I Love You.</div>
+        <div class="final-note">Truly. Always. Without doubt.</div>
+      </div>
     </div>
   </section>
 
   <!-- ============================================================
-  SCREEN 7 — NO RESPONSE
+  SCREEN 7 — NO RESPONSE (3 STEPS)
   ============================================================ -->
   <section class="screen" id="screen-no" aria-label="No response">
-    <div class="glass-card response-card">
-      <div class="response-headline" style="font-size:clamp(2.5rem,8vw,4rem);">If you lost it, okay…</div>
-      <div class="response-body">
-        <p>If my love isn't enough, I still respect your decision.</p>
-        <p>You'll always be <span class="highlight">special to me</span>.</p>
-        <p>Take care, and be happy wherever you are…</p>
+    <div class="glass-card" style="max-width:600px;text-align:center;">
+      <div class="response-letter-stage" id="no-letter-stage">
+        <div class="response-chunk" id="no-chunk-display"></div>
       </div>
-      <div class="response-closing" style="font-size:clamp(1.8rem,5vw,3rem);text-shadow:0 0 30px rgba(181,216,255,0.2);">Still, I Love You.</div>
-      <div class="response-note">With full respect. And no regrets.</div>
+      <div class="response-progress" id="no-progress">
+        <div class="progress-dots" id="no-progress-dots" role="progressbar" aria-label="Response progress"></div>
+      </div>
+      <div class="response-final" id="no-final">
+        <div class="final-headline" style="font-size:clamp(1.8rem,5vw,2.8rem);">🥺 Still Here 🥺</div>
+        <div class="final-sub">I'll always be here if you change your mind.</div>
+        <div class="final-closing" style="font-size:clamp(1.6rem,4vw,2.5rem);">Still, I Love You.</div>
+        <div class="final-note">With full respect. And no regrets.</div>
+      </div>
     </div>
   </section>
 
@@ -1348,14 +1441,12 @@
       <h2>Admin Panel</h2>
       <h3>Love Letter Analytics</h3>
 
-      <!-- Login -->
       <div id="admin-login">
         <input class="admin-input" id="admin-password" type="password" placeholder="Enter password" />
         <button class="admin-btn" id="admin-login-btn">Unlock</button>
         <div class="admin-error" id="admin-error"></div>
       </div>
 
-      <!-- Dashboard -->
       <div id="admin-dashboard" style="display:none;">
         <div id="firebase-status-badge" class="firebase-status offline">
           <span class="status-dot"></span> <span id="firebase-status-text">Connecting…</span>
@@ -1393,7 +1484,7 @@
   </button>
 
   <!-- ============================================================
-  FIREBASE + APP — Modular
+  FIREBASE + APP
   ============================================================ -->
   <script type="module">
     // ================================================================
@@ -1411,14 +1502,11 @@
     };
 
     // ================================================================
-    // APP CONFIG — 3-SONG MUSIC SYSTEM
+    // APP CONFIG
     // ================================================================
     const CONFIG = {
       enableFirebase: true,
       enableMusic: true,
-      // Main Song: bgGrWLoSFJ4
-      // YES Song: 0qXn35dM4qU
-      // NO Song: DwT-sb00wXE
       mainSongId: "bgGrWLoSFJ4",
       yesSongId: "0qXn35dM4qU",
       noSongId: "DwT-sb00wXE",
@@ -1427,7 +1515,7 @@
     };
 
     // ================================================================
-    // LETTER CONTENT (exact original)
+    // LETTER CONTENT
     // ================================================================
     const LETTER_CHUNKS = [
       { text: "Heyy…", cls: "script" },
@@ -1455,6 +1543,58 @@
       { text: "I don't know ami apnar jonno\nbest kina.", cls: "" },
       { text: "But amar jonno\napni best ever.", cls: "" },
       { text: "Mane…", cls: "", sub: "ever." },
+    ];
+
+    // ================================================================
+    // YES RESPONSE — 3 COMPLETE STEPS
+    // ================================================================
+    const YES_CHUNKS = [
+      {
+        text: `Oooo! Tumi YES bolcho?! 😭💗 Ami ki shotti eta dekhchi?! Wait… amar toh ekhon pura system hang hoye gelo! 🥹`,
+        cls: ""
+      },
+      {
+        text: `Ami honestly ekhono bishash korte partesi na… Tumi shotti YES bolso?! 😭`,
+        cls: ""
+      },
+      {
+        text: `Finallyyy! Eto din dhore je moment-ta imagine kortesilam, ajke shetai real hoye gelo. 🥹💍`,
+        cls: ""
+      },
+      {
+        text: `Ekhon amar ekta problem… ami ei moment-ta screenshot nite pari na, video-o korte pari na! 😭😂`,
+        cls: ""
+      },
+      {
+        text: `Ami screenshot nite pari na, video korte pari na… tahole ei moment-ta save korbo kivabe?! 😭💗`,
+        cls: ""
+      },
+      {
+        text: `Mone hoy ei moment-ta amar mathay permanently save kore rakhte hobe… karon eta toh amar favorite moment hoye gelo. 🥹💗`,
+        cls: ""
+      }
+    ];
+
+    // ================================================================
+    // NO RESPONSE — 3 COMPLETE STEPS
+    // ================================================================
+    const NO_CHUNKS = [
+      {
+        text: `Accha… Madam reject kore dilen. 🥲 Thik ache, apnar decision ami respect kori. Kharap toh lagbei… karon mon diye kichu chaile, na shunle ektu kharap lagata shobhabik.`,
+        cls: ""
+      },
+      {
+        text: `Shudhu ekta kotha bolbo, Madam… amake please block koiren na. Kono jayga thekeo na. Ami apnar decision mene nibo, kintu apnar sathe kotha bolar ekta chotto jayga jeno bondho hoye na jay.`,
+        cls: ""
+      },
+      {
+        text: `Reject korchen, thik ache Madam… apnar decision ami respect kori. Kharap lagbe, ektu toh lagbei. 🥲`,
+        cls: ""
+      },
+      {
+        text: `Shudhu amake block koiren na, Madam… reject korleo mene nibo, kintu apnake ekdom hariye felar moto kore dure chole jaben na. 🥺`,
+        cls: ""
+      }
     ];
 
     // ================================================================
@@ -1487,6 +1627,9 @@
       allResponses: [],
       selectedDetailKey: null,
       setIntensity: null,
+      // Response chunk tracking
+      yesChunkIndex: 0,
+      noChunkIndex: 0,
     };
 
     // ================================================================
@@ -1534,7 +1677,7 @@
     }
 
     // ================================================================
-    // PROFESSIONAL READING-TIME SYSTEM
+    // READING-TIME SYSTEM
     // ================================================================
     function calculateReadingDuration(chunk) {
       const allText = chunk.text + (chunk.sub ? ' ' + chunk.sub : '');
@@ -1572,27 +1715,15 @@
     class MusicManager {
       constructor() {
         this.ctx = null;
-        this.players = {
-          main: null,
-          yes: null,
-          no: null,
-        };
-        this.currentTrack = null; // 'main' | 'yes' | 'no' | null
+        this.players = { main: null, yes: null, no: null };
+        this.currentTrack = null;
         this.isMuted = false;
         this.isPlaying = false;
         this.volume = 1.0;
         this.initialized = false;
         this.fadeInterval = null;
-        this.youtubeReady = {
-          main: false,
-          yes: false,
-          no: false,
-        };
-        this.youtubePlayers = {
-          main: null,
-          yes: null,
-          no: null,
-        };
+        this.youtubeReady = { main: false, yes: false, no: false };
+        this.youtubePlayers = { main: null, yes: null, no: null };
         this.pendingStart = null;
       }
 
@@ -1600,9 +1731,7 @@
         if (this.initialized) return;
         try {
           this.ctx = new(window.AudioContext || window.webkitAudioContext)();
-        } catch (e) {
-          this.ctx = null;
-        }
+        } catch (e) { this.ctx = null; }
         this.initialized = true;
         this.loadYouTubeAPI();
       }
@@ -1616,9 +1745,7 @@
         if (typeof YT !== 'undefined' && YT.Player) {
           this.createAllPlayers();
         } else {
-          window.onYouTubeIframeAPIReady = () => {
-            this.createAllPlayers();
-          };
+          window.onYouTubeIframeAPIReady = () => { this.createAllPlayers(); };
         }
       }
 
@@ -1658,14 +1785,12 @@
                 if (this.youtubePlayers[track] && this.youtubePlayers[track].setVolume) {
                   this.youtubePlayers[track].setVolume(Math.round(this.volume * 100));
                 }
-                // If this track was pending start
                 if (this.pendingStart === track) {
                   this.pendingStart = null;
                   this.playTrack(track);
                 }
               },
               onStateChange: (e) => {
-                // If video ends and we're still on this track, replay
                 if (e.data === 0 && this.currentTrack === track) {
                   this.youtubePlayers[track].playVideo();
                 }
@@ -1673,27 +1798,15 @@
             },
           });
           this.youtubePlayers[track] = player;
-        } catch (e) {
-          console.warn(`YouTube player creation failed for ${track}:`, e);
-        }
+        } catch (e) { console.warn(`YouTube player creation failed for ${track}:`, e); }
       }
 
-      playMain() {
-        this.switchTo('main');
-      }
-
-      playYes() {
-        this.switchTo('yes');
-      }
-
-      playNo() {
-        this.switchTo('no');
-      }
+      playMain() { this.switchTo('main'); }
+      playYes() { this.switchTo('yes'); }
+      playNo() { this.switchTo('no'); }
 
       switchTo(track) {
         if (this.currentTrack === track && this.isPlaying) return;
-
-        // Fade out current
         const currentPlayer = this.currentTrack ? this.youtubePlayers[this.currentTrack] : null;
         if (currentPlayer && this.youtubeReady[this.currentTrack]) {
           try {
@@ -1714,11 +1827,9 @@
       startTrack(track) {
         const player = this.youtubePlayers[track];
         if (!player || !this.youtubeReady[track]) {
-          // Player not ready yet — store pending
           this.pendingStart = track;
           return;
         }
-
         try {
           player.playVideo();
           this.currentTrack = track;
@@ -1726,20 +1837,15 @@
           if (player.setVolume) {
             player.setVolume(Math.round(this.volume * 100));
           }
-          // Fade in
           this.fadeInPlayer(player);
-        } catch (e) {
-          console.warn(`Failed to start track ${track}:`, e);
-        }
+        } catch (e) { console.warn(`Failed to start track ${track}:`, e); }
       }
 
       stopCurrent() {
         if (this.currentTrack) {
           const player = this.youtubePlayers[this.currentTrack];
           if (player && this.youtubeReady[this.currentTrack]) {
-            try {
-              player.pauseVideo();
-            } catch (e) {}
+            try { player.pauseVideo(); } catch (e) {}
           }
         }
         this.isPlaying = false;
@@ -1757,16 +1863,13 @@
         if (this.fadeInterval) clearInterval(this.fadeInterval);
         this.fadeInterval = setInterval(() => {
           vol = Math.max(vol - step, 0);
-          if (player.setVolume) {
-            player.setVolume(vol);
-          }
+          if (player.setVolume) player.setVolume(vol);
           if (vol <= 0) {
             clearInterval(this.fadeInterval);
             this.fadeInterval = null;
             if (callback) callback();
           }
         }, interval);
-        // Fallback: if fade takes too long
         setTimeout(() => {
           if (this.fadeInterval) {
             clearInterval(this.fadeInterval);
@@ -1784,9 +1887,7 @@
         if (this.fadeInterval) clearInterval(this.fadeInterval);
         this.fadeInterval = setInterval(() => {
           vol = Math.min(vol + step, target);
-          if (player.setVolume) {
-            player.setVolume(vol);
-          }
+          if (player.setVolume) player.setVolume(vol);
           if (vol >= target) {
             clearInterval(this.fadeInterval);
             this.fadeInterval = null;
@@ -1816,22 +1917,10 @@
         return this.isMuted;
       }
 
-      getCurrentTrack() {
-        return this.currentTrack;
-      }
-
-      isMutedState() {
-        return this.isMuted;
-      }
-
-      // For compatibility with existing code
-      playBackgroundMusic() {
-        this.playMain();
-      }
-
-      startBackgroundMusic() {
-        this.playMain();
-      }
+      getCurrentTrack() { return this.currentTrack; }
+      isMutedState() { return this.isMuted; }
+      playBackgroundMusic() { this.playMain(); }
+      startBackgroundMusic() { this.playMain(); }
     }
 
     // ================================================================
@@ -1874,9 +1963,7 @@
           ...responseData,
           serverTimestamp: serverTimestamp(),
         });
-      } catch (e) {
-        console.warn("Firebase save failed:", e);
-      }
+      } catch (e) { console.warn("Firebase save failed:", e); }
     }
 
     async function trackEvent(event, extra = {}) {
@@ -1953,7 +2040,7 @@
     }
 
     // ================================================================
-    // PETALS — Fewer, Smaller, Softer, Slower
+    // PETALS
     // ================================================================
     function initPetals() {
       const canvas = $('petal-canvas');
@@ -2018,7 +2105,7 @@
     }
 
     // ================================================================
-    // STARS — Very Subtle
+    // STARS
     // ================================================================
     function showStars() {
       const canvas = $('star-canvas');
@@ -2160,10 +2247,11 @@
     }
 
     // ================================================================
-    // LOVE LETTER — Professional Reading-Time (NO SOUND EFFECTS)
+    // LOVE LETTER
     // ================================================================
-    function buildProgressDots() {
-      const container = $('progress-dots');
+    function buildProgressDots(containerId) {
+      const container = $(containerId);
+      if (!container) return;
       container.innerHTML = '';
       LETTER_CHUNKS.forEach((_, i) => {
         const dot = document.createElement('div');
@@ -2172,14 +2260,16 @@
       });
     }
 
-    function updateProgressDot(idx) {
-      document.querySelectorAll('.progress-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+    function updateProgressDot(containerId, idx) {
+      const container = $(containerId);
+      if (!container) return;
+      container.querySelectorAll('.progress-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
     }
 
     async function startLoveLetter() {
       setScreen('screen-letter');
       setPhase('letter');
-      buildProgressDots();
+      buildProgressDots('progress-dots');
       trackEvent('LETTER_STARTED');
       STATE.letterIndex = 0;
       showLetterChunk(0);
@@ -2193,7 +2283,7 @@
       }
       const chunk = LETTER_CHUNKS[idx];
       const el = $('letter-chunk-display');
-      updateProgressDot(idx);
+      updateProgressDot('progress-dots', idx);
 
       let html = '';
       const lines = chunk.text.split('\n');
@@ -2222,7 +2312,6 @@
       el.className = 'letter-chunk';
       await sleep(50);
 
-      // NO sound effects — just visual transition
       el.classList.add('in');
 
       const totalDelay = timing.holdTime + 600;
@@ -2253,11 +2342,72 @@
         await sleep(i === 0 ? 400 : 300);
         const el = $(ids[i]);
         if (el) el.classList.add('visible');
-        // NO sound effects
       }
 
       await sleep(600);
       $('proposal-btns').classList.add('visible');
+    }
+
+    // ================================================================
+    // RESPONSE HELPERS — 3-step display for YES and NO
+    // ================================================================
+    function buildResponseDots(containerId, total) {
+      const container = $(containerId);
+      if (!container) return;
+      container.innerHTML = '';
+      for (let i = 0; i < total; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'progress-dot' + (i === 0 ? ' active' : '');
+        container.appendChild(dot);
+      }
+    }
+
+    function updateResponseDot(containerId, idx) {
+      const container = $(containerId);
+      if (!container) return;
+      container.querySelectorAll('.progress-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+    }
+
+    async function showResponseChunk(displayId, containerId, chunks, idx, onComplete) {
+      if (idx >= chunks.length) {
+        // Show final message
+        const finalEl = document.getElementById(containerId === 'yes-progress' ? 'yes-final' : 'no-final');
+        if (finalEl) finalEl.classList.add('visible');
+        if (onComplete) onComplete();
+        return;
+      }
+
+      const chunk = chunks[idx];
+      const el = $(displayId);
+      const dotsContainer = containerId;
+
+      // Build HTML
+      const lines = chunk.text.split('\n');
+      let html = '';
+      lines.forEach(line => {
+        if (!line.trim()) return;
+        const rendered = applyName(line);
+        html += `<div class="response-line">${rendered}</div>`;
+      });
+
+      const timing = calculateReadingDuration(chunk);
+
+      el.classList.remove('in');
+      el.classList.add('out');
+      await sleep(300);
+
+      el.innerHTML = html;
+      el.className = 'response-chunk';
+      await sleep(50);
+
+      el.classList.add('in');
+      updateResponseDot(dotsContainer, idx);
+
+      const totalDelay = timing.holdTime + 600;
+
+      setTimeout(() => {
+        showResponseChunk(displayId, containerId, chunks, idx + 1, onComplete);
+      }, totalDelay);
     }
 
     // ================================================================
@@ -2291,13 +2441,12 @@
     }
 
     // ================================================================
-    // PROPOSAL BUTTONS — With 3-Song Switching
+    // PROPOSAL BUTTONS — With 3-Step Response Display
     // ================================================================
     async function handleYes() {
       trackEvent('YES_CLICKED');
       await saveUserResponse('ACCEPTED');
 
-      // Switch to YES song
       if (musicManager) {
         musicManager.playYes();
       }
@@ -2305,17 +2454,31 @@
       setPhase('yes');
       if (STATE.setIntensity) STATE.setIntensity(2);
 
-      await sleep(300);
+      // Show YES screen with 3 steps
       setScreen('screen-yes');
 
-      setTimeout(launchConfetti, 400);
+      // Reset and prepare
+      const displayEl = $('yes-chunk-display');
+      const dotsContainer = 'yes-progress';
+      displayEl.className = 'response-chunk';
+      const finalEl = $('yes-final');
+      if (finalEl) finalEl.classList.remove('visible');
+
+      // Build dots for 6 chunks (3 steps with sub-texts)
+      buildResponseDots('yes-progress-dots', YES_CHUNKS.length);
+
+      // Start showing chunks
+      showResponseChunk('yes-chunk-display', 'yes-progress-dots', YES_CHUNKS, 0, () => {
+        // Final message is shown by showResponseChunk when done
+        // Also launch confetti
+        setTimeout(launchConfetti, 400);
+      });
     }
 
     async function handleNo() {
       trackEvent('NO_CLICKED');
       await saveUserResponse('REJECTED');
 
-      // Switch to NO song
       if (musicManager) {
         musicManager.playNo();
       }
@@ -2323,8 +2486,18 @@
       setPhase('no');
       if (STATE.setIntensity) STATE.setIntensity(0.5);
 
-      await sleep(300);
       setScreen('screen-no');
+
+      const displayEl = $('no-chunk-display');
+      displayEl.className = 'response-chunk';
+      const finalEl = $('no-final');
+      if (finalEl) finalEl.classList.remove('visible');
+
+      buildResponseDots('no-progress-dots', NO_CHUNKS.length);
+
+      showResponseChunk('no-chunk-display', 'no-progress-dots', NO_CHUNKS, 0, () => {
+        // Final message shown by showResponseChunk
+      });
     }
 
     // ================================================================
@@ -2404,7 +2577,6 @@
       const loginDiv = $('admin-login');
       const dashboard = $('admin-dashboard');
 
-      // Double CTRL detection
       let ctrlPressCount = 0;
       let ctrlTimer = null;
 
@@ -2416,9 +2588,7 @@
           ctrlPressCount++;
 
           if (ctrlPressCount === 1) {
-            ctrlTimer = setTimeout(() => {
-              ctrlPressCount = 0;
-            }, 500);
+            ctrlTimer = setTimeout(() => { ctrlPressCount = 0; }, 500);
           } else if (ctrlPressCount >= 2) {
             clearTimeout(ctrlTimer);
             ctrlPressCount = 0;
@@ -2434,7 +2604,6 @@
         }
       });
 
-      // Mobile fallback: 5 taps
       let mobileTapCount = 0;
       let mobileTapTimer = null;
       $('welcome-card').addEventListener('click', (e) => {
@@ -2481,20 +2650,15 @@
     // ================================================================
     // APP INIT
     // ================================================================
-    // Create MusicManager instance
     const musicManager = new MusicManager();
 
     function showMusicBtn() { $('music-btn').classList.add('visible'); }
 
     function attemptAutoStartMusic() {
       musicManager.init();
-      // Volume at 100%
       musicManager.setVolume(1.0);
-
-      // Attempt to start main song immediately
       musicManager.playMain();
 
-      // Retry if not playing after short delay
       setTimeout(() => {
         if (musicManager.getCurrentTrack() !== 'main') {
           musicManager.playMain();
@@ -2512,14 +2676,12 @@
       initSession();
       initPetals();
 
-      // Start music immediately
       attemptAutoStartMusic();
 
       initFirebase().then(() => trackEvent('ENTRY'));
 
       initAdmin();
 
-      // Music button toggle
       $('music-btn').addEventListener('click', () => {
         const muted = musicManager.toggleMute();
         const iconOn = $('music-icon-on');
@@ -2543,7 +2705,6 @@
       setTimeout(() => $('name-input')?.focus(), 500);
     }
 
-    // Expose musicManager globally for debugging
     window.musicManager = musicManager;
 
     initApp();
