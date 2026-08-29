@@ -10,26 +10,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
   <style>
     /* ============================================================
-       ROOT TOKENS — Cherry Blossom + Baby Blue (NO PURPLE)
+       ROOT TOKENS — CHERRY BLOSSOM + OFF-PINK + BABY BLUE
        ============================================================ */
     :root {
       --pink: #FFB7C5;
       --pink-soft: #FFD9E5;
       --pink-light: #FFF0F5;
-      --pink-glow: rgba(255, 183, 197, 0.35);
+      --pink-glow: rgba(255, 183, 197, 0.30);
       --blue: #B5D8FF;
       --blue-soft: #D6EAFF;
       --blue-light: #EBF3FF;
-      --blue-glow: rgba(181, 216, 255, 0.25);
+      --blue-glow: rgba(181, 216, 255, 0.20);
       --white: #FFFFFF;
       --white-soft: rgba(255, 255, 255, 0.92);
-      --text-primary: #FFFFFF;
-      --text-secondary: rgba(255, 255, 255, 0.82);
-      --text-muted: rgba(255, 255, 255, 0.45);
+      --text-primary: #2D1B2D;
+      --text-secondary: rgba(45, 27, 45, 0.75);
+      --text-muted: rgba(45, 27, 45, 0.45);
 
-      --glass-bg: rgba(255, 255, 255, 0.10);
-      --glass-border: rgba(255, 255, 255, 0.22);
-      --glass-shadow: 0 8px 48px rgba(180, 120, 160, 0.12);
+      --glass-bg: rgba(255, 255, 255, 0.35);
+      --glass-border: rgba(255, 255, 255, 0.45);
+      --glass-shadow: 0 8px 48px rgba(180, 120, 160, 0.10);
 
       --font-display: 'Cormorant Garamond', Georgia, serif;
       --font-body: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -43,9 +43,9 @@
       --radius-card: 28px;
       --radius-btn: 16px;
 
-      --bg-start: #2a1a3a;
-      --bg-mid: #3a1a4a;
-      --bg-end: #1a2a5a;
+      --bg-start: #FFE8EE;
+      --bg-mid: #FFD9E5;
+      --bg-end: #D6EAFF;
     }
 
     /* ============================================================
@@ -64,7 +64,7 @@
     }
     body {
       font-family: var(--font-body);
-      background: #1a0a2e;
+      background: #FFF5F7;
       color: var(--text-primary);
       min-height: 100vh;
       overflow-x: hidden;
@@ -73,81 +73,83 @@
     }
 
     /* ============================================================
-       ANIMATED BACKGROUND — Soft Pink/Blue Dreamscape
+       ANIMATED BACKGROUND — LIGHT, SOFT, CHERRY BLOSSOM
        ============================================================ */
     .bg-layer {
       position: fixed;
       inset: 0;
       z-index: 0;
-      transition: background 2.8s var(--ease-smooth);
+      transition: background 3s var(--ease-smooth);
     }
     .bg-layer.phase-welcome {
-      background: radial-gradient(ellipse at 20% 30%, #4a2a5a 0%, #2a1a3a 45%, #1a1a3a 75%, #1a2a4a 100%);
+      background: radial-gradient(ellipse at 20% 30%, #FFF0F5 0%, #FFD9E5 40%, #D6EAFF 75%, #EBF3FF 100%);
     }
     .bg-layer.phase-countdown {
-      background: radial-gradient(ellipse at 30% 25%, #4a2a5a 0%, #2a1a4a 40%, #1a2a5a 70%, #1a1a3a 100%);
+      background: radial-gradient(ellipse at 30% 25%, #FFF0F5 0%, #FFD9E5 35%, #D6EAFF 65%, #EBF3FF 100%);
     }
     .bg-layer.phase-letter {
-      background: radial-gradient(ellipse at 40% 30%, #4a2a5a 0%, #2a1a4a 35%, #1a2a5a 65%, #1a1a3a 100%);
+      background: radial-gradient(ellipse at 40% 30%, #FFF5F7 0%, #FFD9E5 30%, #D6EAFF 60%, #EBF3FF 100%);
     }
     .bg-layer.phase-proposal {
-      background: radial-gradient(ellipse at 50% 40%, #4a2a5a 0%, #3a1a5a 35%, #1a2a5a 65%, #1a1a3a 100%);
+      background: radial-gradient(ellipse at 50% 40%, #FFF0F5 0%, #FFD9E5 35%, #D6EAFF 65%, #EBF3FF 100%);
     }
     .bg-layer.phase-yes {
-      background: radial-gradient(ellipse at 50% 50%, #5a2a6a 0%, #3a1a5a 35%, #2a1a4a 65%, #1a1a3a 100%);
+      background: radial-gradient(ellipse at 50% 50%, #FFF5F7 0%, #FFD9E5 30%, #D6EAFF 60%, #EBF3FF 100%);
     }
     .bg-layer.phase-no {
-      background: radial-gradient(ellipse at 50% 40%, #2a1a3a 0%, #1a1a3a 40%, #1a2a3a 70%, #0a1a2a 100%);
+      background: radial-gradient(ellipse at 50% 40%, #FFF0F5 0%, #FFD9E5 30%, #D6EAFF 60%, #EBF3FF 100%);
     }
 
-    /* Soft atmospheric glow orbs */
+    /* Soft atmospheric orbs — very subtle */
     .orb {
       position: fixed;
       border-radius: 50%;
-      filter: blur(80px);
+      filter: blur(100px);
       pointer-events: none;
       z-index: 0;
-      opacity: 0.18;
-      animation: orb-drift 18s ease-in-out infinite alternate;
+      opacity: 0.30;
+      animation: orb-drift 20s ease-in-out infinite alternate;
     }
     .orb-pink {
-      width: 480px;
-      height: 480px;
+      width: 500px;
+      height: 500px;
       background: #FFB7C5;
-      top: -10%;
-      right: -8%;
+      top: -15%;
+      right: -10%;
       animation-delay: 0s;
+      opacity: 0.25;
     }
     .orb-blue {
-      width: 420px;
-      height: 420px;
+      width: 450px;
+      height: 450px;
       background: #B5D8FF;
-      bottom: -10%;
-      left: -8%;
+      bottom: -15%;
+      left: -10%;
       animation-delay: 6s;
+      opacity: 0.20;
     }
     .orb-lavender {
-      width: 360px;
-      height: 360px;
+      width: 380px;
+      height: 380px;
       background: #D6EAFF;
       top: 35%;
       left: 50%;
       transform: translateX(-50%);
       animation-delay: 12s;
-      opacity: 0.10;
+      opacity: 0.15;
     }
     @keyframes orb-drift {
       0% {
         transform: translate(0, 0) scale(1);
       }
       33% {
-        transform: translate(30px, -24px) scale(1.06);
+        transform: translate(40px, -30px) scale(1.05);
       }
       66% {
-        transform: translate(-20px, 20px) scale(0.94);
+        transform: translate(-25px, 25px) scale(0.95);
       }
       100% {
-        transform: translate(10px, -10px) scale(1.02);
+        transform: translate(15px, -15px) scale(1.02);
       }
     }
 
@@ -168,7 +170,7 @@
       transition: opacity 2.5s var(--ease-smooth);
     }
     #star-canvas.visible {
-      opacity: 1;
+      opacity: 0.4;
     }
     #confetti-canvas {
       z-index: 40;
@@ -203,21 +205,22 @@
     }
 
     /* ============================================================
-       GLASS CARD — Premium
+       GLASS CARD — Premium, Light & Soft
        ============================================================ */
     .glass-card {
       background: var(--glass-bg);
-      backdrop-filter: blur(24px) saturate(1.5);
-      -webkit-backdrop-filter: blur(24px) saturate(1.5);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius-card);
-      box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.5);
       padding: clamp(1.75rem, 5vw, 3rem);
       width: 100%;
       max-width: var(--max-width-card);
       position: relative;
       overflow: hidden;
       transition: box-shadow 0.4s var(--ease-smooth);
+      color: var(--text-primary);
     }
     .glass-card::before {
       content: '';
@@ -226,16 +229,7 @@
       left: 0;
       right: 0;
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
-    }
-    .glass-card::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255, 183, 197, 0.15), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
     }
 
     /* ============================================================
@@ -259,7 +253,7 @@
       text-align: center;
       line-height: 1.15;
       margin-bottom: 0.3rem;
-      text-shadow: 0 0 50px var(--pink-glow), 0 0 100px rgba(255, 183, 197, 0.15);
+      text-shadow: 0 0 40px var(--pink-glow), 0 0 80px rgba(255, 183, 197, 0.08);
       letter-spacing: 0.02em;
     }
     #screen-welcome .subtitle {
@@ -279,8 +273,8 @@
     }
     .name-input {
       width: 100%;
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.40);
+      border: 1px solid rgba(255, 255, 255, 0.30);
       border-radius: 14px;
       padding: 1rem 1.25rem;
       font-family: var(--font-display);
@@ -298,12 +292,12 @@
     }
     .name-input:focus {
       border-color: rgba(255, 183, 197, 0.5);
-      background: rgba(255, 255, 255, 0.10);
-      box-shadow: 0 0 0 4px rgba(255, 183, 197, 0.10), 0 0 30px rgba(255, 183, 197, 0.06);
+      background: rgba(255, 255, 255, 0.55);
+      box-shadow: 0 0 0 4px rgba(255, 183, 197, 0.08), 0 0 30px rgba(255, 183, 197, 0.04);
     }
     .error-msg {
       font-size: 0.78rem;
-      color: rgba(255, 183, 197, 0.85);
+      color: rgba(255, 100, 130, 0.8);
       margin-top: 0.4rem;
       min-height: 1.2em;
       padding-left: 0.25rem;
@@ -313,8 +307,8 @@
     .btn-primary {
       width: 100%;
       padding: 1rem 2rem;
-      background: linear-gradient(135deg, rgba(255, 183, 197, 0.30), rgba(181, 216, 255, 0.20));
-      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: linear-gradient(135deg, rgba(255, 183, 197, 0.35), rgba(181, 216, 255, 0.25));
+      border: 1px solid rgba(255, 255, 255, 0.40);
       border-radius: var(--radius-btn);
       color: var(--text-primary);
       font-family: var(--font-body);
@@ -343,7 +337,7 @@
     .btn-primary:hover,
     .btn-primary:focus {
       transform: translateY(-2px);
-      box-shadow: 0 8px 36px rgba(255, 183, 197, 0.25), 0 0 0 1px rgba(255, 183, 197, 0.15);
+      box-shadow: 0 8px 36px rgba(255, 183, 197, 0.20), 0 0 0 1px rgba(255, 183, 197, 0.10);
       outline: none;
     }
     .btn-primary:active {
@@ -351,21 +345,23 @@
     }
 
     /* ============================================================
-       TRANSITION SCREEN
+       TRANSITION SCREEN — Sharp, Elegant, Readable
        ============================================================ */
     #screen-transition {
       z-index: 15;
     }
     .transition-text {
       font-family: var(--font-script);
-      font-size: clamp(2.2rem, 9vw, 4.5rem);
+      font-size: clamp(2.4rem, 9vw, 4.8rem);
       color: var(--text-primary);
       text-align: center;
-      text-shadow: 0 0 60px var(--pink-glow), 0 0 120px rgba(255, 183, 197, 0.12);
+      text-shadow: 0 0 50px var(--pink-glow), 0 0 100px rgba(255, 183, 197, 0.06);
       opacity: 0;
-      transform: translateY(24px) scale(0.97);
+      transform: translateY(20px) scale(0.98);
       transition: opacity 1.1s var(--ease-smooth), transform 1.1s var(--ease-smooth);
       line-height: 1.25;
+      font-weight: 400;
+      letter-spacing: 0.02em;
     }
     .transition-text.visible {
       opacity: 1;
@@ -373,7 +369,7 @@
     }
     .transition-sub {
       font-family: var(--font-display);
-      font-size: clamp(0.95rem, 2.8vw, 1.15rem);
+      font-size: clamp(1rem, 2.8vw, 1.2rem);
       font-weight: 300;
       font-style: italic;
       color: var(--text-secondary);
@@ -381,7 +377,7 @@
       margin-top: 1rem;
       opacity: 0;
       transition: opacity 1s var(--ease-smooth);
-      max-width: 420px;
+      max-width: 440px;
       line-height: 1.7;
       letter-spacing: 0.02em;
     }
@@ -400,11 +396,12 @@
       font-size: clamp(2.4rem, 8vw, 4.2rem);
       color: var(--text-primary);
       text-align: center;
-      text-shadow: 0 0 60px var(--pink-glow), 0 0 120px rgba(255, 183, 197, 0.10);
+      text-shadow: 0 0 50px var(--pink-glow), 0 0 100px rgba(255, 183, 197, 0.06);
       opacity: 0;
       transform: translateY(20px) scale(0.97);
       transition: all 1.2s var(--ease-smooth);
       line-height: 1.2;
+      font-weight: 400;
     }
     .midnight-msg.visible {
       opacity: 1;
@@ -454,7 +451,7 @@
       padding: 0 0.5rem;
       opacity: 0;
       transform: translateY(28px);
-      filter: blur(8px);
+      filter: blur(6px);
       transition: opacity 0.9s var(--ease-smooth), transform 0.9s var(--ease-smooth), filter 0.9s var(--ease-smooth);
       pointer-events: none;
     }
@@ -467,7 +464,7 @@
     .letter-chunk.out {
       opacity: 0;
       transform: translateY(-18px);
-      filter: blur(4px);
+      filter: blur(3px);
     }
     .letter-line-main {
       font-family: var(--font-display);
@@ -476,7 +473,7 @@
       font-style: italic;
       color: var(--text-primary);
       line-height: 1.6;
-      text-shadow: 0 0 30px rgba(255, 183, 197, 0.10);
+      text-shadow: 0 0 20px rgba(255, 183, 197, 0.06);
       letter-spacing: 0.02em;
       max-width: 100%;
       word-break: break-word;
@@ -491,13 +488,9 @@
       font-weight: 500;
       font-style: normal;
     }
-    .letter-line-main em {
-      font-style: italic;
-      color: rgba(255, 214, 229, 0.92);
-    }
     .letter-line-main .name-highlight {
-      color: #FFD9E5;
-      text-shadow: 0 0 24px rgba(255, 183, 197, 0.5);
+      color: #E8749A;
+      text-shadow: 0 0 20px rgba(255, 183, 197, 0.3);
     }
     .letter-line-sub {
       font-family: var(--font-display);
@@ -525,11 +518,11 @@
       width: 4px;
       height: 4px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(45, 27, 45, 0.15);
       transition: all 0.5s var(--ease-smooth);
     }
     .progress-dot.active {
-      background: rgba(255, 183, 197, 0.75);
+      background: #FFB7C5;
       width: 24px;
       border-radius: 2px;
       box-shadow: 0 0 12px rgba(255, 183, 197, 0.25);
@@ -552,7 +545,7 @@
       height: 72px;
       border-radius: 50%;
       border: 2px solid rgba(255, 183, 197, 0.35);
-      box-shadow: 0 0 24px rgba(255, 183, 197, 0.25), inset 0 0 24px rgba(255, 183, 197, 0.08);
+      box-shadow: 0 0 24px rgba(255, 183, 197, 0.20), inset 0 0 24px rgba(255, 183, 197, 0.05);
       margin: 0 auto 1.5rem;
       position: relative;
       animation: ring-pulse 3.2s ease-in-out infinite;
@@ -562,22 +555,22 @@
       position: absolute;
       inset: 6px;
       border-radius: 50%;
-      border: 1px solid rgba(181, 216, 255, 0.25);
+      border: 1px solid rgba(181, 216, 255, 0.20);
     }
     .proposal-ring::after {
       content: '';
       position: absolute;
       inset: 12px;
       border-radius: 50%;
-      background: rgba(255, 183, 197, 0.06);
+      background: rgba(255, 183, 197, 0.04);
     }
     @keyframes ring-pulse {
       0%,
       100% {
-        box-shadow: 0 0 20px rgba(255, 183, 197, 0.25), inset 0 0 20px rgba(255, 183, 197, 0.08);
+        box-shadow: 0 0 20px rgba(255, 183, 197, 0.20), inset 0 0 20px rgba(255, 183, 197, 0.05);
       }
       50% {
-        box-shadow: 0 0 44px rgba(255, 183, 197, 0.45), 0 0 70px rgba(255, 183, 197, 0.12), inset 0 0 20px rgba(255, 183, 197, 0.12);
+        box-shadow: 0 0 44px rgba(255, 183, 197, 0.35), 0 0 70px rgba(255, 183, 197, 0.08), inset 0 0 20px rgba(255, 183, 197, 0.08);
       }
     }
     .proposal-question {
@@ -585,10 +578,11 @@
       font-size: clamp(1.8rem, 6vw, 3.2rem);
       color: var(--text-primary);
       line-height: 1.25;
-      text-shadow: 0 0 40px var(--pink-glow), 0 0 80px rgba(255, 183, 197, 0.08);
+      text-shadow: 0 0 30px var(--pink-glow), 0 0 60px rgba(255, 183, 197, 0.04);
       opacity: 0;
       transform: translateY(18px);
       transition: all 0.9s var(--ease-smooth);
+      font-weight: 400;
     }
     .proposal-question.visible {
       opacity: 1;
@@ -596,13 +590,13 @@
     }
     .proposal-question.final {
       font-size: clamp(2.2rem, 7.5vw, 4rem);
-      text-shadow: 0 0 40px var(--pink-glow), 0 0 100px rgba(255, 183, 197, 0.18);
+      text-shadow: 0 0 40px var(--pink-glow), 0 0 100px rgba(255, 183, 197, 0.10);
       line-height: 1.2;
     }
     .proposal-divider {
       width: 64px;
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+      background: linear-gradient(90deg, transparent, rgba(45, 27, 45, 0.20), transparent);
       margin: 1.25rem auto;
     }
 
@@ -644,18 +638,18 @@
       -webkit-tap-highlight-color: transparent;
       border: 1px solid;
       text-align: center;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
     }
     .proposal-buttons .btn-yes {
-      background: linear-gradient(135deg, rgba(255, 183, 197, 0.45), rgba(181, 216, 255, 0.30));
-      border-color: rgba(255, 183, 197, 0.5);
+      background: linear-gradient(135deg, rgba(255, 183, 197, 0.40), rgba(181, 216, 255, 0.25));
+      border-color: rgba(255, 183, 197, 0.40);
       color: var(--text-primary);
     }
     .proposal-buttons .btn-yes:hover,
     .proposal-buttons .btn-yes:focus {
-      background: linear-gradient(135deg, rgba(255, 183, 197, 0.65), rgba(181, 216, 255, 0.45));
-      border-color: rgba(255, 183, 197, 0.8);
-      box-shadow: 0 8px 36px rgba(255, 183, 197, 0.4), 0 0 0 1px rgba(255, 183, 197, 0.25);
+      background: linear-gradient(135deg, rgba(255, 183, 197, 0.60), rgba(181, 216, 255, 0.40));
+      border-color: rgba(255, 183, 197, 0.60);
+      box-shadow: 0 8px 36px rgba(255, 183, 197, 0.25), 0 0 0 1px rgba(255, 183, 197, 0.15);
       transform: translateY(-3px) scale(1.02);
       outline: none;
     }
@@ -663,14 +657,14 @@
       transform: scale(0.96);
     }
     .proposal-buttons .btn-no {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.30);
+      border-color: rgba(45, 27, 45, 0.15);
       color: var(--text-secondary);
     }
     .proposal-buttons .btn-no:hover,
     .proposal-buttons .btn-no:focus {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.45);
+      border-color: rgba(45, 27, 45, 0.25);
       color: var(--text-primary);
       transform: translateY(-2px);
       outline: none;
@@ -699,11 +693,12 @@
       font-family: var(--font-script);
       font-size: clamp(3rem, 10vw, 5.5rem);
       color: var(--text-primary);
-      text-shadow: 0 0 60px var(--pink-glow), 0 0 120px rgba(255, 183, 197, 0.2);
+      text-shadow: 0 0 50px var(--pink-glow), 0 0 100px rgba(255, 183, 197, 0.08);
       line-height: 1.2;
       margin-bottom: 1.5rem;
       opacity: 0;
       animation: fadeUp 1s 0.3s var(--ease-smooth) forwards;
+      font-weight: 400;
     }
     .response-body {
       font-family: var(--font-display);
@@ -719,18 +714,19 @@
       margin-bottom: 1.2rem;
     }
     .response-body .highlight {
-      color: #FFD9E5;
+      color: #E8749A;
       font-style: italic;
-      text-shadow: 0 0 20px rgba(255, 183, 197, 0.3);
+      text-shadow: 0 0 16px rgba(255, 183, 197, 0.2);
     }
     .response-closing {
       margin-top: 2.5rem;
       font-family: var(--font-script);
       font-size: clamp(2rem, 6vw, 3.5rem);
-      color: rgba(255, 214, 229, 0.9);
-      text-shadow: 0 0 40px var(--pink-glow);
+      color: #E8749A;
+      text-shadow: 0 0 30px var(--pink-glow);
       opacity: 0;
       animation: fadeUp 1s 1.5s var(--ease-smooth) forwards;
+      font-weight: 400;
     }
     .response-note {
       margin-top: 0.5rem;
@@ -763,10 +759,10 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: var(--glass-bg);
+      background: rgba(255, 255, 255, 0.40);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border: 1px solid var(--glass-border);
+      border: 1px solid rgba(255, 255, 255, 0.40);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -774,6 +770,7 @@
       opacity: 0;
       transition: opacity 0.5s var(--ease-smooth), transform 0.3s var(--ease-smooth), box-shadow 0.3s var(--ease-smooth);
       -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
     }
     #music-btn.visible {
       opacity: 1;
@@ -781,14 +778,14 @@
     #music-btn:hover,
     #music-btn:focus {
       transform: scale(1.08);
-      box-shadow: 0 4px 24px rgba(255, 183, 197, 0.25);
+      box-shadow: 0 4px 24px rgba(255, 183, 197, 0.20);
       outline: none;
     }
     .music-icon {
       width: 18px;
       height: 18px;
       fill: none;
-      stroke: rgba(255, 255, 255, 0.7);
+      stroke: rgba(45, 27, 45, 0.6);
       stroke-width: 1.5;
       stroke-linecap: round;
       stroke-linejoin: round;
@@ -798,13 +795,13 @@
     }
 
     /* ============================================================
-       ADMIN PANEL — Premium
+       ADMIN PANEL — Premium, Light
        ============================================================ */
     #admin-overlay {
       position: fixed;
       inset: 0;
       z-index: 9999;
-      background: rgba(10, 4, 20, 0.85);
+      background: rgba(255, 245, 247, 0.92);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       display: none;
@@ -816,8 +813,8 @@
       display: flex;
     }
     .admin-box {
-      background: rgba(26, 10, 46, 0.92);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.70);
+      border: 1px solid rgba(255, 255, 255, 0.50);
       border-radius: 28px;
       padding: 2rem;
       max-width: 760px;
@@ -825,14 +822,15 @@
       max-height: 92vh;
       overflow-y: auto;
       color: var(--text-primary);
-      box-shadow: 0 24px 72px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 24px 72px rgba(180, 120, 160, 0.08);
       backdrop-filter: blur(8px);
     }
     .admin-box h2 {
       font-family: var(--font-script);
       font-size: 2rem;
       margin-bottom: 0.2rem;
-      color: #FFB7C5;
+      color: #E8749A;
+      font-weight: 400;
     }
     .admin-box h3 {
       font-family: var(--font-display);
@@ -846,8 +844,8 @@
       width: 100%;
       padding: 0.75rem 1rem;
       border-radius: 12px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.50);
+      border: 1px solid rgba(45, 27, 45, 0.10);
       color: var(--text-primary);
       font-size: 1rem;
       margin-bottom: 1rem;
@@ -863,7 +861,7 @@
       padding: 0.75rem 1.5rem;
       border-radius: 12px;
       background: linear-gradient(135deg, rgba(255, 183, 197, 0.25), rgba(181, 216, 255, 0.18));
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.30);
       color: var(--text-primary);
       font-weight: 500;
       cursor: pointer;
@@ -874,7 +872,7 @@
       background: rgba(255, 183, 197, 0.25);
     }
     .admin-error {
-      color: #FFB7C5;
+      color: #E8749A;
       font-size: 0.85rem;
       margin-top: 0.5rem;
     }
@@ -885,16 +883,16 @@
       margin: 1.5rem 0;
     }
     .admin-stat {
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.40);
       border-radius: 14px;
       padding: 0.75rem 0.5rem;
       text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.30);
     }
     .admin-stat .num {
       font-size: 1.8rem;
       font-weight: 300;
-      color: #FFB7C5;
+      color: #E8749A;
       font-family: var(--font-display);
     }
     .admin-stat .label {
@@ -916,27 +914,27 @@
       color: var(--text-muted);
       font-weight: 400;
       padding-bottom: 0.5rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom: 1px solid rgba(45, 27, 45, 0.06);
       font-size: 0.65rem;
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
     .admin-table td {
       padding: 0.5rem 0.25rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid rgba(45, 27, 45, 0.04);
       vertical-align: middle;
     }
     .badge-accepted {
       background: rgba(255, 183, 197, 0.20);
-      color: #FFB7C5;
+      color: #E8749A;
       padding: 0.1rem 0.6rem;
       border-radius: 20px;
       font-size: 0.6rem;
       font-weight: 500;
     }
     .badge-rejected {
-      background: rgba(181, 216, 255, 0.12);
-      color: #B5D8FF;
+      background: rgba(181, 216, 255, 0.15);
+      color: #6A9BC7;
       padding: 0.1rem 0.6rem;
       border-radius: 20px;
       font-size: 0.6rem;
@@ -956,11 +954,11 @@
       line-height: 1;
     }
     .admin-close:hover {
-      color: #fff;
+      color: var(--text-primary);
     }
     .admin-back {
       background: none;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(45, 27, 45, 0.10);
       border-radius: 10px;
       padding: 0.4rem 1rem;
       color: var(--text-secondary);
@@ -971,8 +969,8 @@
       font-family: var(--font-body);
     }
     .admin-back:hover {
-      color: #fff;
-      border-color: rgba(255, 255, 255, 0.25);
+      color: var(--text-primary);
+      border-color: rgba(45, 27, 45, 0.20);
     }
     .firebase-status {
       font-size: 0.7rem;
@@ -984,12 +982,12 @@
       margin-bottom: 1rem;
     }
     .firebase-status.connected {
-      background: rgba(181, 216, 255, 0.12);
-      color: #B5D8FF;
+      background: rgba(181, 216, 255, 0.15);
+      color: #6A9BC7;
     }
     .firebase-status.offline {
       background: rgba(255, 183, 197, 0.10);
-      color: rgba(255, 183, 197, 0.6);
+      color: rgba(45, 27, 45, 0.4);
     }
     .status-dot {
       width: 5px;
@@ -1011,10 +1009,10 @@
       margin: 1rem 0;
     }
     .detail-item {
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.30);
       border-radius: 10px;
       padding: 0.75rem;
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.30);
     }
     .detail-item .dk {
       font-size: 0.6rem;
@@ -1290,7 +1288,7 @@
   </section>
 
   <!-- ============================================================
-  SCREEN 5 — PROPOSAL (Specific Questions)
+  SCREEN 5 — PROPOSAL
   ============================================================ -->
   <section class="screen" id="screen-proposal" aria-label="Proposal">
     <div class="glass-card proposal-card">
@@ -1311,7 +1309,7 @@
   </section>
 
   <!-- ============================================================
-  SCREEN 6 — YES RESPONSE (Happy / Emotional)
+  SCREEN 6 — YES RESPONSE
   ============================================================ -->
   <section class="screen" id="screen-yes" aria-label="Yes response">
     <div class="glass-card response-card">
@@ -1326,7 +1324,7 @@
   </section>
 
   <!-- ============================================================
-  SCREEN 7 — NO RESPONSE (Broken / Emotional)
+  SCREEN 7 — NO RESPONSE
   ============================================================ -->
   <section class="screen" id="screen-no" aria-label="No response">
     <div class="glass-card response-card">
@@ -1336,7 +1334,7 @@
         <p>You'll always be <span class="highlight">special to me</span>.</p>
         <p>Take care, and be happy wherever you are…</p>
       </div>
-      <div class="response-closing" style="font-size:clamp(1.8rem,5vw,3rem);text-shadow:0 0 30px rgba(181,216,255,0.4);">Still, I Love You.</div>
+      <div class="response-closing" style="font-size:clamp(1.8rem,5vw,3rem);text-shadow:0 0 30px rgba(181,216,255,0.2);">Still, I Love You.</div>
       <div class="response-note">With full respect. And no regrets.</div>
     </div>
   </section>
@@ -1389,8 +1387,8 @@
       <path d="M9 18V5l12-2v13M9 18a3 3 0 11-6 0 3 3 0 016 0zM21 16a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
     <svg class="music-icon hidden" id="music-icon-off" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M9 18V5l12-2v13M9 18a3 3 0 11-6 0 3 3 0 016 0zM21 16a3 3 0 11-6 0 3 3 0 016 0z" stroke="rgba(255,255,255,0.35)" />
-      <line x1="3" y1="3" x2="21" y2="21" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round" />
+      <path d="M9 18V5l12-2v13M9 18a3 3 0 11-6 0 3 3 0 016 0zM21 16a3 3 0 11-6 0 3 3 0 016 0z" stroke="rgba(45,27,45,0.35)" />
+      <line x1="3" y1="3" x2="21" y2="21" stroke="rgba(45,27,45,0.35)" stroke-width="1.5" stroke-linecap="round" />
     </svg>
   </button>
 
@@ -1454,7 +1452,7 @@
     ];
 
     // ================================================================
-    // PROPOSAL SEQUENCE (exact from prompt)
+    // PROPOSAL SEQUENCE
     // ================================================================
     const PROPOSAL_QUESTIONS = [
       "Will you be mine?",
@@ -1532,7 +1530,6 @@
       return plain.split(' ').filter(w => w.length > 0).length;
     }
 
-    // Word-based timing: 1 word = 1 second, minimum 1.5s
     function getDwellTime(chunk) {
       const allText = chunk.text + (chunk.sub ? ' ' + chunk.sub : '');
       const words = countWords(allText);
@@ -1669,13 +1666,13 @@
     }
 
     // ================================================================
-    // PETALS
+    // PETALS — Fewer, Smaller, Softer, Slower
     // ================================================================
     function initPetals() {
       const canvas = $('petal-canvas');
       const ctx = canvas.getContext('2d');
       const petals = [];
-      let W, H, intensity = 1;
+      let W, H, intensity = 0.6;
 
       function resize() { W = canvas.width = window.innerWidth;
         H = canvas.height = window.innerHeight; }
@@ -1684,42 +1681,43 @@
 
       const COLORS = [
         'rgba(255,183,197,ALPHA)', 'rgba(255,217,229,ALPHA)',
-        'rgba(181,216,255,ALPHA)', 'rgba(214,234,255,ALPHA)', 'rgba(255,255,255,ALPHA)',
+        'rgba(181,216,255,ALPHA)', 'rgba(214,234,255,ALPHA)',
       ];
 
       function spawnPetal() {
         petals.push({
           x: Math.random() * W,
           y: -10,
-          vx: (Math.random() - 0.5) * 1.2,
-          vy: 0.6 + Math.random() * 1.2,
+          vx: (Math.random() - 0.5) * 0.6,
+          vy: 0.3 + Math.random() * 0.6,
           rot: Math.random() * Math.PI * 2,
-          vrot: (Math.random() - 0.5) * 0.04,
-          w: 5 + Math.random() * 8,
-          h: 3 + Math.random() * 5,
-          alpha: 0.3 + Math.random() * 0.5,
+          vrot: (Math.random() - 0.5) * 0.02,
+          w: 4 + Math.random() * 5,
+          h: 2 + Math.random() * 4,
+          alpha: 0.2 + Math.random() * 0.3,
           color: COLORS[Math.floor(Math.random() * COLORS.length)],
           wobble: Math.random() * Math.PI * 2,
-          wobbleSpeed: 0.02 + Math.random() * 0.02,
+          wobbleSpeed: 0.01 + Math.random() * 0.015,
         });
       }
       let spawnTimer = 0;
-      STATE.setIntensity = (v) => { intensity = v; };
+      STATE.setIntensity = (v) => { intensity = Math.max(0.3, Math.min(1.0, v * 0.6)); };
 
       function draw() {
         ctx.clearRect(0, 0, W, H);
         spawnTimer += intensity;
-        if (spawnTimer >= (80 / intensity) && petals.length < 60 * intensity) { spawnPetal();
+        if (spawnTimer >= (180 / Math.max(intensity, 0.3)) && petals.length < 20) { spawnPetal();
           spawnTimer = 0; }
         for (let i = petals.length - 1; i >= 0; i--) {
           const p = petals[i];
           p.wobble += p.wobbleSpeed;
-          p.x += p.vx + Math.sin(p.wobble) * 0.4;
+          p.x += p.vx + Math.sin(p.wobble) * 0.2;
           p.y += p.vy;
           p.rot += p.vrot;
           ctx.save();
           ctx.translate(p.x, p.y);
           ctx.rotate(p.rot);
+          ctx.globalAlpha = p.alpha;
           ctx.fillStyle = p.color.replace('ALPHA', p.alpha.toFixed(2));
           ctx.beginPath();
           ctx.ellipse(0, 0, p.w, p.h, 0, 0, Math.PI * 2);
@@ -1733,19 +1731,19 @@
     }
 
     // ================================================================
-    // STARS
+    // STARS — Very Subtle
     // ================================================================
     function showStars() {
       const canvas = $('star-canvas');
       const ctx = canvas.getContext('2d');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      const stars = Array.from({ length: 80 }, () => ({
+      const stars = Array.from({ length: 40 }, () => ({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        r: 0.5 + Math.random() * 1.5,
-        alpha: 0.2 + Math.random() * 0.6,
-        speed: 0.005 + Math.random() * 0.008,
+        r: 0.5 + Math.random() * 1.0,
+        alpha: 0.1 + Math.random() * 0.2,
+        speed: 0.003 + Math.random() * 0.005,
         phase: Math.random() * Math.PI * 2,
       }));
 
@@ -1775,15 +1773,15 @@
       canvas.height = window.innerHeight;
       canvas.classList.add('active');
       const COLS = ['#FFB7C5', '#FFD9E5', '#B5D8FF', '#D6EAFF', '#ffffff', '#FFC8D6'];
-      const particles = Array.from({ length: 180 }, () => ({
+      const particles = Array.from({ length: 140 }, () => ({
         x: Math.random() * canvas.width,
         y: -10 - Math.random() * canvas.height * 0.3,
         vx: (Math.random() - 0.5) * 3,
-        vy: 2 + Math.random() * 4.5,
+        vy: 2 + Math.random() * 4,
         rot: Math.random() * 360,
         vrot: (Math.random() - 0.5) * 8,
-        w: 4 + Math.random() * 7,
-        h: 2 + Math.random() * 4,
+        w: 4 + Math.random() * 6,
+        h: 2 + Math.random() * 3,
         col: COLS[Math.floor(Math.random() * COLS.length)],
         alpha: 1,
       }));
@@ -1822,7 +1820,7 @@
       try {
         STATE.audio = new Audio(CONFIG.musicPath);
         STATE.audio.loop = true;
-        STATE.audio.volume = 0.25;
+        STATE.audio.volume = 0.2;
         STATE.audio.load();
         STATE.audio.addEventListener('canplaythrough', () => { STATE.musicLoaded = true; });
         STATE.audio.addEventListener('error', () => { STATE.audio = null; });
@@ -1903,7 +1901,7 @@
       setScreen('screen-midnight');
       setPhase('letter');
       showStars();
-      if (STATE.setIntensity) STATE.setIntensity(2);
+      if (STATE.setIntensity) STATE.setIntensity(1.5);
       trackEvent('COUNTDOWN_FINISHED');
       await sleep(600);
       $('midnight-msg-1').classList.add('visible');
@@ -1916,7 +1914,7 @@
     }
 
     // ================================================================
-    // LOVE LETTER (Word-Based Timing)
+    // LOVE LETTER
     // ================================================================
     function buildProgressDots() {
       const container = $('progress-dots');
@@ -1977,7 +1975,6 @@
       await sleep(80);
       el.classList.add('in');
 
-      // Word-based timing
       const dwell = getDwellTime(chunk);
       STATE.letterTimer = setTimeout(() => {
         STATE.letterIndex = idx + 1;
@@ -1986,31 +1983,27 @@
     }
 
     // ================================================================
-    // PROPOSAL (Specific Questions)
+    // PROPOSAL
     // ================================================================
     async function showProposal() {
       setScreen('screen-proposal');
       setPhase('proposal');
       trackEvent('PROPOSAL_SHOWN');
-      if (STATE.setIntensity) STATE.setIntensity(1.5);
+      if (STATE.setIntensity) STATE.setIntensity(1.2);
 
-      // Map questions to elements
       const ids = ['prop-q1', 'prop-q2', 'prop-q3', 'prop-q4', 'prop-q5', 'prop-q6'];
       PROPOSAL_QUESTIONS.forEach((q, i) => {
         const el = $(ids[i]);
         if (!el) return;
         el.innerHTML = applyNamePlain(q).replace(/\n/g, '<br>');
-        // Staggered delay handled by CSS transitions
       });
 
-      // Show them one by one with JS timing for reliability
       for (let i = 0; i < ids.length; i++) {
         await sleep(i === 0 ? 400 : 300);
         const el = $(ids[i]);
         if (el) el.classList.add('visible');
       }
 
-      // Show buttons after all questions
       await sleep(600);
       $('proposal-btns').classList.add('visible');
     }
@@ -2043,7 +2036,7 @@
       await saveUserResponse('ACCEPTED');
 
       setPhase('yes');
-      if (STATE.setIntensity) STATE.setIntensity(2.5);
+      if (STATE.setIntensity) STATE.setIntensity(2);
 
       await sleep(300);
       setScreen('screen-yes');
@@ -2056,7 +2049,7 @@
       await saveUserResponse('REJECTED');
 
       setPhase('no');
-      if (STATE.setIntensity) STATE.setIntensity(0.8);
+      if (STATE.setIntensity) STATE.setIntensity(0.5);
 
       await sleep(300);
       setScreen('screen-no');
@@ -2115,7 +2108,7 @@
       $('admin-list-view').style.display = 'none';
       $('admin-detail').classList.add('open');
       $('admin-detail-content').innerHTML = `
-        <h3 style="font-family:var(--font-script);font-size:1.6rem;color:#FFB7C5;margin-bottom:1rem;">User Details</h3>
+        <h3 style="font-family:var(--font-script);font-size:1.6rem;color:#E8749A;margin-bottom:1rem;font-weight:400;">User Details</h3>
         <div class="detail-grid">
           <div class="detail-item"><div class="dk">Name (as entered)</div><div class="dv">${escapeHTML(r.exactInput || r.userName || '—')}</div></div>
           <div class="detail-item"><div class="dk">Capitalization</div><div class="dv">${escapeHTML(r.capitalization || '—')}</div></div>
@@ -2139,7 +2132,6 @@
       const loginDiv = $('admin-login');
       const dashboard = $('admin-dashboard');
 
-      // Hidden access: tap first screen repeatedly
       $('welcome-card').addEventListener('click', () => {
         STATE.adminClickCount++;
         clearTimeout(STATE.adminClickTimer);
