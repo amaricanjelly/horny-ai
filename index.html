@@ -100,7 +100,7 @@
       background: radial-gradient(ellipse at 50% 40%, #FFF0F5 0%, #FFD9E5 30%, #D6EAFF 60%, #EBF3FF 100%);
     }
 
-    /* Soft atmospheric orbs — very subtle */
+    /* Soft atmospheric orbs */
     .orb {
       position: fixed;
       border-radius: 50%;
@@ -452,7 +452,7 @@
       opacity: 0;
       transform: translateY(28px);
       filter: blur(6px);
-      transition: opacity 0.9s var(--ease-smooth), transform 0.9s var(--ease-smooth), filter 0.9s var(--ease-smooth);
+      transition: opacity 0.6s var(--ease-smooth), transform 0.6s var(--ease-smooth), filter 0.6s var(--ease-smooth);
       pointer-events: none;
     }
     .letter-chunk.in {
@@ -1276,7 +1276,7 @@
   </section>
 
   <!-- ============================================================
-  SCREEN 4 — LOVE LETTER (Word-Based Timing)
+  SCREEN 4 — LOVE LETTER (Professional Reading-Time)
   ============================================================ -->
   <section class="screen" id="screen-letter" aria-label="Love letter" aria-live="polite">
     <div class="letter-stage" id="letter-stage">
@@ -1418,6 +1418,8 @@
       enableMusic: true,
       musicPath: "assets/music.mp3",
       preserveName: true,
+      // Sound effects (Web Audio generated)
+      enableSoundEffects: true,
     };
 
     // ================================================================
@@ -1484,6 +1486,9 @@
       allResponses: [],
       selectedDetailKey: null,
       setIntensity: null,
+      // Sound
+      audioCtx: null,
+      soundEnabled: true,
     };
 
     // ================================================================
@@ -1530,21 +1535,140 @@
       return plain.split(' ').filter(w => w.length > 0).length;
     }
 
-    function getDwellTime(chunk) {
+    // ================================================================
+    // PROFESSIONAL READING-TIME SYSTEM
+    // ================================================================
+    function calculateReadingDuration(chunk) {
       const allText = chunk.text + (chunk.sub ? ' ' + chunk.sub : '');
-      const words = countWords(allText);
-      const base = Math.max(words, 1) * 1000;
-      return Math.max(base, 1500);
+      const plain = allText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+      const wordCount = plain ? plain.split(' ').filter(w => w.length > 0).length : 0;
+
+      // Target: ~250 words per minute = ~4.17 words per second
+      // Base reading time in seconds
+      let readingTime = wordCount / 4.0;
+
+      // Add small buffer for emotional reading
+      readingTime = readingTime * 1.2;
+
+      // Clamp to reasonable ranges
+      const MIN_TIME = 1.5;
+      const MAX_TIME = 8.0;
+
+      let finalTime = Math.max(MIN_TIME, Math.min(MAX_TIME, readingTime));
+
+      // Fine-tune based on word count ranges
+      if (wordCount <= 3) finalTime = Math.max(1.5, finalTime);
+      else if (wordCount <= 7) finalTime = Math.max(2.0, finalTime);
+      else if (wordCount <= 12) finalTime = Math.max(2.8, finalTime);
+      else if (wordCount <= 20) finalTime = Math.max(3.5, finalTime);
+      else if (wordCount <= 30) finalTime = Math.max(4.5, finalTime);
+      else finalTime = Math.min(MAX_TIME, finalTime);
+
+      // Add transition time (fade in/out)
+      const transitionTime = 0.8; // 400ms in + 400ms out
+
+      return {
+        wordCount,
+        readingTime: finalTime,
+        totalTime: finalTime + transitionTime,
+        fadeIn: 400,
+        fadeOut: 400,
+        holdTime: finalTime * 1000,
+      };
     }
 
-    function getTimestamp() {
-      return new Date().toLocaleString('en-US', { hour12: true, dateStyle: 'medium', timeStyle: 'short' });
+    // ================================================================
+    // SOUND DESIGN — Web Audio
+    // ================================================================
+    function initAudioContext() {
+      if (!STATE.audioCtx && CONFIG.enableSoundEffects) {
+        try {
+          STATE.audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+          STATE.audioCtx = null;
+        }
+      }
+      return STATE.audioCtx;
     }
 
-    function detectCapitalization(str) {
-      if (str === str.toUpperCase() && /[A-Z]/.test(str)) return 'Uppercase';
-      if (str === str.toLowerCase()) return 'Lowercase';
-      return 'Mixed';
+    function playTone(freq, duration, type = 'sine', volume = 0.15, delay = 0) {
+      const ctx = initAudioContext();
+      if (!ctx || !STATE.soundEnabled) return;
+      try {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+        gain.gain.setValueAtTime(volume, ctx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + duration);
+      } catch (e) { /* silent fail */ }
+    }
+
+    function playTypingSound() {
+      // Soft, gentle typing sound — throttled
+      const freqs = [400, 500, 600, 450, 550];
+      const f = freqs[Math.floor(Math.random() * freqs.length)];
+      playTone(f, 0.06, 'sine', 0.04);
+    }
+
+    function playSoftChime() {
+      playTone(523.25, 0.4, 'sine', 0.10);
+      setTimeout(() => playTone(659.25, 0.3, 'sine', 0.08), 150);
+    }
+
+    function playRomanticSparkle() {
+      playTone(880, 0.2, 'sine', 0.06);
+      setTimeout(() => playTone(1108.73, 0.25, 'sine', 0.05), 120);
+      setTimeout(() => playTone(1318.51, 0.3, 'sine', 0.04), 240);
+    }
+
+    function playYesSound() {
+      // Romantic confirmation
+      playTone(523.25, 0.3, 'sine', 0.12);
+      setTimeout(() => playTone(659.25, 0.3, 'sine', 0.10), 150);
+      setTimeout(() => playTone(783.99, 0.4, 'sine', 0.08), 300);
+      setTimeout(() => playTone(1046.50, 0.5, 'sine', 0.06), 500);
+    }
+
+    function playNoSound() {
+      // Emotional, soft broken-heart tone
+      playTone(440, 0.3, 'sine', 0.08);
+      setTimeout(() => playTone(349.23, 0.4, 'sine', 0.06), 200);
+      setTimeout(() => playTone(293.66, 0.5, 'sine', 0.04), 400);
+    }
+
+    function playSoftWhoosh() {
+      // noise-like soft whoosh using sine sweep
+      const ctx = initAudioContext();
+      if (!ctx || !STATE.soundEnabled) return;
+      try {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(200, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.04, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.3);
+      } catch (e) { /* silent fail */ }
+    }
+
+    // Typing throttling
+    let lastTypingTime = 0;
+
+    function throttledTypingSound() {
+      const now = Date.now();
+      if (now - lastTypingTime > 120) {
+        playTypingSound();
+        lastTypingTime = now;
+      }
     }
 
     // ================================================================
@@ -1905,8 +2029,10 @@
       trackEvent('COUNTDOWN_FINISHED');
       await sleep(600);
       $('midnight-msg-1').classList.add('visible');
+      playSoftChime();
       await sleep(2000);
       $('midnight-msg-2').classList.add('visible');
+      playSoftChime();
       await sleep(2000);
       $('midnight-msg-3').classList.add('visible');
       await sleep(2800);
@@ -1914,7 +2040,7 @@
     }
 
     // ================================================================
-    // LOVE LETTER
+    // LOVE LETTER — Professional Reading-Time
     // ================================================================
     function buildProgressDots() {
       const container = $('progress-dots');
@@ -1941,7 +2067,7 @@
 
     async function showLetterChunk(idx) {
       if (idx >= LETTER_CHUNKS.length) {
-        await sleep(800);
+        await sleep(600);
         showProposal();
         return;
       }
@@ -1949,6 +2075,7 @@
       const el = $('letter-chunk-display');
       updateProgressDot(idx);
 
+      // Build HTML
       let html = '';
       const lines = chunk.text.split('\n');
       const clsArr = (chunk.cls || '').split(' ').filter(Boolean);
@@ -1966,20 +2093,37 @@
         html += `<div class="letter-line-sub">${escapeHTML(chunk.sub)}</div>`;
       }
 
+      // Calculate timing
+      const timing = calculateReadingDuration(chunk);
+
+      // Fade out previous
       el.classList.remove('in');
       el.classList.add('out');
-      await sleep(400);
+      await sleep(300);
 
+      // Set new content
       el.innerHTML = html;
       el.className = 'letter-chunk';
-      await sleep(80);
-      el.classList.add('in');
+      await sleep(50);
 
-      const dwell = getDwellTime(chunk);
+      // Play typing sounds during fade-in
+      const wordCount = timing.wordCount;
+      const typeCount = Math.min(wordCount, 8);
+      for (let i = 0; i < typeCount; i++) {
+        setTimeout(() => throttledTypingSound(), i * 100);
+      }
+
+      // Fade in
+      el.classList.add('in');
+      playSoftChime();
+
+      // Hold for reading time + fade out time
+      const totalDelay = timing.holdTime + 600;
+
       STATE.letterTimer = setTimeout(() => {
         STATE.letterIndex = idx + 1;
         showLetterChunk(idx + 1);
-      }, dwell + 400);
+      }, totalDelay);
     }
 
     // ================================================================
@@ -2002,10 +2146,12 @@
         await sleep(i === 0 ? 400 : 300);
         const el = $(ids[i]);
         if (el) el.classList.add('visible');
+        if (i === 0 || i === 2 || i === 4) playSoftChime();
       }
 
       await sleep(600);
       $('proposal-btns').classList.add('visible');
+      playRomanticSparkle();
     }
 
     // ================================================================
@@ -2028,10 +2174,21 @@
       await saveResponse(data);
     }
 
+    function detectCapitalization(str) {
+      if (str === str.toUpperCase() && /[A-Z]/.test(str)) return 'Uppercase';
+      if (str === str.toLowerCase()) return 'Lowercase';
+      return 'Mixed';
+    }
+
+    function getTimestamp() {
+      return new Date().toLocaleString('en-US', { hour12: true, dateStyle: 'medium', timeStyle: 'short' });
+    }
+
     // ================================================================
     // PROPOSAL BUTTONS
     // ================================================================
     async function handleYes() {
+      playYesSound();
       trackEvent('YES_CLICKED');
       await saveUserResponse('ACCEPTED');
 
@@ -2042,9 +2199,11 @@
       setScreen('screen-yes');
 
       setTimeout(launchConfetti, 400);
+      setTimeout(playRomanticSparkle, 500);
     }
 
     async function handleNo() {
+      playNoSound();
       trackEvent('NO_CLICKED');
       await saveUserResponse('REJECTED');
 
@@ -2125,19 +2284,38 @@
     }
 
     // ================================================================
-    // ADMIN PANEL INIT
+    // ADMIN PANEL INIT — CTRL+T
     // ================================================================
     function initAdmin() {
       const overlay = $('admin-overlay');
       const loginDiv = $('admin-login');
       const dashboard = $('admin-dashboard');
 
+      // CTRL+T to open admin
+      document.addEventListener('keydown', (e) => {
+        // Ignore if typing in input
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.ctrlKey && e.key === 't') {
+          e.preventDefault();
+          overlay.classList.add('open');
+          loginDiv.style.display = 'block';
+          dashboard.style.display = 'none';
+          $('admin-password').value = '';
+          $('admin-error').textContent = '';
+        }
+      });
+
+      // Mobile: 5 taps on welcome card (fallback)
+      let mobileTapCount = 0;
+      let mobileTapTimer = null;
       $('welcome-card').addEventListener('click', () => {
-        STATE.adminClickCount++;
-        clearTimeout(STATE.adminClickTimer);
-        STATE.adminClickTimer = setTimeout(() => { STATE.adminClickCount = 0; }, 800);
-        if (STATE.adminClickCount >= 5) {
-          STATE.adminClickCount = 0;
+        // Only on mobile or if no keyboard
+        if (!('ontouchstart' in window) && !navigator.maxTouchPoints) return;
+        mobileTapCount++;
+        clearTimeout(mobileTapTimer);
+        mobileTapTimer = setTimeout(() => { mobileTapCount = 0; }, 800);
+        if (mobileTapCount >= 5) {
+          mobileTapCount = 0;
           overlay.classList.add('open');
           loginDiv.style.display = 'block';
           dashboard.style.display = 'none';
@@ -2150,8 +2328,9 @@
         overlay.classList.remove('open');
       });
 
+      // Login with password: 1234
       $('admin-login-btn').addEventListener('click', () => {
-        if ($('admin-password').value === '1122') {
+        if ($('admin-password').value === '1234') {
           loginDiv.style.display = 'none';
           dashboard.style.display = 'block';
           startAdminRealtimeListener();
