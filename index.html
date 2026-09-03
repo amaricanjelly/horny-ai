@@ -468,11 +468,11 @@
     }
     .letter-line-main {
       font-family: var(--font-display);
-      font-size: clamp(1.2rem, 4.2vw, 1.9rem);
+      font-size: clamp(1.4rem, 4.8vw, 2.0rem); /* ~30% larger on mobile */
       font-weight: 300;
       font-style: italic;
       color: var(--text-primary);
-      line-height: 1.6;
+      line-height: 1.7;
       text-shadow: 0 0 20px rgba(255, 183, 197, 0.06);
       letter-spacing: 0.02em;
       max-width: 100%;
@@ -480,7 +480,7 @@
     }
     .letter-line-main.script {
       font-family: var(--font-script);
-      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-size: clamp(2.2rem, 7vw, 3.6rem); /* ~30% larger on mobile */
       font-style: normal;
       font-weight: 400;
     }
@@ -494,12 +494,12 @@
     }
     .letter-line-sub {
       font-family: var(--font-display);
-      font-size: clamp(0.85rem, 2.6vw, 1.05rem);
+      font-size: clamp(1rem, 3vw, 1.2rem); /* ~30% larger on mobile */
       font-weight: 300;
       font-style: italic;
       color: var(--text-muted);
       margin-top: 0.6rem;
-      line-height: 1.6;
+      line-height: 1.7;
       letter-spacing: 0.02em;
     }
     .letter-progress {
@@ -719,7 +719,7 @@
     }
     .response-line {
       font-family: var(--font-display);
-      font-size: clamp(1.1rem, 3.6vw, 1.6rem);
+      font-size: clamp(1.2rem, 4vw, 1.8rem); /* ~30% larger on mobile */
       font-weight: 300;
       font-style: italic;
       color: var(--text-primary);
@@ -731,7 +731,7 @@
     }
     .response-line.script {
       font-family: var(--font-script);
-      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-size: clamp(2rem, 6vw, 3.2rem); /* ~30% larger on mobile */
       font-style: normal;
       font-weight: 400;
     }
@@ -779,7 +779,7 @@
     }
     .response-final .final-headline {
       font-family: var(--font-script);
-      font-size: clamp(2.2rem, 6vw, 3.5rem);
+      font-size: clamp(2.4rem, 7vw, 4rem); /* ~30% larger on mobile */
       color: var(--text-primary);
       text-shadow: 0 0 40px var(--pink-glow);
       line-height: 1.3;
@@ -787,7 +787,7 @@
     }
     .response-final .final-sub {
       font-family: var(--font-display);
-      font-size: clamp(1rem, 2.8vw, 1.2rem);
+      font-size: clamp(1.1rem, 3.2vw, 1.4rem); /* ~30% larger on mobile */
       font-weight: 300;
       font-style: italic;
       color: var(--text-secondary);
@@ -796,7 +796,7 @@
     }
     .response-final .final-closing {
       font-family: var(--font-script);
-      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-size: clamp(2rem, 6vw, 3.4rem); /* ~30% larger on mobile */
       color: #E8749A;
       text-shadow: 0 0 30px var(--pink-glow);
       margin-top: 1.5rem;
@@ -804,7 +804,7 @@
     }
     .response-final .final-note {
       font-family: var(--font-display);
-      font-size: clamp(0.85rem, 2vw, 1rem);
+      font-size: clamp(0.95rem, 2.4vw, 1.15rem); /* ~30% larger on mobile */
       font-style: italic;
       color: var(--text-muted);
       margin-top: 0.3rem;
@@ -1178,10 +1178,10 @@
         min-height: 160px;
       }
       .letter-line-main {
-        font-size: clamp(1rem, 3.8vw, 1.4rem);
+        font-size: clamp(1.3rem, 4.8vw, 1.7rem);
       }
       .letter-line-main.script {
-        font-size: clamp(1.6rem, 5.5vw, 2.4rem);
+        font-size: clamp(2.0rem, 7vw, 3.0rem);
       }
       .letter-progress {
         bottom: 1.25rem;
@@ -1194,10 +1194,10 @@
         padding: 0.3rem 0.15rem;
       }
       .response-line {
-        font-size: clamp(0.95rem, 3.2vw, 1.3rem);
+        font-size: clamp(1.1rem, 4vw, 1.5rem);
       }
       .response-line.script {
-        font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+        font-size: clamp(1.8rem, 6vw, 2.8rem);
       }
       .response-letter-stage {
         min-height: 160px;
@@ -1277,10 +1277,10 @@
         min-height: 120px;
       }
       .response-line {
-        font-size: clamp(0.85rem, 2.8vw, 1.1rem);
+        font-size: clamp(0.95rem, 3.2vw, 1.2rem);
       }
       .response-line.script {
-        font-size: clamp(1.3rem, 4vw, 1.8rem);
+        font-size: clamp(1.5rem, 4.8vw, 2.0rem);
       }
       .response-progress {
         bottom: 1rem;
@@ -1515,38 +1515,30 @@
     };
 
     // ================================================================
-    // LETTER CONTENT
+    // LETTER CONTENT — REPLACED WITH NEW BANGLISH TEXT
     // ================================================================
     const LETTER_CHUNKS = [
-      { text: "Heyy…", cls: "script" },
-      { text: "Finally…", cls: "script" },
-      { text: "Jei din er jonno\nwait korchilam,", cls: "" },
-      { text: "oi din ta\naise poro.", cls: "" },
-      { text: "Ami na,\nguchai valo moto\nkotha bolte pari na.", cls: "" },
-      { text: "Sorry for that.", cls: "", sub: "genuinely." },
-      { text: "Anyway mam…", cls: "script" },
-      { text: "Ami kokhono airokom bhabe\nkaoke boli na.", cls: "" },
-      { text: "Really.", cls: "bold" },
-      { text: "Ajke September 9.", cls: "" },
-      { text: "Mane ajke amar birthday.", cls: "", sub: "my day. but not really." },
-      { text: "Kothai theke shuru korbo\nbujhtacina.", cls: "" },
-      { text: "{{NAME}},", cls: "script name-highlight" },
-      { text: "apni amake kemon bhabe\netodin mone korcen,\njeta ami janina.", cls: "" },
-      { text: "Kintu ami apnake amar life er\nspecial kichu ekta mone korchi.", cls: "" },
-      { text: "Ami life e maturity bhabe\n2 ta relation korci.", cls: "" },
-      { text: "But aktaeo ami kaoke\npropose kori nai.", cls: "" },
-      { text: "Ora amake propose korse.", cls: "", sub: "but this time…" },
-      { text: "Ei jonno life er\nfirst time propose kortaci.", cls: "" },
-      { text: "Tao onekta\nserious bhabe.", cls: "bold" },
-      { text: "Ami apnake amar GF hisebe\nmoteo chai na.", cls: "" },
-      { text: "Wife hisebe chai.", cls: "script" },
-      { text: "I don't know ami apnar jonno\nbest kina.", cls: "" },
-      { text: "But amar jonno\napni best ever.", cls: "" },
-      { text: "Mane…", cls: "", sub: "ever." },
+      { text: "Hey ayshuu mam,", cls: "script" },
+      { text: "finaly ey din ta ase porse,\njei din tar jonno ami opoekka korcilam.", cls: "" },
+      { text: "ajke 9 September,\nmane ajke amar birthday.", cls: "" },
+      { text: "bablem ey special din a,\nspecial person,\nakto special kiso bole,\nha-ha.", cls: "" },
+      { text: "kotai tekei soro korbo bojtecina,\nsorry for that.", cls: "" },
+      { text: "ami arokom bahbe kaoke bole nai,\nbelieve me.", cls: "" },
+      { text: "anyway mam,", cls: "script" },
+      { text: "ey 21 din a amk apni ki mone korcen,\njeta ami jani na,", cls: "" },
+      { text: "but\nami apnake special kiso akta mone korci,\nmane onak special.", cls: "" },
+      { text: "ami kinto fun kortecina mam,\nbesi na, just apni aktoo seriously niyen kota golo.", cls: "" },
+      { text: "frist time ami kaoke propose korteci,\nallah,", cls: "" },
+      { text: "sotti bolte ami kaoke nij tekei propose korinai,\nummm,\nahem.", cls: "" },
+      { text: "mam,", cls: "script" },
+      { text: "ami, apnake amar gf hisebe moteo chai,\nje onneder moto time ta pass korbo.", cls: "" },
+      { text: "ami, apnake ami amar wife hisebe chai,\nmane wife,\ntarpor ar kisoi na mam.", cls: "bold" },
+      { text: "er ceye besi kiso chai na,", cls: "" },
+      { text: "i know ata akto besi hoye jasse,\ncuz 21-22 day poricoy a arokom kota,\nkao, kaoke bole na.", cls: "" },
     ];
 
     // ================================================================
-    // YES RESPONSE — 3 COMPLETE STEPS
+    // YES RESPONSE — 6 CHUNKS (preserved)
     // ================================================================
     const YES_CHUNKS = [
       {
@@ -1576,7 +1568,7 @@
     ];
 
     // ================================================================
-    // NO RESPONSE — 3 COMPLETE STEPS
+    // NO RESPONSE — 4 CHUNKS (preserved)
     // ================================================================
     const NO_CHUNKS = [
       {
@@ -1670,42 +1662,35 @@
       return 'session_' + Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    function countWords(text) {
+    // ================================================================
+    // WORD COUNT & DURATION SYSTEM (0.5 sec per word)
+    // ================================================================
+    function getWordCount(text) {
+      // Strip HTML tags, normalize spaces, split on whitespace
       const plain = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
       if (!plain) return 0;
       return plain.split(' ').filter(w => w.length > 0).length;
     }
 
+    function getDisplayDuration(text) {
+      const words = getWordCount(text);
+      // 0.5 second per word, minimum 1.0 second, maximum 30 seconds
+      return Math.max(1.0, Math.min(30.0, words * 0.5));
+    }
+
     // ================================================================
-    // READING-TIME SYSTEM
+    // READING-TIME SYSTEM (compatible with old structure but uses new word count)
     // ================================================================
     function calculateReadingDuration(chunk) {
       const allText = chunk.text + (chunk.sub ? ' ' + chunk.sub : '');
-      const plain = allText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-      const wordCount = plain ? plain.split(' ').filter(w => w.length > 0).length : 0;
-
-      let readingTime = wordCount / 4.0;
-      readingTime = readingTime * 1.2;
-
-      const MIN_TIME = 1.5;
-      const MAX_TIME = 8.0;
-
-      let finalTime = Math.max(MIN_TIME, Math.min(MAX_TIME, readingTime));
-
-      if (wordCount <= 3) finalTime = Math.max(1.5, finalTime);
-      else if (wordCount <= 7) finalTime = Math.max(2.0, finalTime);
-      else if (wordCount <= 12) finalTime = Math.max(2.8, finalTime);
-      else if (wordCount <= 20) finalTime = Math.max(3.5, finalTime);
-      else if (wordCount <= 30) finalTime = Math.max(4.5, finalTime);
-      else finalTime = Math.min(MAX_TIME, finalTime);
-
+      const duration = getDisplayDuration(allText);
       return {
-        wordCount,
-        readingTime: finalTime,
-        totalTime: finalTime + 0.8,
+        wordCount: getWordCount(allText),
+        readingTime: duration,
+        totalTime: duration + 0.8,
         fadeIn: 400,
         fadeOut: 400,
-        holdTime: finalTime * 1000,
+        holdTime: duration * 1000,
       };
     }
 
@@ -2371,7 +2356,7 @@
     async function showResponseChunk(displayId, containerId, chunks, idx, onComplete) {
       if (idx >= chunks.length) {
         // Show final message
-        const finalEl = document.getElementById(containerId === 'yes-progress' ? 'yes-final' : 'no-final');
+        const finalEl = document.getElementById(containerId === 'yes-progress-dots' ? 'yes-final' : 'no-final');
         if (finalEl) finalEl.classList.add('visible');
         if (onComplete) onComplete();
         return;
@@ -2459,7 +2444,7 @@
 
       // Reset and prepare
       const displayEl = $('yes-chunk-display');
-      const dotsContainer = 'yes-progress';
+      const dotsContainer = 'yes-progress-dots';
       displayEl.className = 'response-chunk';
       const finalEl = $('yes-final');
       if (finalEl) finalEl.classList.remove('visible');
