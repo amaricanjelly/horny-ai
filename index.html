@@ -468,9 +468,8 @@
     }
     .letter-line-main {
       font-family: var(--font-display);
-      font-size: clamp(1.4rem, 4.8vw, 2.0rem); /* ~30% larger on mobile */
-      font-weight: 300;
-      font-style: italic;
+      font-size: clamp(1.4rem, 4.8vw, 2.0rem);
+      font-weight: 500;
       color: var(--text-primary);
       line-height: 1.7;
       text-shadow: 0 0 20px rgba(255, 183, 197, 0.06);
@@ -480,7 +479,7 @@
     }
     .letter-line-main.script {
       font-family: var(--font-script);
-      font-size: clamp(2.2rem, 7vw, 3.6rem); /* ~30% larger on mobile */
+      font-size: clamp(2.2rem, 7vw, 3.6rem);
       font-style: normal;
       font-weight: 400;
     }
@@ -494,7 +493,7 @@
     }
     .letter-line-sub {
       font-family: var(--font-display);
-      font-size: clamp(1rem, 3vw, 1.2rem); /* ~30% larger on mobile */
+      font-size: clamp(1rem, 3vw, 1.2rem);
       font-weight: 300;
       font-style: italic;
       color: var(--text-muted);
@@ -719,8 +718,8 @@
     }
     .response-line {
       font-family: var(--font-display);
-      font-size: clamp(1.2rem, 4vw, 1.8rem); /* ~30% larger on mobile */
-      font-weight: 300;
+      font-size: clamp(1.2rem, 4vw, 1.8rem);
+      font-weight: 500;
       font-style: italic;
       color: var(--text-primary);
       line-height: 1.8;
@@ -731,7 +730,7 @@
     }
     .response-line.script {
       font-family: var(--font-script);
-      font-size: clamp(2rem, 6vw, 3.2rem); /* ~30% larger on mobile */
+      font-size: clamp(2rem, 6vw, 3.2rem);
       font-style: normal;
       font-weight: 400;
     }
@@ -779,7 +778,7 @@
     }
     .response-final .final-headline {
       font-family: var(--font-script);
-      font-size: clamp(2.4rem, 7vw, 4rem); /* ~30% larger on mobile */
+      font-size: clamp(2.4rem, 7vw, 4rem);
       color: var(--text-primary);
       text-shadow: 0 0 40px var(--pink-glow);
       line-height: 1.3;
@@ -787,7 +786,7 @@
     }
     .response-final .final-sub {
       font-family: var(--font-display);
-      font-size: clamp(1.1rem, 3.2vw, 1.4rem); /* ~30% larger on mobile */
+      font-size: clamp(1.1rem, 3.2vw, 1.4rem);
       font-weight: 300;
       font-style: italic;
       color: var(--text-secondary);
@@ -796,7 +795,7 @@
     }
     .response-final .final-closing {
       font-family: var(--font-script);
-      font-size: clamp(2rem, 6vw, 3.4rem); /* ~30% larger on mobile */
+      font-size: clamp(2rem, 6vw, 3.4rem);
       color: #E8749A;
       text-shadow: 0 0 30px var(--pink-glow);
       margin-top: 1.5rem;
@@ -804,7 +803,7 @@
     }
     .response-final .final-note {
       font-family: var(--font-display);
-      font-size: clamp(0.95rem, 2.4vw, 1.15rem); /* ~30% larger on mobile */
+      font-size: clamp(0.95rem, 2.4vw, 1.15rem);
       font-style: italic;
       color: var(--text-muted);
       margin-top: 0.3rem;
@@ -1515,26 +1514,34 @@
     };
 
     // ================================================================
-    // LETTER CONTENT — REPLACED WITH NEW BANGLISH TEXT
+    // LETTER CONTENT — BANGLA + VERY LITTLE ENGLISH (99% Bangla)
     // ================================================================
     const LETTER_CHUNKS = [
-      { text: "Hey ayshuu mam,", cls: "script" },
-      { text: "finaly ey din ta ase porse,\njei din tar jonno ami opoekka korcilam.", cls: "" },
-      { text: "ajke 9 September,\nmane ajke amar birthday.", cls: "" },
-      { text: "bablem ey special din a,\nspecial person,\nakto special kiso bole,\nha-ha.", cls: "" },
-      { text: "kotai tekei soro korbo bojtecina,\nsorry for that.", cls: "" },
-      { text: "ami arokom bahbe kaoke bole nai,\nbelieve me.", cls: "" },
-      { text: "anyway mam,", cls: "script" },
-      { text: "ey 21 din a amk apni ki mone korcen,\njeta ami jani na,", cls: "" },
-      { text: "but\nami apnake special kiso akta mone korci,\nmane onak special.", cls: "" },
-      { text: "ami kinto fun kortecina mam,\nbesi na, just apni aktoo seriously niyen kota golo.", cls: "" },
-      { text: "frist time ami kaoke propose korteci,\nallah,", cls: "" },
-      { text: "sotti bolte ami kaoke nij tekei propose korinai,\nummm,\nahem.", cls: "" },
-      { text: "mam,", cls: "script" },
-      { text: "ami, apnake amar gf hisebe moteo chai,\nje onneder moto time ta pass korbo.", cls: "" },
-      { text: "ami, apnake ami amar wife hisebe chai,\nmane wife,\ntarpor ar kisoi na mam.", cls: "bold" },
-      { text: "er ceye besi kiso chai na,", cls: "" },
-      { text: "i know ata akto besi hoye jasse,\ncuz 21-22 day poricoy a arokom kota,\nkao, kaoke bole na.", cls: "" },
+      { text: "এই যে‌…", cls: "script" },
+      { text: "আজকের দিনটার জন্য আমি কতদিন অপেক্ষা করেছি, সেটা হয়তো তুমি জানো না।", cls: "" },
+      { text: "আজ ৯ই সেপ্টেম্বর।", cls: "" },
+      { text: "আজ আমার জন্মদিন।", cls: "" },
+      { text: "আমি ভাবলাম, এই বিশেষ দিনে, বিশেষ একটা মানুষকে, বিশেষ কিছু বলি।", cls: "" },
+      { text: "কিন্তু কোথা থেকে শুরু করবো, সেটাই বুঝতে পারছি না।", cls: "" },
+      { text: "sorry for that.", cls: "" },
+      { text: "আমি এমনভাবে কাউকে আগে কখনো বলিনি।", cls: "" },
+      { text: "believe me.", cls: "" },
+      { text: "anyway…", cls: "script" },
+      { text: "এই ২১ দিনে তুমি আমাকে কীভাবে মনে করছো, সেটা আমি জানি না।", cls: "" },
+      { text: "কিন্তু আমি তোমাকে খুব বিশেষ কিছু মনে করি।", cls: "" },
+      { text: "খুবই বিশেষ।", cls: "bold" },
+      { text: "আমি কিন্তু মজা করছি না।", cls: "" },
+      { text: "শুধু একটু серьёзভাবে নিও এই কথাগুলো।", cls: "" },
+      { text: "জীবনে প্রথমবার আমি কাউকে propose করছি।", cls: "" },
+      { text: "আল্লাহ! সত্যি বলতে, আমি নিজে থেকে কাউকে propose করিনি।", cls: "" },
+      { text: "ummm… ahem.", cls: "" },
+      { text: "আমি তোমাকে আমার girlfriend হিসেবে চাই না।", cls: "" },
+      { text: "যেটা অন্য কারো সাথে সময় কাটানোর মতো।", cls: "" },
+      { text: "আমি তোমাকে আমার wife হিসেবে চাই।", cls: "bold" },
+      { text: "হ্যাঁ, wife।", cls: "" },
+      { text: "এর বেশি আর কিছু না।", cls: "" },
+      { text: "আমি জানি, এটা একটু বেশি হয়ে যাচ্ছে।", cls: "" },
+      { text: "কারণ ২১-২২ দিনের পরিচয়ে এমন বলা, কেউ কাউকে বলে না।", cls: "" },
     ];
 
     // ================================================================
@@ -1695,7 +1702,7 @@
     }
 
     // ================================================================
-    // MUSIC MANAGER — 3-SONG SYSTEM
+    // MUSIC MANAGER — 3-SONG SYSTEM (fixed for specter scene)
     // ================================================================
     class MusicManager {
       constructor() {
@@ -1710,6 +1717,7 @@
         this.youtubeReady = { main: false, yes: false, no: false };
         this.youtubePlayers = { main: null, yes: null, no: null };
         this.pendingStart = null;
+        this._autoplayAttempted = false;
       }
 
       init() {
@@ -1774,6 +1782,16 @@
                   this.pendingStart = null;
                   this.playTrack(track);
                 }
+                // If this is the main track and we haven't started yet, try to play
+                if (track === 'main' && !this._autoplayAttempted) {
+                  this._autoplayAttempted = true;
+                  // Attempt to start main music after a short delay
+                  setTimeout(() => {
+                    if (!this.isPlaying && this.currentTrack !== 'main') {
+                      this.playMain();
+                    }
+                  }, 800);
+                }
               },
               onStateChange: (e) => {
                 if (e.data === 0 && this.currentTrack === track) {
@@ -1786,7 +1804,14 @@
         } catch (e) { console.warn(`YouTube player creation failed for ${track}:`, e); }
       }
 
-      playMain() { this.switchTo('main'); }
+      playMain() { 
+        // Ensure we switch to main track, and if not ready, wait
+        if (!this.youtubeReady['main']) {
+          this.pendingStart = 'main';
+          return;
+        }
+        this.switchTo('main'); 
+      }
       playYes() { this.switchTo('yes'); }
       playNo() { this.switchTo('no'); }
 
@@ -2213,7 +2238,7 @@
     }
 
     // ================================================================
-    // MIDNIGHT REVEAL
+    // MIDNIGHT REVEAL (Specter scene — music starts here)
     // ================================================================
     async function startMidnightReveal() {
       setScreen('screen-midnight');
@@ -2221,6 +2246,12 @@
       showStars();
       if (STATE.setIntensity) STATE.setIntensity(1.5);
       trackEvent('COUNTDOWN_FINISHED');
+      
+      // Start the main background music when the specter scene appears
+      if (musicManager) {
+        musicManager.playMain();
+      }
+      
       await sleep(600);
       $('midnight-msg-1').classList.add('visible');
       await sleep(2000);
@@ -2642,19 +2673,8 @@
     function attemptAutoStartMusic() {
       musicManager.init();
       musicManager.setVolume(1.0);
-      musicManager.playMain();
-
-      setTimeout(() => {
-        if (musicManager.getCurrentTrack() !== 'main') {
-          musicManager.playMain();
-        }
-      }, 1500);
-
-      setTimeout(() => {
-        if (musicManager.getCurrentTrack() !== 'main') {
-          musicManager.playMain();
-        }
-      }, 3500);
+      // We'll start music when the specter scene appears
+      // but we can prepare the player now
     }
 
     async function initApp() {
