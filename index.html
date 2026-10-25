@@ -85,6 +85,13 @@ textarea:focus{border-color:#ff4d8d}
 .ac li{padding:2px 0}.msg{font-size:.9rem;font-style:italic;opacity:.85;margin-bottom:8px;white-space:pre-wrap}
 .meta{font-size:.82rem;opacity:.7}
 .no{color:#ff7a96}.bd{font:700 1.5rem 'Cormorant Garamond',serif;padding:2px 18px;border-radius:30px}.bd.y{background:rgba(110,231,160,.15);color:#6ee7a0;border:1px solid #6ee7a0}.bd.n{background:rgba(255,122,150,.15);color:#ff7a96;border:1px solid #ff7a96}
+#gcard{max-width:460px;width:100%;padding:28px 22px;display:grid;gap:14px;text-align:left}
+#gcard label{display:grid;gap:6px;font-size:.9rem;color:#ffb3cb}
+#gcard input{width:100%;padding:13px 16px;border-radius:14px;border:1px solid rgba(255,120,170,.35);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:1rem;outline:none}
+#gcard input:focus{border-color:#ff4d8d;box-shadow:0 0 0 3px rgba(255,77,141,.25)}
+.opt{flex:1;min-width:130px;padding:14px;border-radius:16px;border:1px solid rgba(255,120,170,.4);background:rgba(255,255,255,.07);color:#fff;font:500 1rem Jost,sans-serif;cursor:pointer;transition:.3s}
+.opt.sel{background:linear-gradient(135deg,#e0245e,#8b1030);border-color:#ffb3cb;box-shadow:0 0 22px rgba(255,77,141,.6)}
+.bd.p{background:rgba(255,207,122,.12);color:#ffcf7a;border:1px solid #ffcf7a}
 </style>
 </head>
 <body class="locked">
@@ -93,10 +100,23 @@ textarea:focus{border-color:#ff4d8d}
 <symbol id="h" viewBox="0 0 32 29"><path fill="url(#hg)" d="M23.6 0c-2.7 0-5.1 1.3-6.6 3.4C15.5 1.3 13.1 0 10.4 0 4.7 0 0 4.6 0 10.3c0 9.2 14.2 17.5 16 18.7 1.8-1.2 16-9.5 16-18.7C32 4.6 27.3 0 23.6 0z"/></symbol>
 </defs></svg>
 <div id="fall"></div><canvas id="fx"></canvas><div id="flash"></div><div id="cine"></div>
-<audio id="song" src="SaveTik.io_7685267223396486421.mp3" loop preload="auto"></audio>
+<audio id="song" src="Barsaat%20(Lyrics)%20-%20Banjaare%20_%207Alfaaz.mp3" loop preload="auto"></audio>
 <button id="mus" aria-label="Music mute or unmute">🔇</button>
 
-<section id="hero" class="screen active">
+<section id="gate" class="screen active">
+  <h2>Shuru korar age ekta kotha... 🥺</h2>
+  <div class="glass" id="gcard">
+    <label>Tomar naam<input id="gName" maxlength="40" placeholder="Naam likho" autocomplete="off"></label>
+    <label>Tomar boyosh<input id="gAge" type="number" inputmode="numeric" min="1" max="120" placeholder="Boyosh likho"></label>
+    <label>Ekta select koro</label>
+    <div class="row" id="gChoice" style="margin:0"><button type="button" class="opt" data-v="LESBIAN">Lesbian</button><button type="button" class="opt" data-v="STRAIGHT">Straight</button></div>
+    <button class="btn" id="gSubmit">Submit ❤️</button>
+    <p class="err" id="gErr"></p>
+    <p class="note" style="margin:0">Ei info gulo save hobe. Submit korle gan shuru hobe 🎵</p>
+  </div>
+</section>
+
+<section id="hero" class="screen">
   <div class="orb o1"></div><div class="orb o2"></div>
   <p class="tag">RAISA ISLAM MIMI ❤️</p>
   <div class="scene"><div class="h3d" id="h3d"></div></div>
@@ -133,7 +153,7 @@ textarea:focus{border-color:#ff4d8d}
   <div class="top"><h2>Promise Dashboard</h2><div class="row" style="margin:0"><button class="btn sm ghost" id="aRef">Refresh</button><button class="btn sm" id="aClose">Close (Esc)</button></div></div>
   <p class="err" id="aErr"></p>
   <div id="aLast"></div>
-  <div class="stats"><div class="glass stat"><b id="sT">0</b><span>Total answers</span></div><div class="glass stat"><b id="sC" class="ok">0</b><span>YES</span></div><div class="glass stat"><b id="sN" class="no">0</b><span>NO</span></div></div>
+  <div class="stats"><div class="glass stat"><b id="sT">0</b><span>Entries</span></div><div class="glass stat"><b id="sC" class="ok">0</b><span>YES</span></div><div class="glass stat"><b id="sN" class="no">0</b><span>NO</span></div><div class="glass stat"><b id="sP" class="wa">0</b><span>Answer pending</span></div></div>
   <div id="aList"></div>
 </div></div>
 
@@ -143,7 +163,7 @@ import {getDatabase,ref,push,onValue,get} from "https://www.gstatic.com/firebase
 
 const firebaseConfig={apiKey:"AIzaSyBPOxLeM17VKjx37WWK8pYVJoEVIP68qao",authDomain:"hedar-app.firebaseapp.com",databaseURL:"https://hedar-app-default-rtdb.firebaseio.com",projectId:"hedar-app",storageBucket:"hedar-app.firebasestorage.app",messagingSenderId:"846963972873",appId:"1:846963972873:web:7be71f344c854aad2691d8"};
 const app=initializeApp(firebaseConfig),db=getDatabase(app);
-const subs=ref(db,"promiseSubmissions");
+const subs=ref(db,"promiseSubmissions"),visRef=ref(db,"visitors");
 const $=id=>document.getElementById(id),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
 
@@ -185,6 +205,23 @@ if(si>=MSG.length-1){go("promise");return}
 si++;const c=$("mcard");c.classList.remove("swap");void c.offsetWidth;c.classList.add("swap");show()}
 $("nextBtn").onclick=nextS;$("mcard").onclick=nextS;
 
+/* entry gate: name + age + one choice -> saved, then song starts */
+let visitorId=null,gSaving=false,gChoice="";
+$("gChoice").onclick=e=>{const b=e.target.closest(".opt");if(!b)return;gChoice=b.dataset.v;document.querySelectorAll(".opt").forEach(x=>x.classList.toggle("sel",x===b))};
+async function gateSubmit(){if(gSaving||visitorId)return;const name=$("gName").value.trim(),age=Number($("gAge").value),E=$("gErr");
+if(!name){E.textContent="Naam likho 🥺";return}
+if(!Number.isInteger(age)||age<1||age>120){E.textContent="Sothik boyosh likho 🥺";return}
+if(!gChoice){E.textContent="Duita theke ekta select koro 🥺";return}
+E.textContent="";gSaving=true;$("gSubmit").disabled=true;$("gSubmit").textContent="Saving... 💭";
+song.play().then(()=>mus.textContent="🔊").catch(e=>console.warn("Music:",e));
+const d=new Date(),p=n=>String(n).padStart(2,"0");
+try{const r=await push(visRef,{name,age,choice:gChoice,submittedAt:d.getTime(),date:`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`,time:`${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`});
+visitorId=r.key;burst(innerWidth/2,innerHeight/2,100,8);go("hero")}
+catch(e){console.error(e);E.textContent="Save hoy ni ("+(e.code||e.message||"network error")+"). Connection check kore abar Submit koro.";$("gSubmit").disabled=false;$("gSubmit").textContent="Submit ❤️"}
+finally{gSaving=false}}
+$("gSubmit").onclick=gateSubmit;
+["gName","gAge"].forEach(i=>$(i).addEventListener("keydown",e=>{if(e.key==="Enter")gateSubmit()}));
+
 /* open */
 $("openBtn").onclick=async()=>{const b=$("openBtn").getBoundingClientRect();
 burst(b.left+b.width/2,b.top+b.height/2,130,9);for(let i=0;i<24;i++)petal();
@@ -204,6 +241,7 @@ saving=true;$("perr").textContent="";$("yesBtn").disabled=$("notBtn").disabled=t
 const d=new Date(),p=n=>String(n).padStart(2,"0"),pr={};boxes.forEach((b,i)=>pr["p"+(i+1)]=b.checked);
 const rec={name:"Raisa Islam Mimi",promises:pr,acceptedCount:boxes.filter(b=>b.checked).length,completed,optionalMessage:$("optMsg").value.trim().slice(0,500),
 submittedAt:d.getTime(),date:`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`,time:`${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`};
+if(visitorId)rec.visitorId=visitorId;
 try{await push(subs,rec);saved=true;boxes.forEach(b=>b.disabled=true);$("optMsg").disabled=true;
 if(completed)success();else{$("yesBtn").hidden=$("notBtn").hidden=true;$("perr").style.color="#ffd0df";$("perr").textContent="Thik ache Mimi 🤍 Tomar decision ke ami respect kori. Jokhon ready hobe, tokhon bolo."}}
 catch(e){console.error(e);$("perr").textContent="Save hoy ni ("+(e.code||e.message||"network error")+"). Connection check kore abar try koro.";$("yesBtn").disabled=$("notBtn").disabled=false;$("yesBtn").textContent=$("yesBtn").dataset.o}
@@ -215,20 +253,29 @@ await typeTo($("f3"),"Thank you for being a part of my life, Mimi. I hope we kee
 $("yesBtn").onclick=()=>submit(true);$("notBtn").onclick=()=>submit(false);
 
 /* hidden admin: press A twice. No login (read access is controlled by the database rules). */
-let rows=[],unsub=null,panel=false;
+let rows=[],vrows=[],unsub=null,panel=false;
+const CH={LESBIAN:"Lesbian",STRAIGHT:"Straight"};
 const toList=s=>Object.entries(s.val()||{}).map(([id,v])=>({id,...v}));
-function startData(){if(unsub)return;unsub=onValue(subs,s=>{rows=toList(s);$("aErr").textContent="";render()},e=>{unsub=null;$("aErr").textContent="Data load hoy ni ("+(e.code||e.message)+"). Rules e promiseSubmissions er .read true ache kina dekho."})}
-function card(r,last){const c=el("div","glass ac"),h=el("div","h");
-h.append(el("span","bd "+(r.completed?"y":"n"),r.completed?"YES ✔":"NO ✖"),el("span","meta",(last?"Last answer · ":"")+(r.date||"")+" "+(r.time||"")));
-const ul=el("ul");PR.forEach((t,i)=>{const y=r.promises&&r.promises["p"+(i+1)];ul.append(el("li",y?"ok":"no",(y?"✔ ":"✖ ")+t))});
-c.append(h,el("p","meta",(r.name||"-")+" · "+(r.acceptedCount??0)+"/6 promise accepted"),ul);
-if(r.optionalMessage)c.append(el("p","msg","“"+r.optionalMessage+"”"));return c}
-function render(){const s=[...rows].sort((a,b)=>b.submittedAt-a.submittedAt),y=s.filter(r=>r.completed).length;
-$("sT").textContent=s.length;$("sC").textContent=y;$("sN").textContent=s.length-y;
+function startData(){if(unsub)return;const bad=e=>{$("aErr").textContent="Data load hoy ni ("+(e.code||e.message)+"). Rules check koro."};
+const a=onValue(subs,s=>{rows=toList(s);$("aErr").textContent="";render()},bad),b=onValue(visRef,s=>{vrows=toList(s);render()},bad);unsub=()=>{a();b()}}
+function card(it,last){const v=it.v,r=it.r,c=el("div","glass ac"),h=el("div","h");
+const t=r||v;
+h.append(el("span","bd "+(r?(r.completed?"y":"n"):"p"),r?(r.completed?"YES ✔":"NO ✖"):"Answer pending"),el("span","meta",(last?"Last answer · ":"")+(t.date||"")+" "+(t.time||"")));
+c.append(h,el("p","meta",v?`${v.name} · ${v.age} bochor · ${CH[v.choice]||v.choice} · entered ${v.date} ${v.time}`:(r.name||"-")));
+if(r){c.append(el("p","meta",(r.acceptedCount??0)+"/6 promise accepted"));const ul=el("ul");PR.forEach((x,i)=>{const y=r.promises&&r.promises["p"+(i+1)];ul.append(el("li",y?"ok":"no",(y?"✔ ":"✖ ")+x))});c.append(ul);
+if(r.optionalMessage)c.append(el("p","msg","“"+r.optionalMessage+"”"))}
+return c}
+function render(){const vm={};vrows.forEach(v=>vm[v.id]=v);const latest={},orph=[];
+[...rows].sort((a,b)=>a.submittedAt-b.submittedAt).forEach(r=>{if(r.visitorId&&vm[r.visitorId])latest[r.visitorId]=r;else orph.push(r)});
+const items=[...vrows.map(v=>({v,r:latest[v.id]||null})),...orph.map(r=>({v:null,r}))];
+const T=it=>it.r?it.r.submittedAt:it.v.submittedAt;items.sort((a,b)=>T(b)-T(a));
+const ans=items.filter(i=>i.r),y=ans.filter(i=>i.r.completed).length;
+$("sT").textContent=vrows.length;$("sC").textContent=y;$("sN").textContent=ans.length-y;$("sP").textContent=items.filter(i=>!i.r).length;
 const A=$("aLast"),L=$("aList");A.textContent="";L.textContent="";
-if(!s.length){A.append(el("p","sub","Ekhono kono answer ashe ni."));return}
-A.append(card(s[0],true));s.slice(1).forEach(r=>L.append(card(r,false)))}
-$("aRef").onclick=async()=>{try{rows=toList(await get(subs));$("aErr").textContent="";render()}catch(e){$("aErr").textContent="Refresh hoy ni: "+(e.code||e.message)}};
+if(!items.length){A.append(el("p","sub","Ekhono kono entry ashe ni."));return}
+const first=ans.length?ans[0]:null;if(first)A.append(card(first,true));
+items.filter(i=>i!==first).forEach(i=>L.append(card(i,false)))}
+$("aRef").onclick=async()=>{try{rows=toList(await get(subs));vrows=toList(await get(visRef));$("aErr").textContent="";render()}catch(e){$("aErr").textContent="Refresh hoy ni: "+(e.code||e.message)}};
 const openAdmin=()=>{panel=true;$("admin").classList.add("open");startData()};
 const closeAdmin=()=>{panel=false;$("admin").classList.remove("open");if(unsub){unsub();unsub=null}};
 $("aClose").onclick=closeAdmin;
