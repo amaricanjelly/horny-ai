@@ -12,8 +12,10 @@ html{scroll-behavior:smooth}
 body{font-family:Jost,system-ui,sans-serif;font-weight:300;color:#ffe6ee;line-height:1.8;background:linear-gradient(170deg,#050103,#1f030d 45%,#3d0820 80%,#0a0206);background-attachment:fixed;overflow-x:hidden}
 body.locked{overflow:hidden}
 [hidden]{display:none!important}
-section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:84px 18px;position:relative;text-align:center}
-section>*{position:relative;z-index:2}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;gap:18px;padding:64px 18px 34px;text-align:center;overflow-y:auto;opacity:0;visibility:hidden;transform:translateY(20px) scale(.98);filter:blur(8px);transition:opacity .8s,transform .8s,filter .8s,visibility .8s;z-index:3}
+.screen.active{opacity:1;visibility:visible;transform:none;filter:none}
+.screen::before,.screen::after{content:"";flex:1 0 8px}
+.screen>*{position:relative;z-index:2}
 h1,h2{font-family:'Cormorant Garamond',serif;font-weight:700;letter-spacing:.04em;line-height:1.25;font-size:clamp(1.8rem,7vw,3.2rem);background:var(--pg);background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 7s linear infinite;filter:drop-shadow(0 0 18px rgba(255,77,141,.4))}
 @keyframes shine{to{background-position:220% center}}
 .tag{font-size:.8rem;letter-spacing:.35em;color:#ffb3cb;font-weight:500}
@@ -48,15 +50,9 @@ h1,h2{font-family:'Cormorant Garamond',serif;font-weight:700;letter-spacing:.04e
 @keyframes beat{50%{scale:1.1}}
 .bigheart{width:clamp(120px,32vw,170px);height:clamp(108px,29vw,155px);filter:drop-shadow(0 0 32px rgba(255,47,120,.9));animation:beat 1.4s infinite}
 /* messages */
-#stack{display:grid;gap:18px;max-width:620px;width:100%}
+#story{max-width:620px;width:100%;display:grid;gap:16px;justify-items:center}#mcard{width:100%;min-height:170px;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;padding:30px 24px}.cnt{font-size:.85rem;opacity:.65;letter-spacing:.2em}.swap{animation:sw .6s both}@keyframes sw{from{opacity:0;transform:translateY(16px) scale(.96)}}
 .mc{padding:24px 22px;font-family:'Cormorant Garamond',serif;font-size:clamp(1.15rem,4.3vw,1.45rem);font-weight:500;text-align:left}
 .tw{position:relative;display:block}.tw .g{visibility:hidden;display:block}.tw .ty{position:absolute;inset:0;display:block}
-/* allah */
-#allah{background:radial-gradient(circle at 50% 45%,rgba(242,196,109,.16),transparent 60%);overflow:hidden}
-#allah h2{background:var(--gold);background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;font-size:clamp(2.2rem,10vw,4.4rem);filter:drop-shadow(0 0 26px rgba(242,196,109,.7))}
-.gp{position:absolute;width:5px;height:5px;border-radius:50%;background:#f2c46d;box-shadow:0 0 12px #f2c46d;opacity:0;animation:fl 9s ease-in-out infinite;z-index:1}
-@keyframes fl{20%,80%{opacity:.8}to{transform:translateY(-120px);opacity:0}}
-.at{max-width:620px;font-family:'Cormorant Garamond',serif;font-size:clamp(1.15rem,4.3vw,1.45rem);font-weight:500;display:grid;gap:20px}
 /* promise */
 #pcard{max-width:640px;width:100%;padding:28px 22px;text-align:left}
 .pc{display:flex;gap:12px;align-items:flex-start;padding:12px 6px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.08)}
@@ -88,6 +84,7 @@ textarea:focus{border-color:#ff4d8d}
 .ac ul{list-style:none;margin:10px 0;font-size:.9rem}
 .ac li{padding:2px 0}.msg{font-size:.9rem;font-style:italic;opacity:.85;margin-bottom:8px;white-space:pre-wrap}
 .meta{font-size:.82rem;opacity:.7}
+.no{color:#ff7a96}.bd{font:700 1.5rem 'Cormorant Garamond',serif;padding:2px 18px;border-radius:30px}.bd.y{background:rgba(110,231,160,.15);color:#6ee7a0;border:1px solid #6ee7a0}.bd.n{background:rgba(255,122,150,.15);color:#ff7a96;border:1px solid #ff7a96}
 </style>
 </head>
 <body class="locked">
@@ -99,29 +96,21 @@ textarea:focus{border-color:#ff4d8d}
 <audio id="song" src="SaveTik.io_7685267223396486421.mp3" loop preload="auto"></audio>
 <button id="mus" aria-label="Music mute or unmute">🔇</button>
 
-<section id="hero">
+<section id="hero" class="screen active">
   <div class="orb o1"></div><div class="orb o2"></div>
   <p class="tag">RAISA ISLAM MIMI ❤️</p>
   <div class="scene"><div class="h3d" id="h3d"></div></div>
-  <h1>Hey Raisa Islam Mimi... ❤️</h1>
+  <h1>Hey Waisuuuuuu baby... 🥺❤️</h1>
   <p class="sub">Tomar jonno amar kichu kotha ache...</p>
   <button class="btn" id="openBtn">Open My Heart ❤️</button>
 </section>
 
-<main id="main" hidden>
-  <section id="msgs"><div id="stack"></div></section>
+<main id="main">
+  <section id="msgs" class="screen"><div id="story"><div class="glass mc" id="mcard"><span class="tw"><span class="g" id="mg"></span><span class="ty" id="my"></span></span></div><p class="cnt" id="cnt"></p><button class="btn" id="nextBtn">Next 💗</button></div></section>
 
-  <section id="allah">
-    <h2 class="rv">ALLAH SAKKHI ❤️</h2>
-    <div class="at">
-      <p class="rv">Allah sakshi, ami mon theke chai amader relationship-ta shundor hok. Ami chai amra dujon dujoner pashe thaki, ekjon arekjon-ke respect kori, bujhi, ar kokhono choto choto vul-er jonno ekjon arekjon-ke hariye na feli.</p>
-      <p class="rv">Allah sakshi, amar intention tomar sathe shotti, amar feelings shotti. Ami chai amader bondhon-ta lifetime-er hok. 🥺❤️</p>
-    </div>
-  </section>
-
-  <section id="promise">
-    <h2 class="rv">Raisa Islam Mimi, Will You Promise Me? 🥺❤️</h2>
-    <div class="glass rv" id="pcard">
+  <section id="promise" class="screen">
+    <h2>Raisa Islam Mimi, Will You Promise Me? 🥺❤️</h2>
+    <div class="glass" id="pcard">
       <div id="plist"></div>
       <textarea id="optMsg" maxlength="500" placeholder="Chaile amake kichu bolte paro (optional)..."></textarea>
       <div class="row">
@@ -133,7 +122,7 @@ textarea:focus{border-color:#ff4d8d}
     </div>
   </section>
 
-  <section id="final" hidden>
+  <section id="final" class="screen">
     <svg class="bigheart"><use href="#h"/></svg>
     <h2 class="fin">RAISA ISLAM MIMI ❤️</h2>
     <p class="fin2" id="f1"></p><p class="fin2" id="f2"></p><p class="fin3" id="f3"></p>
@@ -141,22 +130,19 @@ textarea:focus{border-color:#ff4d8d}
 </main>
 
 <div id="admin"><div class="wrap">
-  <div class="top"><h2>Promise Dashboard</h2>
-    <div class="row" style="margin:0"><button class="btn sm ghost" id="aRef">Refresh</button><button class="btn sm ghost" id="aOut" hidden>Sign out</button><button class="btn sm" id="aClose">Close (Esc)</button></div></div>
-  <div id="aAuth" class="glass" style="padding:18px;text-align:center"></div>
-  <div id="aData" hidden>
-    <div class="stats"><div class="glass stat"><b id="sT">0</b><span>Total submissions</span></div><div class="glass stat"><b id="sC" class="ok">0</b><span>Completed</span></div><div class="glass stat"><b id="sN" class="wa">0</b><span>Not completed</span></div></div>
-    <div id="aList"></div>
-  </div>
+  <div class="top"><h2>Promise Dashboard</h2><div class="row" style="margin:0"><button class="btn sm ghost" id="aRef">Refresh</button><button class="btn sm" id="aClose">Close (Esc)</button></div></div>
+  <p class="err" id="aErr"></p>
+  <div id="aLast"></div>
+  <div class="stats"><div class="glass stat"><b id="sT">0</b><span>Total answers</span></div><div class="glass stat"><b id="sC" class="ok">0</b><span>YES</span></div><div class="glass stat"><b id="sN" class="no">0</b><span>NO</span></div></div>
+  <div id="aList"></div>
 </div></div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
-import {getDatabase,ref,push,onValue,get,remove} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
-import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import {getDatabase,ref,push,onValue,get} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
 
 const firebaseConfig={apiKey:"AIzaSyBPOxLeM17VKjx37WWK8pYVJoEVIP68qao",authDomain:"hedar-app.firebaseapp.com",databaseURL:"https://hedar-app-default-rtdb.firebaseio.com",projectId:"hedar-app",storageBucket:"hedar-app.firebasestorage.app",messagingSenderId:"846963972873",appId:"1:846963972873:web:7be71f344c854aad2691d8"};
-const app=initializeApp(firebaseConfig),db=getDatabase(app),auth=getAuth(app);
+const app=initializeApp(firebaseConfig),db=getDatabase(app);
 const subs=ref(db,"promiseSubmissions");
 const $=id=>document.getElementById(id),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
@@ -167,9 +153,7 @@ const PR=["I promise je ami tomar sathe lifetime thakar sincere try korbo.","I p
 /* build content */
 $("h3d").innerHTML=Array.from({length:9},(_,i)=>`<svg style="transform:translateZ(${(i-4)*6}px);filter:brightness(${.5+i*.07})"><use href="#h"/></svg>`).join("");
 async function typeTo(e,t,sp=40){for(let i=1;i<=t.length;i++){e.textContent=t.slice(0,i);await sleep(sp)}}
-MSG.forEach(t=>{const c=el("div","glass mc rv"),w=el("span","tw"),g=el("span","g",t),y=el("span","ty");w.append(g,y);c.append(w);c.dataset.t=t;$("stack").append(c)});
 PR.forEach((t,i)=>{const l=el("label","pc"),inp=el("input");inp.type="checkbox";inp.dataset.i=i;l.append(inp,el("span","bx","✓"),el("span","",t));$("plist").append(l)});
-for(let i=0;i<22;i++){const p=el("span","gp");p.style.cssText=`left:${Math.random()*100}%;top:${30+Math.random()*70}%;animation-delay:${-Math.random()*9}s;animation-duration:${7+Math.random()*6}s`;$("allah").append(p)}
 
 /* petals + hearts */
 function petal(){const e=document.createElement("span"),h=Math.random()<.3;
@@ -190,16 +174,21 @@ raf=ps.length?requestAnimationFrame(loop):0;if(!raf)cx.clearRect(0,0,cv.width,cv
 const song=$("song"),mus=$("mus");song.volume=.6;
 mus.onclick=()=>{if(song.paused)song.play().then(()=>mus.textContent="🔊").catch(e=>console.warn(e));else{song.pause();mus.textContent="🔇"}};
 
-/* scroll reveal + typewriter */
-const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;const t=e.target;t.classList.add("in");io.unobserve(t);
-if(t.dataset.t)typeTo(t.querySelector(".ty"),t.dataset.t,22)}),{threshold:.35});
+/* click-through story: one sentence per click */
+function go(id){document.querySelectorAll(".screen").forEach(e=>e.classList.toggle("active",e.id===id));$(id).scrollTop=0}
+let si=-1,typing=false,skipT=false;
+async function show(){const t=MSG[si];$("cnt").textContent=(si+1)+" / "+MSG.length;$("mg").textContent=t;const y=$("my");y.textContent="";typing=true;skipT=false;
+$("nextBtn").textContent=si==MSG.length-1?"Promise korbo 🥺":"Next 💗";
+for(let i=1;i<=t.length&&!skipT;i++){y.textContent=t.slice(0,i);await sleep(26)}y.textContent=t;typing=false}
+function nextS(e){if(e)burst(e.clientX,e.clientY,16,4);if(typing){skipT=true;return}
+if(si>=MSG.length-1){go("promise");return}
+si++;const c=$("mcard");c.classList.remove("swap");void c.offsetWidth;c.classList.add("swap");show()}
+$("nextBtn").onclick=nextS;$("mcard").onclick=nextS;
 
 /* open */
 $("openBtn").onclick=async()=>{const b=$("openBtn").getBoundingClientRect();
 burst(b.left+b.width/2,b.top+b.height/2,130,9);for(let i=0;i<24;i++)petal();
-$("flash").classList.add("on");await sleep(750);
-$("hero").style.display="none";$("main").hidden=false;document.body.classList.remove("locked");scrollTo(0,0);
-document.querySelectorAll(".rv").forEach(e=>io.observe(e));$("flash").classList.remove("on")};
+$("flash").classList.add("on");await sleep(750);go("msgs");nextS();$("flash").classList.remove("on")};
 
 /* promise -> Firebase (each submission is a new unique push id) */
 let saving=false,saved=false;
@@ -220,37 +209,28 @@ if(completed)success();else{$("yesBtn").hidden=$("notBtn").hidden=true;$("perr")
 catch(e){console.error(e);$("perr").textContent="Save hoy ni ("+(e.code||e.message||"network error")+"). Connection check kore abar try koro.";$("yesBtn").disabled=$("notBtn").disabled=false;$("yesBtn").textContent=$("yesBtn").dataset.o}
 finally{saving=false}}
 async function success(){explode();const c=$("cine");c.textContent="Promise ta save hoye gelo ❤️";c.classList.add("on");await sleep(2600);c.classList.remove("on");
-$("final").hidden=false;$("final").scrollIntoView({behavior:"smooth"});await sleep(900);
+go("final");await sleep(900);
 await typeTo($("f1"),"Oky, promish dilam. ❤️",70);await sleep(700);await typeTo($("f2"),"Sorry... 🥺",90);await sleep(700);
 await typeTo($("f3"),"Thank you for being a part of my life, Mimi. I hope we keep choosing each other.",38)}
 $("yesBtn").onclick=()=>submit(true);$("notBtn").onclick=()=>submit(false);
 
-/* hidden admin: double-press A opens it; real access = Firebase Auth + rules */
+/* hidden admin: press A twice. No login (read access is controlled by the database rules). */
 let rows=[],unsub=null,panel=false;
-function stopData(){if(unsub){unsub();unsub=null}rows=[];render()}
-function startData(){if(unsub||!auth.currentUser)return;
-unsub=onValue(subs,s=>{rows=toList(s);showData(true);render()},e=>{unsub=null;denied(e)})}
 const toList=s=>Object.entries(s.val()||{}).map(([id,v])=>({id,...v}));
-function showData(ok){$("aData").hidden=!ok;if(ok)$("aAuth").textContent="Signed in: "+(auth.currentUser?.email||"admin")}
-function denied(e){showData(false);const a=$("aAuth");a.textContent="";a.append(el("p","err","Ei account authorized na ("+(e.code||e.message)+")."),
-el("p","meta","Firebase console → Realtime Database → Data te  admins / "+auth.currentUser.uid+" = true  add koro, tarpor Refresh koro."))}
-function authUI(u){const a=$("aAuth");$("aOut").hidden=!u;
-if(!u){stopData();showData(false);a.textContent="";const b=el("button","btn","Google diye Sign in");b.onclick=async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){a.append(el("p","err","Sign in hoy ni: "+(e.code||e.message)))}};a.append(el("p","sub","Admin hishebe sign in koro (authorized account lagbe)."),b)}
-else if(panel)startData()}
-onAuthStateChanged(auth,authUI);
-function render(){const L=$("aList");L.textContent="";const s=[...rows].sort((a,b)=>b.submittedAt-a.submittedAt);
-$("sT").textContent=s.length;$("sC").textContent=s.filter(r=>r.completed).length;$("sN").textContent=s.filter(r=>!r.completed).length;
-if(!s.length){L.append(el("p","sub","Ekhono kono submission nai."));return}
-for(const r of s){const c=el("div","glass ac"),h=el("div","h");
-h.append(el("b","",r.name||"-"),el("span",r.completed?"ok":"wa",r.completed?"✔ Completed":"… Not completed"));
-const ul=el("ul");PR.forEach((t,i)=>{const y=r.promises&&r.promises["p"+(i+1)];ul.append(el("li",y?"ok":"wa",(y?"✔ ":"✖ ")+t))});
-const m=el("p","meta",`${r.date||""} ${r.time||""} · ${r.acceptedCount??0}/6 accepted`);
-const d=el("button","btn sm ghost","Delete");d.onclick=async()=>{if(confirm("Ei submission delete korbe?"))try{await remove(ref(db,"promiseSubmissions/"+r.id))}catch(e){alert("Delete hoy ni: "+(e.code||e.message))}};
-c.append(h,ul);if(r.optionalMessage)c.append(el("p","msg","“"+r.optionalMessage+"”"));c.append(m,d);L.append(c)}}
-$("aRef").onclick=async()=>{if(!auth.currentUser)return;try{rows=toList(await get(subs));showData(true);render()}catch(e){denied(e)}};
-$("aOut").onclick=()=>signOut(auth);
-const openAdmin=()=>{panel=true;$("admin").classList.add("open");authUI(auth.currentUser)};
-const closeAdmin=()=>{panel=false;$("admin").classList.remove("open")};
+function startData(){if(unsub)return;unsub=onValue(subs,s=>{rows=toList(s);$("aErr").textContent="";render()},e=>{unsub=null;$("aErr").textContent="Data load hoy ni ("+(e.code||e.message)+"). Rules e promiseSubmissions er .read true ache kina dekho."})}
+function card(r,last){const c=el("div","glass ac"),h=el("div","h");
+h.append(el("span","bd "+(r.completed?"y":"n"),r.completed?"YES ✔":"NO ✖"),el("span","meta",(last?"Last answer · ":"")+(r.date||"")+" "+(r.time||"")));
+const ul=el("ul");PR.forEach((t,i)=>{const y=r.promises&&r.promises["p"+(i+1)];ul.append(el("li",y?"ok":"no",(y?"✔ ":"✖ ")+t))});
+c.append(h,el("p","meta",(r.name||"-")+" · "+(r.acceptedCount??0)+"/6 promise accepted"),ul);
+if(r.optionalMessage)c.append(el("p","msg","“"+r.optionalMessage+"”"));return c}
+function render(){const s=[...rows].sort((a,b)=>b.submittedAt-a.submittedAt),y=s.filter(r=>r.completed).length;
+$("sT").textContent=s.length;$("sC").textContent=y;$("sN").textContent=s.length-y;
+const A=$("aLast"),L=$("aList");A.textContent="";L.textContent="";
+if(!s.length){A.append(el("p","sub","Ekhono kono answer ashe ni."));return}
+A.append(card(s[0],true));s.slice(1).forEach(r=>L.append(card(r,false)))}
+$("aRef").onclick=async()=>{try{rows=toList(await get(subs));$("aErr").textContent="";render()}catch(e){$("aErr").textContent="Refresh hoy ni: "+(e.code||e.message)}};
+const openAdmin=()=>{panel=true;$("admin").classList.add("open");startData()};
+const closeAdmin=()=>{panel=false;$("admin").classList.remove("open");if(unsub){unsub();unsub=null}};
 $("aClose").onclick=closeAdmin;
 let lastA=0;
 addEventListener("keydown",e=>{if(e.key==="Escape"){closeAdmin();return}
